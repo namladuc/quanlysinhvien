@@ -125,36 +125,126 @@ def login():
     return render_template('general/login.html',
                            truong = session['truong'])
 
+@login_required
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect(url_for("login"))
 
+@login_required
 @app.route("/home")
 def home():
     return render_template(session['role'] + 'index.html',
                     my_user = session['username'],
                     truong = session['truong'])
 
-# -------------------------- Khoa -------------------------
 
+# -------------------------- Khoa -------------------------
+@login_required
 @app.route('/form_add_khoa')
 def form_add_khoa():
     return "Error"
 
+@login_required
 @app.route("/view_all_khoa")
 def view_all_khoa():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT k.*, COUNT(n.ma_nganh)
+                FROM khoa k
+                JOIN nganh n ON k.ma_khoa = n.ma_khoa
+                WHERE n.is_delete = 0
+                """)
+    cac_khoa = cur.fetchall()
+    
     return render_template(session['role'] + 'khoa/view_all_khoa.html',
+                           cac_khoa = cac_khoa,
                            my_user = session['username'],
                            truong = session['truong'])
 
+@login_required
+@app.route("/view_khoa/<string:ma_khoa>")
+def view_khoa(ma_khoa):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT *
+                FROM khoa k
+                where k.ma_khoa = %s
+                """, (ma_khoa, ))
+    khoa = cur.fetchall()
+    
+    if (len(khoa) == 0):
+        return "Error"
+    
+    cur.execute("""
+                SELECT n.ma_nganh, n.ten_nganh, n.hinh_thuc_dao_tao,
+                lh.ma_he, lh.ten_he, lh.hoc_phi_tin_chi,
+                FROM nganh n 
+                JOIN loai_he lh ON lh.ma_he = n.ma_he
+                WHERE n.is_delete = 0 AND n.ma_khoa = %s
+                """, (ma_khoa, ))
+    cac_nganh = cur.fetchall()
+    
+    return render_template(session['role'] + 'khoa/view_khoa.html',
+                           khoa = khoa,
+                           cac_nganh = cac_nganh,
+                           my_user = session['username'],
+                           truong = session['truong'])
+    
 # -------------------------- Khoa -------------------------
+
+
+# -------------------------- Nganh -------------------------
+
+@login_required
+@app.route('/view_all_nganh')
+def view_all_nganh():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT n.ma_nganh, n.ten_nganh, n.hinh_thuc_dao_tao, k.ten_khoa, lh.ten_he
+                FROM nganh n
+                JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                JOIN loai_he lh ON lh.ma_he = n.ma_he
+                WHERE n.is_delete = 0
+                """)
+    cac_nganh = cur.fetchall()
+    
+    return render_template(session['role'] + 'nganh/view_all_nganh.html',
+                           cac_nganh = cac_nganh,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route('/view_nganh/<string:ma_nganh>')
+def view_nganh(ma_nganh):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT *
+                FROM nganh n
+                WHERE n.is_delete = 0 AND n.ma_nganh = %s
+                """, (ma_nganh, ))
+    nganh = cur.fetchall()
+    
+    return render_template(session['role'] + 'nganh/view_nganh.html',
+                           nganh = nganh,
+                           my_user = session['username'],
+                           truong = session['truong'])
+# -------------------------- Nganh -------------------------
+
 
 # -------------------------- Sinh vien -------------------------
 
+@login_required
 @app.route("/bang_sinh_vien")
 def bang_sinh_vien():
-    return render_template('sinhvien/bang_sinh_vien.html')  
+    cur = mysql.connection.cursor()
+    return render_template('sinhvien/bang_sinh_vien.html',
+                           my_user = session['username'],
+                           truong = session['truong'])  
 
 """
     - View table sinh vien:
