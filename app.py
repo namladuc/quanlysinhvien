@@ -242,21 +242,452 @@ def view_nganh(ma_nganh):
 @app.route("/bang_sinh_vien")
 def bang_sinh_vien():
     cur = mysql.connection.cursor()
-    return render_template('sinhvien/bang_sinh_vien.html',
+    
+    cur.execute("""
+                 SELECT sv.ma_sinh_vien, sv.ho_ten, sv.gioi_tinh, sv.noi_sinh, l.ten_lop,
+                 n.ten_nganh, sv.email, sv.so_dien_thoai, sv.chung_minh_thu
+                FROM sinh_vien sv
+                JOIN sinh_vien_lop svl ON sv.ma_sinh_vien = svl.ma_sinh_vien
+                JOIN lop l ON svl.ma_lop = l.ma_lop
+                JOIN nganh n ON l.ma_nganh = n.ma_nganh
+                WHERE sv.is_delete = 0
+                """)
+    sinh_vien = cur.fetchall()
+    
+    return render_template(session['role'] +'sinhvien/bang_sinh_vien.html',
+                           sinh_vien = sinh_vien,
                            my_user = session['username'],
                            truong = session['truong'])  
 
-"""
-    - View table sinh vien:
-        SELECT sv.ma_sinh_vien, img.path_to_img, sv.ho_ten, sv.gioi_tinh, 
-        FROM sinh_vien sv
-        JOIN sinh_vien_lop svl ON sv.ma_sinh_vien = svl.ma_sinh_vien
-        JOIN lop l ON svl.ma_lop = l.ma_lop
-        JOIN khoa k ON l.ma_khoa = k.ma_khoa
-        JOIN nganh n ON l.ma_nganh = n.ma_nganh
-        JOIN loai_he h ON n.ma_he = h.ma_he
-        JOIN image_data img ON sv.id_image = img.id_image
-        WHERE sv.is_delete == 0
+@login_required
+@app.route("/delete_sinh_vien/<string:ma_sinh_vien>")
+def delete_sinh_vien(ma_sinh_vien):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                UPDATE sinh_vien
+                SET is_delete = 1
+                WHERE ma_sinh_vien = %s
+                """, (ma_sinh_vien, ))
+    
+    mysql.connection.commit()
+    return redirect(url_for('bang_sinh_vien'))
+
+@login_required
+@app.route("/bang_sinh_vien/form_view_update_sinh_vien/<string:ma_sinh_vien>_<string:can_edit>", methods=['GET','POST'])
+def form_view_update_sinh_vien(ma_sinh_vien, can_edit):
+    mode = "disabled"
+    if (can_edit == "Y"):
+        mode = ""
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                 SELECT sv.*, img.path_to_image, CONCAT(l.ten_lop, " _ ", n.ten_nganh, " _ ", k.ten_khoa), l.ma_lop
+                FROM sinh_vien sv
+                JOIN sinh_vien_lop svl ON sv.ma_sinh_vien = svl.ma_sinh_vien
+                JOIN lop l ON svl.ma_lop = l.ma_lop
+                JOIN nganh n ON l.ma_nganh = n.ma_nganh
+                JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                JOIN image_data img ON img.id_image = sv.id_image
+                WHERE sv.is_delete = 0 AND sv.ma_sinh_vien = %s
+                """, (ma_sinh_vien, ))
+    data_default = cur.fetchall()
+    
+    if (len(data_default) == 0):
+        return "Error"
+    
+    data_default = data_default[0]
+    
+    cur.execute("""
+                SELECT l.ma_lop, 
+                CONCAT(l.ten_lop, " _ ", n.ten_nganh, " _ ", k.ten_khoa)
+                FROM lop l 
+                JOIN nganh n ON l.ma_nganh = n.ma_nganh
+                JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                WHERE l.ma_lop != %s
+                """, (data_default[-1],))
+    cac_lop = cur.fetchall()
+    
+    if request.method == 'POST':
+        details = request.form
+        ma_sinh_vien = data_default[0]
+        ho_ten = details['ho_ten'].strip()
+        ngay_sinh = details['ngay_sinh'].strip()
+        gioi_tinh = details['gioi_tinh'].strip()
+        dan_toc = details['dan_toc'].strip()
+        quoc_tich = details['quoc_tich'].strip()
+        noi_sinh = details['noi_sinh'].strip()
+        email = details['email'].strip()
+        dia_chi = details['dia_chi'].strip()
+        so_dien_thoai = details['so_dien_thoai'].strip()
+        chung_minh_thu = details['chung_minh_thu'].strip()
+        ngay_cmt = details['ngay_cmt'].strip()
+        noi_cmt = details['noi_cmt'].strip()
+        id_image = data_default[13]
         
-"""
+        ma_lop = details['ma_lop'].strip()
+        image_profile = request.files['ImageProfileUpload']
+        
+        if image_profile.filename != '':
+            ID_image = "Image_Profile_" + str(ma_sinh_vien) 
+            id_image = ID_image
+            filename = ID_image + "." + secure_filename(image_profile.filename).split(".")[1]
+            pathToImage = app.config['UPLOAD_FOLDER_IMG'] + "/" + filename
+            image_profile.save(pathToImage)
+            take_image_to_save(ID_image, pathToImage)
+            
+
+        if ma_lop != data_default[-2]:
+            for elm in cac_lop:
+                if elm[1] == ma_lop:
+                    ma_lop = elm[0]
+                    break
+            cur.execute("""
+                        UPDATE sinh_vien_lop
+                        SET ma_lop = %s
+                        WHERE ma_sinh_vien = %s AND ma_lop = %s
+                        """, (ma_lop, ma_sinh_vien, data_default[-1]))
+            mysql.connection.commit()
+        
+        cur.execute("""
+                    UPDATE sinh_vien
+                    SET ho_ten = %s, gioi_tinh = %s, ngay_sinh = %s, quoc_tich = %s,
+                    dan_toc = %s, chung_minh_thu = %s, ngay_cmt = %s, noi_cmt = %s,
+                    dia_chi = %s, noi_sinh = %s, email = %s, so_dien_thoai = %s, id_image = %s, update_at = current_timestamp(), 
+                    update_by = %s
+                    WHERE ma_sinh_vien = %s
+                    """, (ho_ten, gioi_tinh, ngay_sinh, quoc_tich, dan_toc, chung_minh_thu, ngay_cmt, noi_cmt, dia_chi,
+                          noi_sinh, email, so_dien_thoai, id_image, session['username'][6], ma_sinh_vien))
+        
+        if (ma_sinh_vien == session['username'][3]):
+                cur.execute("""SELECT us.*, sv.ho_ten, img.path_to_image
+                    FROM user us
+                    JOIN sinh_vien sv ON sv.ma_sinh_vien = us.ma_nguoi_dung 
+                    JOIN image_data img ON img.id_image = nql.id_image
+                    WHERE username=%s""",(ma_sinh_vien,))
+                user_data = cur.fetchall()
+                
+                my_user = user_data[0]
+        
+                session['username'] = my_user
+        
+        mysql.connection.commit()
+        return redirect(url_for("bang_sinh_vien"))
+    
+    return render_template(session['role'] +'sinhvien/form_view_update_sinh_vien.html',
+                           mode = mode,
+                           sinh_vien = data_default,
+                           cac_lop = cac_lop,
+                           my_user = session['username'],
+                           truong = session['truong']) 
+
+@login_required
+@app.route("/bang_sinh_vien/form_add_sinh_vien_upload_file", methods=['GET','POST'])
+def form_add_sinh_vien_upload_file():
+    if request.method == 'POST':
+        data_file = request.files['FileDataUpload']
+        if data_file.filename != '':
+            if data_file.filename.split(".")[-1] not in ['txt', 'xlsx', 'csv', 'xls', 'xlsm']:
+                return redirect(url_for("form_add_data_employees_upload_file"))
+            filename = "TMP_" + data_file.filename 
+            pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
+            data_file.save(pathToFile)
+            return redirect(url_for("form_add_sinh_vien_upload_process", filename=filename))
+        return redirect(url_for("form_add_sinh_vien_upload_file"))
+    return render_template(session['role'] +'sinhvien/form_add_sinh_vien_upload_file.html',
+                           my_user = session['username'],
+                           truong = session['truong']) 
+
+@login_required
+@app.route("/bang_sinh_vien/form_add_sinh_vien_upload_process/<string:filename>", methods=['GET','POST'])
+def form_add_sinh_vien_upload_process(filename):
+    
+    pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
+    
+    default_tag_column = ['ma_sinh_vien', 'ho_ten', 'gioi_tinh', 'ngay_sinh', 'noi_sinh',
+                    'email', 'dan_toc', 'dia_chi', 'so_dien_thoai', 'quoc_tich',
+                    'chung_minh_thu', 'ngay_cmt', 'noi_cmt', 'ma_lop']
+    
+    default_name_column = ['Mã Sinh Viên', 'Họ tên', 'Giới tính', 'Ngày sinh', 'Nơi sinh',
+                           'Email', 'Dân tộc', 'Địa chỉ', 'Số điện thoại', 'Quốc tịch',
+                           'CMT / Thẻ căn cước', 'Nơi cấp CMT', 'Ngày cấp CMT', 'Mã Lớp']
+    
+    data_sv = pd.read_excel(pathToFile)
+    data_column = list(data_sv.columns)
+    
+    if (len(data_column) > len(default_tag_column)) or len(data_column) < 3:
+        return "Error"
+        
+    if request.method == 'POST':
+        cur = mysql.connection.cursor()
+        details = request.form
+        column_link = [details[col] for col in data_column]
+        column_match = [default_name_column.index(elm) for elm in column_link]
+        
+        if (len(set(column_match)) != len(column_link)):
+            return "Error"
+        
+        if 0 not in column_match or 1 not in column_match or 2 not in column_match:
+            return "Error"
+        if 3 not in column_match or 4 not in column_match or 13 not in column_match:
+            return "Error"
+        
+        # Kiểm tra xem mã lớp có tồn tại không
+        tmp = tuple(set(data_sv[data_column[column_match.index(13)]]))
+        if len(tmp) == 1:
+            cur.execute("SELECT ma_lop FROM lop WHERE ma_lop = %s", tmp)
+        else:
+            new_tmp = ["\"" + text +"\"" for text in tmp]
+            cur.execute("SELECT ma_lop FROM lop WHERE ma_lop IN (" + ", ".join(new_tmp) + ")")
+        data_tuple = cur.fetchall()
+        data_tmp_take = []
+        for elm in data_tuple:
+            data_tmp_take.append(elm[0])
+        if (len(data_tmp_take) != len(tmp)):
+            return "Error"
+        
+        # Tách cột mã lớp ra so với các cột còn lại để import vào bảng khác
+        msv_ma_lop = data_sv[[data_column[column_match.index(0)], data_column[column_match.index(13)]]]
+        col_ma_lop = [data_column[column_match.index(0)], data_column[column_match.index(13)]]
+        data_sv = data_sv.drop(data_column[column_match.index(13)], axis=1)
+        data_column.remove(data_column[column_match.index(13)])
+        column_match.remove(13)
+        
+        sql = "INSERT INTO `sinh_vien` ("
+        for index in column_match:
+            sql += default_tag_column[index] + ","
+        sql += 'created_by'
+        sql += ") VALUES "
+        for index_row in range(data_sv.shape[0]):
+            sql += "("
+            for col in data_column:
+                sql +=  "\"" + str(data_sv[col][index_row]) + "\"" + ","
+            sql += "\"" + session['username'][6] + "\""
+            sql += "),"
+        sql = sql[:-1:]    
+        cur.execute(sql)
+        
+        sql = "INSERT INTO `sinh_vien_lop` ( ma_sinh_vien, ma_lop ) VALUES "
+        for index_row in range(msv_ma_lop.shape[0]):
+            sql += "("
+            for col in col_ma_lop:
+                sql += "\"" + str(msv_ma_lop[col][index_row]) + "\"" + ","
+            sql = sql[:-1:]
+            sql += "),"
+        sql = sql[:-1:]
+        
+        cur.execute(sql)
+        mysql.connection.commit()
+        os.remove(pathToFile)
+        return redirect(url_for("bang_sinh_vien"))        
+        
+    return render_template(session['role'] +"sinhvien/form_add_data_sinh_vien_upload_process.html",
+                           filename = filename,
+                           truong = session['truong'],
+                           my_user = session['username'],
+                           name_column = default_name_column,
+                           index_column = data_column)
+    
+@login_required
+@app.route("/get_table_sinh_vien_excel")
+def get_table_sinh_vien_excel():
+    cur = mysql.connection.cursor()
+    cur.execute("""
+                SELECT sv.ma_sinh_vien, sv.ho_ten, sv.gioi_tinh, sv.ngay_sinh, sv.noi_sinh, svl.ma_lop
+                FROM sinh_vien sv
+                JOIN sinh_vien_lop svl ON sv.ma_sinh_vien = svl.ma_sinh_vien
+                WHERE sv.is_delete = 0
+                """)
+    sinh_vien = cur.fetchall()
+    columnName = ['MaSinhVien','HoTen','GioiTinh','NgaySinh','NoiSinh','MaLop']
+    data = pd.DataFrame.from_records(sinh_vien, columns=columnName)
+    data = data.set_index('MaSinhVien')
+    pathFile = app.config['SAVE_FOLDER_EXCEL'] + "/" + "Data_Sinh_Vien.xlsx"
+    data.to_excel(pathFile)
+    return send_file(pathFile, as_attachment=True)
+    
+@login_required
+@app.route('/get_table_sinh_vien_pdf')
+def get_table_sinh_vien_pdf():
+    pathFile = app.config['SAVE_FOLDER_PDF']  + '/Table Sinh Vien.pdf'
+    pdfkit.from_url("/".join(request.url.split("/")[:-1:]) + '/table_print_sinh_vien',pathFile)
+    return send_file(pathFile, as_attachment=True)
+    
+@login_required
+@app.route("/bang_sinh_vien/form_add_sinh_vien", methods=['GET','POST'])
+def form_add_sinh_vien():
+    
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT l.ma_lop, 
+                CONCAT(l.ten_lop, " _ ", n.ten_nganh, " _ ", k.ten_khoa)
+                FROM lop l 
+                JOIN nganh n ON l.ma_nganh = n.ma_nganh
+                JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                """)
+    cac_lop = cur.fetchall()
+    
+    if request.method == 'POST':
+        details = request.form
+        ma_sinh_vien = details['ma_sinh_vien'].strip()
+        ho_ten = details['ho_ten'].strip()
+        ngay_sinh = details['ngay_sinh'].strip()
+        gioi_tinh = details['gioi_tinh'].strip()
+        dan_toc = details['dan_toc'].strip()
+        quoc_tich = details['quoc_tich'].strip()
+        noi_sinh = details['noi_sinh'].strip()
+        email = details['email'].strip()
+        dia_chi = details['dia_chi'].strip()
+        so_dien_thoai = details['so_dien_thoai'].strip()
+        chung_minh_thu = details['chung_minh_thu'].strip()
+        ngay_cmt = details['ngay_cmt'].strip()
+        noi_cmt = details['noi_cmt'].strip()
+        id_image = "none_image_profile"
+        
+        ma_lop = details['ma_lop'].strip()
+        
+        for elm in cac_lop:
+            if elm[1] == ma_lop:
+                ma_lop = elm[0]
+                break
+        
+        cur.execute("""SELECT ma_sinh_vien FROM sinh_vien WHERE ma_sinh_vien=%s""", (ma_sinh_vien, ))
+        kiem_tra_ma_sinh_vien = cur.fetchall()
+        
+        if len(kiem_tra_ma_sinh_vien) != 0:
+            return render_template(session['role'] +'employees/form_add_data_employees.html',
+                        ma_err="True",
+                        my_user = session['username'],
+                        truong = session['truong']) 
+            
+        image_profile = request.files['ImageProfileUpload']
+        
+        if image_profile.filename != '':
+            ID_image = "Image_Profile_" + ma_sinh_vien 
+            filename = ID_image + "." + secure_filename(image_profile.filename).split(".")[1]
+            pathToImage = app.config['UPLOAD_FOLDER_IMG'] + "/" + filename
+            image_profile.save(pathToImage)
+            take_image_to_save(ID_image, pathToImage)
+            
+        cur.execute("""
+                    INSERT INTO `sinh_vien` 
+                    (`ma_sinh_vien`, `ho_ten`, `gioi_tinh`, `ngay_sinh`, `noi_sinh`,
+                    `email`, `dan_toc`, `dia_chi`, `so_dien_thoai`, `quoc_tich`,
+                    `chung_minh_thu`, `ngay_cmt`, `noi_cmt`, `id_image`, `is_delete`,
+                    `created_at`, `created_by`, `update_at`, `update_by`) 
+                    VALUES 
+                    (%s, %s, %s, %s, %s, %s, %s, %s, 
+                    %s, %s, %s, %s, %s, %s, 
+                    '0', current_timestamp(), %s, current_timestamp(), NULL);
+                    """, (ma_sinh_vien, ho_ten, gioi_tinh, ngay_sinh, noi_sinh, email,
+                          dan_toc, dia_chi, so_dien_thoai, quoc_tich, chung_minh_thu, 
+                          ngay_cmt, noi_cmt, id_image, session['username'][6]))
+        
+        cur.execute("""
+                    INSERT INTO sinh_vien_lop (ma_sinh_vien, ma_lop)
+                    VALUES (%s, %s)
+                    """, (ma_sinh_vien, ma_lop))
+        
+        mysql.connection.commit()
+        return redirect(url_for("bang_sinh_vien"))
+        
+    return render_template(session['role'] +'sinhvien/form_add_sinh_vien.html',
+                           cac_lop = cac_lop,
+                           my_user = session['username'],
+                           truong = session['truong']) 
+
+@login_required
+@app.route("/form_infomation_one_sinh_vien/<string:ma_sinh_vien>")
+def form_infomation_one_sinh_vien(ma_sinh_vien):
+    
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                 SELECT sv.*, img.path_to_image, CONCAT(l.ten_lop, " _ ", n.ten_nganh, " _ ", k.ten_khoa), l.ma_lop
+                FROM sinh_vien sv
+                JOIN sinh_vien_lop svl ON sv.ma_sinh_vien = svl.ma_sinh_vien
+                JOIN lop l ON svl.ma_lop = l.ma_lop
+                JOIN nganh n ON l.ma_nganh = n.ma_nganh
+                JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                JOIN image_data img ON img.id_image = sv.id_image
+                WHERE sv.is_delete = 0 AND sv.ma_sinh_vien = %s
+                """, (ma_sinh_vien, ))
+    data_default = cur.fetchall()
+    
+    if (len(data_default) == 0):
+        return "Error"
+    
+    data_default = data_default[0]
+    
+    cur.execute("SELECT * FROM truong")
+    truong = cur.fetchall()
+    truong = truong[0]
+    
+    return render_template("sinhvien/form_infomation_one_sinh_vien.html",
+                           sinh_vien = data_default,
+                           truong = truong)
+
+@login_required
+@app.route("/get_pdf_one_sinh_vien/<string:ma_sinh_vien>")
+def get_pdf_one_sinh_vien(ma_sinh_vien):
+    pathFile = app.config['SAVE_FOLDER_PDF']  + '/Sinh Vien_' + ma_sinh_vien + '.pdf'
+    pdfkit.from_url("/".join(request.url.split("/")[:-2:]) + '/form_infomation_one_sinh_vien/' + ma_sinh_vien,pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
+@app.route("/table_print_sinh_vien")
+def table_print_sinh_vien():
+    
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                 SELECT sv.ma_sinh_vien, sv.ho_ten, sv.gioi_tinh, sv.noi_sinh, l.ten_lop,
+                 n.ten_nganh, sv.email, sv.so_dien_thoai, sv.chung_minh_thu
+                FROM sinh_vien sv
+                JOIN sinh_vien_lop svl ON sv.ma_sinh_vien = svl.ma_sinh_vien
+                JOIN lop l ON svl.ma_lop = l.ma_lop
+                JOIN nganh n ON l.ma_nganh = n.ma_nganh
+                WHERE sv.is_delete = 0
+                """)
+    sinh_vien = cur.fetchall()
+    
+    return render_template('sinhvien/table_print_sinh_vien.html', 
+                           sinh_vien =  sinh_vien) 
+
+
 # -------------------------- Sinh vien -------------------------
+
+def take_image_to_save(id_image, path_to_img):
+    cur = mysql.connection.cursor()
+    cur.execute("""SELECT * FROM image_data""")
+    img_data = cur.fetchall()
+    change_path = False
+    
+    path_to_img = "/".join(path_to_img.split("/")[1::])
+    
+    for data in img_data:
+        if id_image in data:
+            change_path = True
+            if os.path.exists(data[1]):
+                os.remove(data[1])
+            break
+    
+    if change_path:
+        sql = """
+            UPDATE image_data
+            SET path_to_image = %s
+            WHERE id_image = %s"""
+        val = (id_image, path_to_img)
+        cur.execute(sql,val)
+        mysql.connection.commit()
+        return True
+    
+    sql = """
+        INSERT INTO image_data (id_image, path_to_image) 
+        VALUES (%s, %s)"""
+    val = (id_image, path_to_img)
+    cur.execute(sql,val)
+    mysql.connection.commit()
+    return True
+    

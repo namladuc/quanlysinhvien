@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+{% block title %} Cập nhật sinh viên {% endblock title %}
+{% block content %}
+<!-- Add Update -->
+<link rel="stylesheet" href="{{ url_for('static', filename='doc/css/addupdate.css') }}">
+<style>
+    .Choicefile {
+      display: block;
+      background: #14142B;
+      border: 1px solid #fff;
+      color: #fff;
+      width: 150px;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      padding: 5px 0px;
+      border-radius: 5px;
+      font-weight: 500;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .Choicefile:hover {
+      text-decoration: none;
+      color: white;
+    }
+
+    #uploadfile,
+    .removeimg {
+      display: none;
+    }
+
+    #thumbbox {
+      position: relative;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .removeimg {
+      height: 25px;
+      position: absolute;
+      background-repeat: no-repeat;
+      top: 5px;
+      left: 5px;
+      background-size: 25px;
+      width: 25px;
+      /* border: 3px solid red; */
+      border-radius: 50%;
+
+    }
+
+    .removeimg::before {
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+      content: '';
+      border: 1px solid red;
+      background: red;
+      text-align: center;
+      display: block;
+      margin-top: 11px;
+      transform: rotate(45deg);
+    }
+
+    .removeimg::after {
+      /* color: #FFF; */
+      /* background-color: #DC403B; */
+      content: '';
+      background: red;
+      border: 1px solid red;
+      text-align: center;
+      display: block;
+      transform: rotate(-45deg);
+      margin-top: -2px;
+    }
+  </style>
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb">
+            <li class="breadcrumb-item"><a href="/bang_sinh_vien">Danh sách sinh viên</a></li>
+            <li class="breadcrumb-item active"><a href="">Xem - sửa sinh viên</a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+
+            <div class="tile">
+
+                <h3 class="tile-title">Xem - sửa sinh viên</h3>
+                <div class="tile-body">
+                    <div class="row element-button">
+                        <div class="col-sm-2">
+                            <a class="btn btn-delete btn-sm print-file" type="button" title="In"
+                                onclick="myApp.printSinhVien()"><i class="fas fa-print"></i>In thông tin</a>
+                        </div>
+                        <div class="col-sm-2">
+                            <a class="btn btn-delete btn-sm pdf-file" type="button" title="Xuất PDF" href="/get_pdf_one_sinh_vien/{{sinh_vien[0]}}"><i
+                                    class="fas fa-file-pdf"></i> Xuất PDF</a>
+                        </div>
+
+                    </div>
+                    <form class="row" action="/bang_sinh_vien/form_view_update_sinh_vien/{{sinh_vien[0]}}_Y" method="post" enctype="multipart/form-data">
+                        <!-- btn -->
+                        <div class="col-md-12">
+                            {% if mode != "" %}
+                            <a class="btn btn-info" href="/bang_sinh_vien/form_view_update_sinh_vien/{{sinh_vien[0]}}_Y" style="width: 100px; border-radius: 10px;">Sửa</a>
+                            {% endif %}
+
+                            {% if mode == "" %}
+                            <input type="submit" name="submit" id="reset" value="Lưu" class="btn btn-save"
+                                style="width: 100px; border-radius: 10px;">
+
+                            <a class="btn btn-danger" href="/bang_sinh_vien/form_view_update_sinh_vien/{{sinh_vien[0]}}_N"
+                                style="width: 100px; border-radius: 10px;">Hủy</a>
+                            {% endif %}
+
+                            <a href="/bang_sinh_vien" class="btn btn-secondary"
+                                style="width: 100px; border-radius: 10px;">Quay lại</a>
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Mã sinh viên</label>
+                                        <input type="text" class="form-control" value="{{sinh_vien[0]}}" id="empno" name="ma_sinh_vien"
+                                            disabled>
+                                        <span id="available"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Họ và tên</label>
+                                        <input type="text" class="form-control" value="{{sinh_vien[1]}}" id="empname" name="ho_ten"
+                                            {{mode}}>
+                                        <span id="available"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="control-label">Giới tính</label>
+                                    <select class="form-control" id="exampleSelect2" name="gioi_tinh" {{mode}}>
+                                        <option>{{sinh_vien[2]}}</option>
+                                        <option>Nam</option>
+                                        <option>Nữ</option>
+                                    </select>
+                                    </fieldset>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Ngày sinh (Định dạng: Tháng - Ngày - Năm)</label>
+                                        <input type="date" class="form-control" value="{{sinh_vien[3]}}" name="ngay_sinh"
+                                            id="Date_Birth" {{mode}}>
+                                        <span id="available"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Quốc tịch</label>
+                                        <input class="form-control" value="{{sinh_vien[9]}}" type="text"
+                                            name="quoc_tich" {{mode}}>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Dân tộc</label>
+                                        <input type="text" class="form-control" value="{{sinh_vien[6]}}" name="dan_toc" id="national" {{mode}}>
+                                        <span id="available"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">CMND/CCCD</label>
+                                        <input type="text" class="form-control" value="{{sinh_vien[10]}}" name="chung_minh_thu" {{mode}}>
+                                        <span id="available"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Ngày cấp (Định dạng: Tháng - Ngày - Năm)</label>
+                                        <input type="date" class="form-control" value="{{sinh_vien[11]}}" name="ngay_cmt" id="cmtday"
+                                        {{mode}}>
+                                        <span id="available"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label">Nơi cấp</label>
+                                        <input type="text" class="form-control" value="{{sinh_vien[12]}}" name="noi_cmt" id="cmtaddress"
+                                        {{mode}}>
+                                        <span id="available"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label">Lớp - Ngành - Khoa</label>
+                                        <select class="form-control" id="department" name="ma_lop" {{mode}}>
+                                            <option> {{sinh_vien[-2]}} </option>
+                                            {% for data in cac_lop %}
+                  
+                                            <option>{{data[1]}} </option>
+                          
+                                            {% endfor %}
+                                          </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Địa chỉ thường trú</label>
+                                        <textarea class="form-control" id="address" name="dia_chi" rows="2" {{mode}}>{{sinh_vien[7]}}</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Nơi sinh</label>
+                                        <textarea class="form-control" id="address" name="noi_sinh" rows="2" {{mode}}>{{sinh_vien[4]}}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- image -->
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div style="text-align: center;">
+                                        <img id="img-upload">
+                                        <div id="tem_img">
+                                            <img id="id_img_profile"
+                                                src="{{ url_for('static', filename=sinh_vien[-3])}}" alt="Ảnh"
+                                                width="170px" height="170px">
+                                            <a class="removeimg" href="javascript:"></a>
+                                        </div><br>
+                                        <div class="col-md-8"></div>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <span class="input-group-btn" style="margin-left: 130px;">
+                                                    <span id="Choicefile" class="btn btn-info btn-file">
+                                                        Ảnh(4x6) <input type="file" id="imginp"
+                                                            name="ImageProfileUpload" onchange="readURL(this)" {{mode}}>
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label">Email</label>
+                                        <input type="text" value="{{sinh_vien[5]}}" class="form-control" name="email" {{mode}}>
+                                        <span id="available"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label">Số điện thoại</label>
+                                        <input type="text" value="{{sinh_vien[8]}}" class="form-control"
+                                            name="so_dien_thoai" {{mode}}>
+                                        <span id="available"></span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <br><br>
+        </div>
+    </div>
+</main>
+<!-- Essential javascripts for application to work-->
+<script src="{{url_for('static', filename='doc/js/jquery-3.2.1.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/popper.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/bootstrap.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/main.js')}}"></script>
+<!-- The javascript plugin to display page loading on top-->
+<script src="{{url_for('static', filename='doc/js/plugins/pace.min.js')}}"></script>
+<script>
+    // get_information_one_employee
+    var myApp = new function () {
+        this.printSinhVien = function () {
+            var win = window.open('/form_infomation_one_sinh_vien/{{sinh_vien[0]}}', '', 'height=700,width=1400');
+            win.document.close();
+            win.print();
+        }
+    }
+    var img_default = "{{ url_for('static', filename=sinh_vien[-3])}}";
+    function readURL(input, thumbimage) {
+       
+      if (input.files && input.files[0]) { //Sử dụng  cho Firefox - chrome
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          $("#id_img_profile").attr('src', e.target.result);
+        }
+        reader.readAsDataURL(input.files[0]);
+      }
+      else { // Sử dụng cho IE
+        $("#id_img_profile").attr('src', input.value);
+
+      }
+      $("#id_img_profile").show();
+      $('.filename').text($("#imginp").val());
+      $('.Choicefile').css('background', '#14142B');
+      $('.Choicefile').css('cursor', 'default');
+      $(".removeimg").show();
+      $(".Choicefile").unbind('click');
+
+    }
+    $(document).ready(function () {
+        
+      $(".Choicefile").bind('click', function () {
+        $("#imginp").click();
+
+      });
+      $(".removeimg").click(function () {
+        $("#id_img_profile").attr('src', img_default);
+        $(".removeimg").hide();
+        $(".Choicefile").bind('click', function () {
+          $("#imginp").click();
+        });
+        $('.Choicefile').css('background', '#14142B');
+        $('.Choicefile').css('cursor', 'pointer');
+        $(".filename").text("");
+      });
+    })
+</script>
+{% endblock content %}

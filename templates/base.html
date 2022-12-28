@@ -47,7 +47,7 @@
         </div>
         <hr>
         <ul class="app-menu">
-            <li><a class="app-menu__item haha"><i class='app-menu__icon bx bx-user'></i>
+            <li><a class="app-menu__item haha" href=""><i class='app-menu__icon bx bx-user'></i>
                     <span class="app-menu__label">Quản lý</span></a></li>
             <li><a class="app-menu__item" href="/view_all_khoa"><i class='app-menu__icon bx bxs-school'></i><span
                         class="app-menu__label">Khoa</span></a></li>
@@ -67,20 +67,7 @@
                         class="app-menu__label">Cài đặt</span></a></li>
         </ul>
     </aside>
-
-    <script src="{{url_for('static', filename='doc/js/jquery-3.2.1.min.js')}}"></script>
-    <!--===============================================================================================-->
-    <script src="{{url_for('static', filename='doc/js/popper.min.js')}}"></script>
-    <script src="https://unpkg.com/boxicons@latest/dist/boxicons.js"></script>
-    <!--===============================================================================================-->
-    <script src="{{url_for('static', filename='doc/js/bootstrap.min.js')}}"></script>
-    <!--===============================================================================================-->
-    <script src="{{url_for('static', filename='doc/js/main.js')}}"></script>
-    <!--===============================================================================================-->
-    <script src="{{url_for('static', filename='doc/js/plugins/pace.min.js')}}"></script>
-    <!--===============================================================================================-->
-    <script src="{{url_for('static', filename='doc/js/plugins/chart.js')}}"></script>
-    <!--===============================================================================================-->
+    {% block content %}{% endblock content %}
     <script src="{{url_for('static', filename='js/displaytime/displaytime.js')}}"></script>
     <!--===============================================================================================-->
     <script src="{{url_for('static', filename='js/active/active.js')}}"></script>

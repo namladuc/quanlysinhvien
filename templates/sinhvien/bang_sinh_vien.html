@@ -1,2 +1,213 @@
 {% extends "base.html" %}
+{% block title %} Danh sách sinh viên {% endblock title %}
+{% block content %}
 
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item active"><a href="#"><b>Danh sách sinh viên</b></a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <div class="tile-body">
+
+                    <div class="row element-button">
+
+                        <div class="col-sm-2">
+                            <a class="btn btn-add btn-sm" href="/bang_sinh_vien/form_add_sinh_vien" title="Thêm sinh viên"><i
+                                    class="fas fa-plus"></i>
+                                Thêm sinh viên</a>
+                        </div>
+
+                        <div class="col-sm-2">
+                            <a class="btn btn-delete btn-sm nhap-tu-file" href="/bang_sinh_vien/form_add_sinh_vien_upload_file"
+                                type="button" title="Tải từ file"><i class="fas fa-file-upload"></i>Tải từ file</a>
+                        </div>
+
+                        <div class="col-sm-2">
+                          <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printSV()"><i
+                              class="fas fa-print"></i> In thông tin</a>
+                        </div>
+                        <div class="col-sm-2">
+                            <a class="btn btn-excel btn-sm" href="/get_table_sinh_vien_excel" title="Xuất Excel"><i
+                                    class="fas fa-file-excel"></i> Xuất Excel</a>
+                        </div>
+
+                        <div class="col-sm-2">
+                            <a class="btn btn-delete btn-sm pdf-file" type="button" title="Xuất PDF"
+                                href="/get_table_sinh_vien_pdf"><i class="fas fa-file-pdf"></i>Xuất PDF</a>
+                        </div>
+
+                        <div class="col-sm-2">
+                            <a class="btn btn-delete btn-sm" type="button" title="Xóa tất cả các phần tử đã chọn"
+                                onclick="deleteMoreRow(this)"><i class="fas fa-trash-alt"></i> Xóa phần tử đã chọn </a>
+                        </div>
+
+                    </div>
+                    <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0"
+                        border="0" id="sampleTable">
+                        <thead>
+                            <tr>
+                                <th width="10"><input type="checkbox" id="all"></th>
+                                <th>Mã sinh viên</th>
+                                <th >Họ và tên</th>
+                                <th >Giới tính</th>
+                                <th >Nơi sinh</th>
+                                <th >Tên lớp</th>
+                                <th >Tên ngành</th>
+                                <th>Email</th>
+                                <th >Số điện thoại</th>
+                                <th>CCCD/CMT</th>
+                                <th width="75">Tính năng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                          {% for data in sinh_vien %}
+                            <tr>
+                                <td width="10"><input type="checkbox" id="myChecker" name="check1" value="1"></td>
+                                <td>{{data[0]}}</td>
+                                <td>{{data[1]}}</td>
+                                <td>{{data[2]}}</td>
+                                <td>{{data[3]}}</td>
+                                <td>{{data[4]}}</td>
+                                <td>{{data[5]}}</td>
+                                <td>{{data[6]}}</td>
+                                <td>{{data[7]}}</td>
+                                <td>{{data[8]}}</td>
+                                <td class="table-td-center"><button class="btn btn-primary btn-sm trash" type="button"
+                                        title="Xóa" onclick="deleteRow({{data[0]}})"><i class="fas fa-trash-alt"></i>
+                                    </button>
+                                    <button class="btn btn-primary btn-sm edit" type="button" title="Sửa" id="show-emp">
+                                        <a href="/bang_sinh_vien/form_view_update_sinh_vien/{{data[0]}}_N"><i class="fa fa-eye"
+                                                aria-hidden="true"></i></a>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- Essential javascripts for application to work-->
+<script src="{{url_for('static', filename='doc/js/jquery-3.2.1.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/popper.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/bootstrap.min.js')}}"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="{{url_for('static', filename='doc/js/main.js')}}"></script>
+<!-- The javascript plugin to display page loading on top-->
+<script src="{{url_for('static', filename='doc/js/plugins/pace.min.js')}}"></script>
+<!-- Page specific javascripts-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+<!-- Data table plugin-->
+<!-- <script type="text/javascript" src="js/plugins/jquery.dataTables.min.js"></script> -->
+<script src="{{url_for('static', filename='doc/js/plugins/jquery.dataTables.min.js')}}"></script>
+<!-- <script type="text/javascript" src="js/plugins/dataTables.bootstrap.min.js"></script> -->
+<script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
+<script type="text/javascript">$('#sampleTable').DataTable();</script>
+<script>
+  function deleteRow(id) {
+    swal({
+      title: "Cảnh báo",
+      text: "Bạn có chắc chắn là muốn xóa sinh viên này?", // index = 3
+      buttons: ["Hủy bỏ", "Đồng ý"],
+    })
+      .then((willDelete) => {
+
+        if (willDelete) {
+          $.ajax({
+            url:"/delete_sinh_vien/" + id,
+            context: document.body
+          })
+          swal("Đã xóa thành công.!", {
+
+          });
+          location.reload();
+        }
+      });
+  }
+
+  function deleteMoreRow(r) {
+    var numRow = document.getElementById("sampleTable").rows.length;
+    var id_sv = [];
+    $('#sampleTable tbody :checkbox').each(function () {
+        let i = this.parentNode.parentNode.rowIndex;
+        if (this.checked) {
+          id_sv.push(this.parentNode.parentNode.childNodes[3].textContent);
+        }
+    });
+
+    swal({
+      title: "Cảnh báo",
+      text: "Bạn có chắc chắn là muốn xóa các sinh viên này?", // index = 3
+      buttons: ["Hủy bỏ", "Đồng ý"],
+    })
+      .then((willDelete) => {
+        if (willDelete) {
+          for (let i = 0; i < id_sv.length; i++) {
+            $.ajax({
+              url:"/delete_sinh_vien/" + id_sv[i],
+              context: document.body
+            })
+          }
+          swal("Đã xóa thành công.!", {});
+        }
+        location.reload();
+      });
+  }
+
+  oTable = $('#sampleTable').dataTable();
+  $('#all').click(function (e) {
+    $('#sampleTable tbody :checkbox').prop('checked', $(this).is(':checked'));
+    e.stopImmediatePropagation();
+  });
+
+  //In dữ liệu
+  var myApp = new function () {
+    this.printSV = function () {
+      var win = window.open('/table_print_sinh_vien', '', 'height=700,width=1400');
+      win.document.close();
+      win.print();
+    }
+  }
+  //     //Sao chép dữ liệu
+  var copyTextareaBtn = document.querySelector('.js-textareacopybtn');
+
+  copyTextareaBtn.addEventListener('click', function (event) {
+    var copyTextarea = document.querySelector('.js-copytextarea');
+    copyTextarea.focus();
+
+    var mytext = copyTextarea.textContent.substring(661,copyTextarea.textContent.length).split("\n")
+
+    var index = 0;
+    var data = [];
+    mytext.forEach(function (text) {
+      if (text.trim().length != 0) {
+          data.push(text.trim());
+          index += 1;
+          if (index == 7) {
+            data.push("\n")
+            index = 0;
+          }
+      }
+    });
+
+    navigator.clipboard.writeText(data.join(" "));
+
+    try {
+      var successful = document.execCommand('copy');
+      var msg = successful ? 'successful' : 'unsuccessful';
+      console.log('Copying text command was ' + msg);
+    } catch (err) {
+      console.log('Oops, unable to copy');
+    }
+  });
+</script>
+{% endblock content %}

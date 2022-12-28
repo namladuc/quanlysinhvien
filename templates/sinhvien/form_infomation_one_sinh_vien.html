@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{{ url_for('static', filename='doc/css/info.css') }}">
+    <link rel="stylesheet" type="text/css"
+        href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <!-- or -->
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}">
+
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="container profile-container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="data-box">
+                        <div class="pro-s-cover">
+                            <img src="{{ url_for('static', filename=sinh_vien[-3]) }}" style="border-radius: 50%;" width="130px" height="130px" alt="Ảnh">
+                            <h6>{{sinh_vien[1]}}</h6>
+                            <span>{{sinh_vien[-2]}}</span>
+                            <p>{{truong[1]}}</p>
+                        </div>
+                    </div>
+
+                    <div class="data-box">
+                        <h6>Kết quả học tập</h6>
+                        <span class="font-italic" style="font-weight: bold;">test</span>
+                        <p>test</p>
+                        <p>test</p>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="data-box">
+                        <h2>Thông tin cá nhân</h2>
+                        <table>
+                            <tr>
+                            <tr>
+                                <td class="font-italic">Mã sinh viên</td>
+                                <td>: {{sinh_vien[0]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Họ và tên</td>
+                                <td>: {{sinh_vien[1]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Giới tính</td>
+                                <td>: {{sinh_vien[2]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Địa chỉ</td>
+                                <td>: {{sinh_vien[7]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">CMND/CCCD</td>
+                                <td>: {{sinh_vien[10]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Ngày sinh</td>
+                                <td>: {{sinh_vien[3]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Quê quán</td>
+                                <td>: {{sinh_vien[4]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Số điện thoại</td>
+                                <td>: {{sinh_vien[8]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Email</td>
+                                <td>: {{sinh_vien[5]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Quốc tịch</td>
+                                <td>: {{sinh_vien[9]}}</td>
+                            </tr>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="data-box">
+                        <h2>Thông tin gia đình</h2>
+                        <table>
+                            <tr>
+                            <tr>
+                                <td class="font-italic">Tên cha</td>
+                                <td>: {{sinh_vien[0]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Năm sinh cha</td>
+                                <td>: {{sinh_vien[1]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Số điện thoại cha</td>
+                                <td>: {{sinh_vien[2]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Nghề cha</td>
+                                <td>: {{sinh_vien[7]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Địa chi cha</td>
+                                <td>: {{sinh_vien[10]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Nơi làm việc cha</td>
+                                <td>: {{sinh_vien[3]}}</td>
+                            </tr>
+                            <tr><td>----------------</td><td>---------------</td></tr>
+                            <tr>
+                                <td class="font-italic">Tên mẹ</td>
+                                <td>: {{sinh_vien[0]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Năm sinh mẹ</td>
+                                <td>: {{sinh_vien[1]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Số điện thoại mẹ</td>
+                                <td>: {{sinh_vien[2]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Nghề mẹ</td>
+                                <td>: {{sinh_vien[7]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Địa chi mẹ</td>
+                                <td>: {{sinh_vien[10]}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-italic">Nơi làm việc mẹ</td>
+                                <td>: {{sinh_vien[3]}}</td>
+                            </tr>
+                            <tr><td>----------------</td><td>---------------</td></tr>
+                            <tr>
+                                <td class="font-italic">Tên vợ/chồng</td>
+                                <td>: {{sinh_vien[3]}}</td>
+                            </tr>
+
+                            <tr>
+                                <td class="font-italic">Ngày sinh vợ/chồng</td>
+                                <td>: {{sinh_vien[3]}}</td>
+                            </tr>
+
+                            <tr>
+                                <td class="font-italic">Nghề nghiệp vợ/chồng</td>
+                                <td>: {{sinh_vien[3]}}</td>
+                            </tr>
+
+                            <tr>
+                                <td class="font-italic">Địa chỉ vợ/chồng</td>
+                                <td>: {{sinh_vien[3]}}</td>
+                            </tr>
+                            <tr><td>----------------</td><td>---------------</td></tr>
+                            <tr>
+                                <td class="font-italic">Thông tin anh, chị, em</td>
+                                <td>: {{sinh_vien[3]}}</td>
+                            </tr>
+                            <tr><td>----------------</td><td>---------------</td></tr>
+                            <tr>
+                                <td class="font-italic">Thông tin các con</td>
+                                <td>: {{sinh_vien[3]}}</td>
+                            </tr>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
