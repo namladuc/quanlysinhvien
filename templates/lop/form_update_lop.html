@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title%} Lớp {% endblock %}
+{% block content %}
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb">
+            <li class="breadcrumb-item"><a href="/table_lop">Lớp</a></li>
+            <li class="breadcrumb-item"><a href="">Chỉnh sửa thông tin lớp</a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+
+            <div class="tile">
+
+                <h3 class="tile-title">Chỉnh sửa thông tin lớp</h3>
+                <div class="tile-body">
+                    <form class="row" method="post" action="/table_lop/form_update_lop/{{lop[0]}}" enctype="multipart/form-data">
+                        <div class="form-group col-md-4">
+                            <label class="control-label">Mã lớp</label>
+                            <input class="form-control" value="{{lop[0]}}" type="text" name="ma_lop" disabled>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label class="control-label">Mã ngành</label>
+                            <input class="form-control" value="{{lop[1]}}" type="text" name="ma_nganh" disabled>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label class="control-label">Năm</label>
+                            <input class="form-control" value="{{lop[2]}}" type="text" name="nam" required>
+                        </div>
+                        <div class="form-group col-md-8">
+                            <label class="control-label">Tên lớp</label>
+                            <input class="form-control" value="{{lop[3]}}" type="text" name="ten_lop" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label class="control-label">Mã quản lý</label>
+                            <input class="form-control" value="{{lop[4]}}" type="text" name="ma_nguoi_quan_ly" >
+                        </div>
+                        <div id="toast">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <input class="btn btn-save" type="submit" onclick="showSuccessToast();"
+                                value="Lưu" />
+                            <a class="btn btn-cancel" href="/table_lop">Hủy bỏ</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock  %}

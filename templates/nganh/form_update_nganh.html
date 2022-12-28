@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title%} Chỉnh sửa thông tin ngành {% endblock %}
+{% block title%} Chỉnh sửa thông tin ngành {{nganh[2]}} {% endblock %}
 {% block content %}
 <main class="app-content">
     <div class="app-title">
         <ul class="app-breadcrumb breadcrumb">
             <li class="breadcrumb-item"><a href="/table_nganh">Ngành</a></li>
-            <li class="breadcrumb-item"><a href="">Chỉnh sửa thông tin ngành</a></li>
+            <li class="breadcrumb-item"><a href="">Chỉnh sửa thông tin ngành {{nganh[2]}}</a></li>
         </ul>
         <div id="clock"></div>
     </div>
@@ -16,28 +16,35 @@
 
                 <h3 class="tile-title">Chỉnh sửa thông tin ngành</h3>
                 <div class="tile-body">
-                    <form class="row" method="post" action="/form_add_nganh" enctype="multipart/form-data">
+                    <form class="row" method="post" action="/table_nganh/form_update_nganh/{{nganh[0]}}" enctype="multipart/form-data">
                         <div class="form-group col-md-6">
                             <label class="control-label">Mã ngành</label>
-                            <input class="form-control" type="text" name="ma_nganh" required>
+                            <input class="form-control" value="{{nganh[0]}}" type="text" name="ma_nganh" disabled>
                         </div>
                         <div class="form-group col-md-6">
                             <label class="control-label">Mã khoa</label>
-                            <input class="form-control" type="text" name="ma_khoa" required>
+                            <input class="form-control" value="{{nganh[1]}}" type="text" name="ma_khoa" disabled>
                         </div>
                         <div class="form-group col-md-6">
                             <label class="control-label">Tên ngành</label>
-                            <input class="form-control" type="text" name="ten_nganh" required>
+                            <input class="form-control" value="{{nganh[2]}}" type="text" name="ten_nganh" required>
                         </div>
                         <div class="form-group col-md-6">
                         </div>
                         <div class="form-group col-md-6">
                             <label class="control-label">Hình thức đào tạo</label>
-                            <input class="form-control" type="text" name="hinh_thuc_dao_tao" required>
+                            <input class="form-control" value="{{nganh[3]}}" type="text" name="hinh_thuc_dao_tao" required>
                         </div>
                         <div class="form-group col-md-6">
-                            <label class="control-label">Hệ</label>
-                            <input class="form-control" type="text" name="ma_he" required>
+                            <label class="control-label">Mã Hệ</label>
+                            <select class="form-control" id="department" name="ma_he" {{mode}}>
+                                <option> {{nganh[4]}} </option>
+                                {% for data in cac_he %}
+      
+                                <option>{{data[0]}} </option>
+              
+                                {% endfor %}
+                              </select>
                         </div>
                         <div id="toast">
                         </div>

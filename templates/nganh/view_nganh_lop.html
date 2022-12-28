@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block title %} Ngành {% endblock title %}
+{% block title %} Ngành {{nganh[1]}} {% endblock title %}
 {% block content %}
 <main class="app-content">
     <div class="app-title">
         <ul class="app-breadcrumb breadcrumb side">
-            <li class="breadcrumb-item active"><a href="#"><b>Ngành</b></a></li>
+            <li class="breadcrumb-item"><a href="/table_nganh">Ngành {{nganh[1]}}</a></li>
+            <li class="breadcrumb-item"><a href="">Các Lớp </a></li>
         </ul>
         <div id="clock"></div>
     </div>
@@ -13,79 +14,34 @@
         <div class="col-md-12">
             <div class="tile">
                 <div class="tile-body">
-
-                    <div class="row element-button">
-
-                        <div class="col-sm-2">
-                            <a class="btn btn-add btn-sm" href="/table_nganh/form_add_nganh" title="Thêm ngành mới"><i
-                                    class="fas fa-plus"></i>
-                                Thêm</a>
-                        </div>
-
-                        <div class="col-sm-2">
-                            <a class="btn btn-delete btn-sm nhap-tu-file" href="/table_nganh/form_add_nganh_upload_file"
-                                type="button" title="Tải từ file"><i class="fas fa-file-upload"></i>Tải từ file</a>
-                        </div>
-
-                        <div class="col-sm-2">
-                          <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printTable()"><i
-                              class="fas fa-print"></i> In thông tin</a>
-                        </div>
-                        <div class="col-sm-2">
-                            <a class="btn btn-excel btn-sm" href="/get_table_nganh_excel" title="Xuất Excel"><i
-                                    class="fas fa-file-excel"></i> Xuất Excel</a>
-                        </div>
-
-                        <div class="col-sm-2">
-                            <a class="btn btn-delete btn-sm pdf-file" type="button" title="Xuất PDF"
-                                href="/get_table_nganh_pdf"><i class="fas fa-file-pdf"></i>Xuất PDF</a>
-                        </div>
-
-                        <div class="col-sm-2">
-                            <a class="btn btn-delete btn-sm" type="button" title="Xóa tất cả các phần tử đã chọn"
-                                onclick="deleteMoreRow(this)"><i class="fas fa-trash-alt"></i> Xóa phần tử đã chọn </a>
-                        </div>
-
-                    </div>
                     <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0"
                         border="0" id="sampleTable">
                         <thead>
                             <tr>
-                                <th width="10"><input type="checkbox" id="all"></th>
-                                <th>Mã ngành</th>
-                                <th >Tên ngành</th>
-                                <th >Tên khoa</th>
-                                <th >Hình thức đào tạo</th>
-                                <th >Hệ</th>
-                                <th >Số lượng lớp</th>
+                                <th>Mã lớp</th>
+                                <th>Tên lớp</th>
+                                <th>Năm</th>
+                                <th>Mã người quản lí</th>
                                 <th>Tính năng</th>
                             </tr>
                         </thead>
                         <tbody>
-                          {% for data in cac_nganh %}
+                          {% for data in cac_lop %}
                             <tr>
-                                <td width="10"><input type="checkbox" id="myChecker" name="check1" value="1"></td>
                                 <td>{{data[0]}}</td>
-                                <td>{{data[1]}}</td>
                                 <td>{{data[3]}}</td>
                                 <td>{{data[2]}}</td>
                                 <td>{{data[4]}}</td>
-                                <td class="table-td-center">
-                                  <button class="btn btn-outline-primary" type="button" title="Ấn vào để xem các lớp thuộc ngành Khoa học dữ liệu"
-                                  onclick="location.href='/table_nganh/view_nganh_lop/{{data[0]}}';">{{data[5]}}
-                                  </button>
-                                </td>
                                 <td class="table-td-center"><button class="btn btn-primary btn-sm trash" type="button"
                                         title="Xóa" onclick="deleteRow('{{data[0]}}')"><i class="fas fa-trash-alt"></i>
                                     </button>
-                                    <button class="btn btn-primary btn-sm edit" type="button" title="Sửa" id="show-emp">
-                                        <a href="/table_nganh/form_update_nganh/{{data[0]}}"><i class="fa fa-edit"
+                                    <button class="btn btn-primary btn-sm edit" type="button" title="Xem" id="show-emp">
+                                        <a href=""><i class="fa fa-eye"
                                                 aria-hidden="true"></i></a>
                                     </button>
                                 </td>
                             </tr>
                           {% endfor %}
-
                         </tbody>
                     </table>
                 </div>
@@ -113,14 +69,14 @@
    function deleteRow(id) {
      swal({
        title: "Cảnh báo",
-       text: "Bạn có chắc chắn là muốn xóa ngành này?", // index = 3
+       text: "Bạn có chắc chắn là muốn xóa lớp này?", // index = 3
        buttons: ["Hủy bỏ", "Đồng ý"],
      })
        .then((willDelete) => {
         
          if (willDelete) {
            $.ajax({
-             url:"/delete_nganh/" + id,
+             url:"/delete_lop/" + id,
              context: document.body
            })
            swal("Đã xóa thành công.!", {
@@ -143,14 +99,14 @@
 
      swal({
        title: "Cảnh báo",
-       text: "Bạn có chắc chắn là muốn xóa những ngành này?", // index = 3
+       text: "Bạn có chắc chắn là muốn xóa những lớp này?", // index = 3
        buttons: ["Hủy bỏ", "Đồng ý"],
      })
        .then((willDelete) => {
          if (willDelete) {
            for (let i = 0; i < id_nv.length; i++) {
              $.ajax({
-               url:"/delete_nganh/" + id_nv[i],
+               url:"/delete_lop/" + id_nv[i],
                context: document.body
              })
            }
@@ -165,14 +121,5 @@
      $('#sampleTable tbody :checkbox').prop('checked', $(this).is(':checked'));
      e.stopImmediatePropagation();
    });
-   
-   //In dữ liệu
-   var myApp = new function () {
-     this.printTable = function () {
-       var win = window.open('/table_print_nganh', '', 'height=700,width=1400');
-       win.document.close();
-       win.print();
-     }
-   }
  </script>
 {% endblock content %}

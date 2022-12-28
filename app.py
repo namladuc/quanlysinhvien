@@ -138,6 +138,10 @@ def home():
                     my_user = session['username'],
                     truong = session['truong'])
 
+@app.route("/forgot")
+def forgot():
+    return render_template("general/forgot.html",
+                           truong = session['truong'])
 
 # -------------------------- Khoa -------------------------
 @login_required
@@ -292,9 +296,9 @@ def table_nganh():
     cur.execute("""
                 SELECT n.ma_nganh, n.ten_nganh, n.hinh_thuc_dao_tao, k.ten_khoa, lh.ten_he, COUNT(l.ma_lop)
                 FROM nganh n
-                JOIN khoa k ON k.ma_khoa = n.ma_khoa
-                JOIN loai_he lh ON lh.ma_he = n.ma_he
-                JOIN lop l ON l.ma_nganh = n.ma_nganh
+                LEFT JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                LEFT JOIN loai_he lh ON lh.ma_he = n.ma_he
+                LEFT JOIN lop l ON l.ma_nganh = n.ma_nganh
                 WHERE n.is_delete = 0 AND (l.is_delete = 0 OR l.is_delete IS NULL)
                 GROUP BY n.ma_nganh
                 ORDER BY k.ten_khoa ASC, n.ten_nganh ASC
@@ -314,9 +318,9 @@ def get_table_nganh_excel():
     cur.execute("""
                 SELECT n.ma_nganh, n.ten_nganh, n.hinh_thuc_dao_tao, k.ten_khoa, lh.ten_he, COUNT(l.ma_lop)
                 FROM nganh n
-                JOIN khoa k ON k.ma_khoa = n.ma_khoa
-                JOIN loai_he lh ON lh.ma_he = n.ma_he
-                JOIN lop l ON l.ma_nganh = n.ma_nganh
+                LEFT JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                LEFT JOIN loai_he lh ON lh.ma_he = n.ma_he
+                LEFT JOIN lop l ON l.ma_nganh = n.ma_nganh
                 WHERE n.is_delete = 0 AND (l.is_delete = 0 OR l.is_delete IS NULL)
                 GROUP BY n.ma_nganh
                 ORDER BY k.ten_khoa ASC, n.ten_nganh ASC
@@ -325,7 +329,7 @@ def get_table_nganh_excel():
     columnName = ['MaNganh','TenNganh','HinhThucDaoTao','TenKhoa','TenHe','SoLuongLop']
     data = pd.DataFrame.from_records(cac_nganh, columns=columnName)
     data = data.set_index('MaNganh')
-    pathFile = app.config['SAVE_FOLDER_EXCEL'] + "/" + "Data_Nganh.xlsx"
+    pathFile = app.config['SAVE_FOLDER_EXCEL'] + "/" + "Data_lop.xlsx"
     data.to_excel(pathFile)
     return send_file(pathFile, as_attachment=True)
 
@@ -337,9 +341,9 @@ def table_print_nganh():
     cur.execute("""
                 SELECT n.ma_nganh, n.ten_nganh, n.hinh_thuc_dao_tao, k.ten_khoa, lh.ten_he, COUNT(l.ma_lop)
                 FROM nganh n
-                JOIN khoa k ON k.ma_khoa = n.ma_khoa
-                JOIN loai_he lh ON lh.ma_he = n.ma_he
-                JOIN lop l ON l.ma_nganh = n.ma_nganh
+                LEFT JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                LEFT JOIN loai_he lh ON lh.ma_he = n.ma_he
+                LEFT JOIN lop l ON l.ma_nganh = n.ma_nganh
                 WHERE n.is_delete = 0 AND (l.is_delete = 0 OR l.is_delete IS NULL)
                 GROUP BY n.ma_nganh
                 ORDER BY k.ten_khoa ASC, n.ten_nganh ASC
@@ -355,18 +359,186 @@ def get_table_nganh_pdf():
     pdfkit.from_url("/".join(request.url.split("/")[:-1:]) + '/table_print_nganh',pathFile)
     return send_file(pathFile, as_attachment=True)
 
-@login_required
-@app.route("/table_nganh/view_nganh/<string:ma_nganh>")
-def view_nganh(ma_nganh):
-    return "Error"
+@app.route("/table_nganh/form_add_nganh_upload_file", methods=['GET','POST'])
+def form_add_nganh_upload_file():
+    if request.method == 'POST':
+        data_file = request.files['FileDataUpload']
+        if data_file.filename != '':
+            if data_file.filename.split(".")[-1] not in ['txt', 'xlsx', 'csv', 'xls', 'xlsm']:
+                return redirect(url_for("form_add_nganh_upload_file"))
+            filename = "TMP_" + data_file.filename 
+            pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
+            data_file.save(pathToFile)
+            return redirect(url_for("form_add_nganh_upload_process", filename=filename))
+        return redirect(url_for("form_add_nganh_upload_file"))
+    return render_template(session['role'] + 'nganh/form_add_nganh_upload_file.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
 
-@app.route("/table_nganh/form_add_nganh")
+@app.route("/table_nganh/form_add_nganh_upload_process/<string:filename>", methods=['GET','POST'])
+def form_add_nganh_upload_process(filename):
+    pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
+    
+    default_tag_column = ['ma_nganh','ten_nganh','hinh_thuc_dao_tao','ma_khoa','ma_he']
+    
+    default_name_column = ['Mã ngành', 'Tên ngành', 'Hình thức đào tạo', 'Mã khoa', 'Mã hệ']
+    
+    data_lop = pd.read_excel(pathToFile)
+    data_column = list(data_lop.columns)
+    
+    if (len(data_column) > len(default_tag_column)) or len(data_column) < 3:
+        return "Error"
+        
+    if request.method == 'POST':
+        cur = mysql.connection.cursor()
+        details = request.form
+        column_link = [details[col] for col in data_column]
+        column_match = [default_name_column.index(elm) for elm in column_link]
+        
+        if (len(set(column_match)) != len(column_link)):
+            return "Error"
+        
+        if (len(column_match) != 5):
+            return "Error"
+        
+        # Kiểm tra xem mã ngành có tồn tại không
+        tmp = tuple(set(data_lop[data_column[column_match.index(0)]]))
+        if len(tmp) == 1:
+            cur.execute("SELECT ma_nganh FROM nganh WHERE ma_nganh = %s", tmp)
+        else:
+            new_tmp = ["\"" + text +"\"" for text in tmp]
+            cur.execute("SELECT ma_nganh FROM nganh WHERE ma_nganh IN (" + ", ".join(new_tmp) + ")")
+        data_tuple = cur.fetchall()
+        data_tmp_take = []
+        for elm in data_tuple:
+            data_tmp_take.append(elm[0])
+        if (len(data_tmp_take) != 0):
+            return "Error"
+        
+        # Kiểm tra xem mã khoa có tồn tại không
+        tmp = tuple(set(data_lop[data_column[column_match.index(3)]]))
+        if len(tmp) == 1:
+            cur.execute("SELECT ma_khoa FROM khoa WHERE ma_khoa = %s", tmp)
+        else:
+            new_tmp = ["\"" + text +"\"" for text in tmp]
+            cur.execute("SELECT ma_khoa FROM khoa WHERE ma_khoa IN (" + ", ".join(new_tmp) + ")")
+        data_tuple = cur.fetchall()
+        data_tmp_take = []
+        for elm in data_tuple:
+            data_tmp_take.append(elm[0])
+        if (len(data_tmp_take) != len(tmp)):
+            return "Error"
+        
+        # Kiểm tra xem mã hệ có tồn tại không
+        tmp = tuple(set(data_lop[data_column[column_match.index(4)]]))
+        if len(tmp) == 1:
+            cur.execute("SELECT ma_he FROM loai_he WHERE ma_he = %s", tmp)
+        else:
+            new_tmp = ["\"" + text +"\"" for text in tmp]
+            cur.execute("SELECT ma_he FROM loai_he WHERE ma_he IN (" + ", ".join(new_tmp) + ")")
+        data_tuple = cur.fetchall()
+        data_tmp_take = []
+        for elm in data_tuple:
+            data_tmp_take.append(elm[0])
+        if (len(data_tmp_take) != len(tmp)):
+            return "Error"
+        
+        sql = "INSERT INTO `nganh` ("
+        for index in column_match:
+            sql += default_tag_column[index] + ","
+        sql = sql[:-1:]
+        sql += ") VALUES "
+        for index_row in range(data_lop.shape[0]):
+            sql += "("
+            for col in data_column:
+                sql +=  "\"" + str(data_lop[col][index_row]) + "\"" + ","
+            sql = sql[:-1:]
+            sql += "),"
+        sql = sql[:-1:]  
+        
+        cur.execute(sql)
+        mysql.connection.commit()
+        os.remove(pathToFile)
+        return redirect(url_for("table_nganh"))        
+    
+    return render_template(session['role'] + 'nganh/form_add_nganh_upload_process.html',
+                           filename = filename,
+                           truong = session['truong'],
+                           my_user = session['username'],
+                           name_column = default_name_column,
+                           index_column = data_column)
+
+@app.route("/table_nganh/view_nganh_lop/<string:ma_nganh>")
+def view_nganh_lop(ma_nganh):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("SELECT ma_nganh, ten_nganh FROM nganh WHERE ma_nganh = %s", (ma_nganh, ))
+    nganh = cur.fetchall()
+    
+    if (len(nganh) != 1):
+        return "Error"
+    
+    nganh = nganh[0]
+    
+    cur.execute("""
+                SELECT l.*
+                FROM lop l 
+                JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                WHERE n.ma_nganh = %s AND l.is_delete = 0
+                """, (ma_nganh, ))
+    cac_lop = cur.fetchall()
+    
+    return render_template(session['role'] + 'nganh/view_nganh_lop.html',
+                           nganh = nganh,
+                           cac_lop = cac_lop,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@app.route("/table_nganh/form_add_nganh", methods=['GET','POST'])
 def form_add_nganh():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("SELECT * FROM khoa")
+    cac_khoa = cur.fetchall()
+    
+    cur.execute("SELECT * FROM loai_he")
+    cac_he = cur.fetchall()
+    
+    if request.method == 'POST':
+        details = request.form
+        ma_nganh = details['ma_nganh'].strip()
+        ma_khoa = details['ma_khoa'].strip().split("_")[0].strip()
+        ten_nganh = details['ten_nganh'].strip()
+        hinh_thuc_dao_tao = details['hinh_thuc_dao_tao'].strip()
+        ma_he = details['ma_he'].split("_")[0].strip()
+        
+        cur.execute("""
+                    SELECT * 
+                    FROM nganh
+                    WHERE ma_nganh = %s
+                    """, (ma_nganh, ))
+        if (len(cur.fetchall()) != 0):
+            return render_template(session['role'] + 'nganh/form_add_nganh.html',
+                                   ma_err = "Mã ngành đã tồn tại",
+                                   cac_he = cac_he,
+                                   cac_khoa = cac_khoa,
+                                   my_user = session['username'],
+                                   truong = session['truong'])
+        
+        cur.execute("""
+                    INSERT INTO nganh(ma_nganh, ma_khoa, ten_nganh, hinh_thuc_dao_tao, ma_he) VALUES
+                    (%s, %s, %s, %s, %s)
+                    """, (ma_nganh, ma_khoa, ten_nganh, hinh_thuc_dao_tao, ma_he))
+        mysql.connection.commit()
+        return redirect(url_for('table_nganh'))
+        
     return render_template(session['role'] + 'nganh/form_add_nganh.html',
+                           cac_khoa = cac_khoa,
+                           cac_he = cac_he,
                            my_user = session['username'],
                            truong = session['truong']) 
 
-@app.route("/table_nganh/form_update_nganh/<string:ma_nganh>")
+@app.route("/table_nganh/form_update_nganh/<string:ma_nganh>", methods = ['GET','POST'])
 def form_update_nganh(ma_nganh):
     cur = mysql.connection.cursor()
     
@@ -377,7 +549,32 @@ def form_update_nganh(ma_nganh):
                 """, (ma_nganh, ))
     nganh = cur.fetchall()
     
+    if (len(nganh) != 1):
+        return "Error"
+    
+    nganh = nganh[0]
+    
+    cur.execute("SELECT * FROM loai_he")
+    cac_he = cur.fetchall()
+    
+    if request.method == 'POST':
+        details = request.form
+        ma_nganh = nganh[0]
+        ma_khoa = nganh[1]
+        ten_nganh = details['ten_nganh']
+        hinh_thuc_dao_tao = details['hinh_thuc_dao_tao']
+        ma_he = details['ma_he']
+        
+        cur.execute("""
+                    UPDATE nganh
+                    SET ten_nganh = %s, hinh_thuc_dao_tao = %s,
+                    ma_he = %s WHERE ma_nganh = %s
+                    """, (ten_nganh, hinh_thuc_dao_tao, ma_he, ma_nganh))
+        mysql.connection.commit()
+        return redirect(url_for('table_nganh'))
+    
     return render_template(session['role'] + 'nganh/form_update_nganh.html',
+                           cac_he = cac_he,
                            nganh = nganh,
                            my_user = session['username'],
                            truong = session['truong'])
@@ -396,6 +593,238 @@ def delete_nganh(ma_nganh):
     
     return redirect(request.url)
 # -------------------------- Nganh -------------------------
+
+
+# -------------------------- Lop -------------------------
+
+@login_required
+@app.route("/table_lop")
+def table_lop():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+               SELECT l.*, n.ten_nganh, COUNT(svl.ma_sinh_vien)
+                FROM lop l 
+                LEFT JOIN sinh_vien_lop svl ON svl.ma_lop = l.ma_lop
+                LEFT JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                WHERE l.is_delete = 0
+                GROUP BY l.ma_lop
+                """)
+    cac_lop = cur.fetchall()
+    
+    return render_template(session['role'] + 'lop/table_lop.html', 
+                           cac_lop = cac_lop,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/table_lop/form_add_lop", methods=['GET','POST'])
+def form_add_lop():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("SELECT * FROM nganh WHERE is_delete = 0")
+    cac_nganh = cur.fetchall()
+    
+    if request.method == 'POST':
+        details = request.form
+        ma_lop = details['ma_lop'].strip()
+        ma_nganh = details['ma_nganh'].split("_")[0].strip()
+        nam = details['nam'].strip()
+        ten_lop = details['ten_lop'].strip()
+        ma_nguoi_quan_ly = details['ma_nguoi_quan_ly'].strip()
+        
+        cur.execute("SELECT * FROM lop WHERE ma_lop = %s", (ma_lop, ))
+        if (len(cur.fetchall()) != 0):
+            return render_template(session['role'] + 'lop/form_add_lop.html',
+                           ma_err = "Mã lớp đã tồn tại",        
+                            cac_nganh = cac_nganh,
+                            my_user = session['username'],
+                            truong = session['truong'])
+            
+        cur.execute("SELECT * FROM lop WHERE ma_nguoi_quan_ly = %s AND is_delete = 0", (ma_nguoi_quan_ly, ))
+        if (len(cur.fetchall()) != 0):
+            return render_template(session['role'] + 'lop/form_add_lop.html',
+                           ma_err = "Người quản lý đang quản lý lớp khác",        
+                            cac_nganh = cac_nganh,
+                            my_user = session['username'],
+                            truong = session['truong'])
+        if ma_nguoi_quan_ly == '':
+            cur.execute("""
+                    INSERT INTO lop(ma_lop, ma_nganh, nam, ten_lop, ma_nguoi_quan_ly) VALUES
+                    (%s, %s, %s, %s, NULL)
+                    """, (ma_lop, ma_nganh, nam, ten_lop))
+        else:
+            cur.execute("""
+                        INSERT INTO lop(ma_lop, ma_nganh, nam, ten_lop, ma_nguoi_quan_ly) VALUES
+                        (%s, %s, %s, %s, %s)
+                        """, (ma_lop, ma_nganh, nam, ten_lop, ma_nguoi_quan_ly))
+        mysql.connection.commit()
+        return redirect(url_for('table_lop'))
+        
+    return render_template(session['role'] + 'lop/form_add_lop.html',
+                           cac_nganh = cac_nganh,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/table_lop/form_update_lop/<string:ma_lop>", methods=['GET','POST'])
+def form_update_lop(ma_lop):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("SELECT * FROM lop WHERE ma_lop = %s", (ma_lop, ))
+    lop = cur.fetchall()
+    
+    if (len(lop) != 1):
+        return "Error"
+    
+    lop = lop[0]
+    
+    if request.method == 'POST':
+        details = request.form
+        nam = details['nam'].strip()
+        ten_lop = details['ten_lop'].strip()
+        ma_nguoi_quan_ly = details['ma_nguoi_quan_ly'].strip()
+        
+        if (ma_nguoi_quan_ly == 'None' or ma_nguoi_quan_ly == ""):
+            cur.execute("""
+                UPDATE lop
+                SET nam = %s, ten_lop = %s, ma_nguoi_quan_ly = NULL
+                WHERE ma_lop = %s
+                """, (nam, ten_lop, ma_lop))
+        else:
+            cur.execute("""
+                    UPDATE lop
+                    SET nam = %s, ten_lop = %s, ma_nguoi_quan_ly = %s
+                    WHERE ma_lop = %s
+                    """, (nam, ten_lop, ma_nguoi_quan_ly, ma_lop))
+        
+        mysql.connection.commit()
+        return redirect(url_for('table_lop'))
+    
+    return render_template(session['role'] + 'lop/form_update_lop.html',
+                           lop = lop,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/table_lop/form_add_lop_upload_file", methods=['GET','POST'])
+def form_add_lop_upload_file():
+    if request.method == 'POST':
+        data_file = request.files['FileDataUpload']
+        if data_file.filename != '':
+            if data_file.filename.split(".")[-1] not in ['txt', 'xlsx', 'csv', 'xls', 'xlsm']:
+                return redirect(url_for("form_add_nganh_upload_file"))
+            filename = "TMP_" + data_file.filename 
+            pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
+            data_file.save(pathToFile)
+            return redirect(url_for("form_add_lop_upload_process", filename=filename))
+        return redirect(url_for("form_add_lop_upload_file"))
+    return render_template(session['role'] + 'lop/form_add_lop_upload_file.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/table_lop/form_add_lop_upload_process/<string:filename>", methods=['GET','POST'])
+def form_add_lop_upload_process(filename):
+    pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
+    
+    default_tag_column = ['ma_lop','ma_nganh','nam','ten_lop','ma_nguoi_quan_ly']
+    
+    default_name_column = ['Mã Lớp', 'Mã Ngành', 'Năm', 'Tên Lớp', 'Mã Người Quản Lý']
+    
+    data_lop = pd.read_excel(pathToFile)
+    data_column = list(data_lop.columns)
+    
+    if (len(data_column) > len(default_tag_column)) or len(data_column) < 3:
+        return "Error"
+        
+    if request.method == 'POST':
+        cur = mysql.connection.cursor()
+        details = request.form
+        column_link = [details[col] for col in data_column]
+        column_match = [default_name_column.index(elm) for elm in column_link]
+        
+        if (len(set(column_match)) != len(column_link)):
+            return "Error"
+        
+        if (len(column_match) != 5):
+            return "Error"
+        
+        if (len(tuple(set(data_lop[data_column[column_match.index(4)]]))) 
+            != len(tuple(data_lop[data_column[column_match.index(4)]]))):
+            return "Error"
+        
+        # Kiểm tra xem mã nganh có tồn tại không
+        tmp = tuple(set(data_lop[data_column[column_match.index(1)]]))
+        if len(tmp) == 1:
+            cur.execute("SELECT ma_nganh FROM nganh WHERE ma_nganh = %s", tmp)
+        else:
+            new_tmp = ["\"" + text +"\"" for text in tmp]
+            cur.execute("SELECT ma_nganh FROM nganh WHERE ma_nganh IN (" + ", ".join(new_tmp) + ")")
+        data_tuple = cur.fetchall()
+        data_tmp_take = []
+        for elm in data_tuple:
+            data_tmp_take.append(elm[0])
+        if (len(data_tmp_take) != len(tmp)):
+            return "Error"
+        
+        # Kiểm tra xem mã lớp có tồn tại không
+        tmp = tuple(set(data_lop[data_column[column_match.index(0)]]))
+        if len(tmp) == 1:
+            cur.execute("SELECT ma_lop FROM lop WHERE ma_lop = %s", tmp)
+        else:
+            new_tmp = ["\"" + text +"\"" for text in tmp]
+            cur.execute("SELECT ma_lop FROM lop WHERE ma_lop IN (" + ", ".join(new_tmp) + ")")
+        data_tuple = cur.fetchall()
+        data_tmp_take = []
+        for elm in data_tuple:
+            data_tmp_take.append(elm[0])
+        if (len(data_tmp_take) != 0):
+            return "Error"
+        
+        sql = "INSERT INTO `lop` ("
+        for index in column_match:
+            sql += default_tag_column[index] + ","
+        sql = sql[:-1:]
+        sql += ") VALUES "
+        for index_row in range(data_lop.shape[0]):
+            sql += "("
+            for col in data_column:
+                sql +=  "\"" + str(data_lop[col][index_row]) + "\"" + ","
+            sql = sql[:-1:]
+            sql += "),"
+        sql = sql[:-1:]  
+        
+        cur.execute(sql)
+        mysql.connection.commit()
+        os.remove(pathToFile)
+        return redirect(url_for("table_lop"))        
+    
+    return render_template(session['role'] + 'lop/form_add_lop_upload_process.html',
+                           filename = filename,
+                           truong = session['truong'],
+                           my_user = session['username'],
+                           name_column = default_name_column,
+                           index_column = data_column)
+    
+@app.route("/table_lop/view_lop_sinh_vien")
+def view_lop_sinh_vien():
+    return render_template('lop/view_lop_sinh_vien.html')
+
+@login_required
+@app.route("/delete_lop/<string:ma_lop>")
+def delete_lop(ma_lop):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                UPDATE lop
+                SET is_delete = 1
+                WHERE ma_lop = %s
+                """, (ma_lop, ))
+    mysql.connection.commit()
+    return redirect(request.url)
+
+# -------------------------- Lop -------------------------
 
 
 # -------------------------- Sinh vien -------------------------

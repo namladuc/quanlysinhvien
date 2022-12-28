@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %} Thêm lớp {% endblock title %}
+{% block content %}
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb">
+            <li class="breadcrumb-item"><a href="/table_lop">Lớp</a></li>
+            <li class="breadcrumb-item active"> <a href="#">Thêm lớp từ file </a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <h3 class="tile-title">Thêm lớp - Upload file excel</h3>
+                <div class="tile-body">
+
+                    <form class="row" method="post" action="/table_lop/form_add_lop_upload_process/{{filename}}" enctype="multipart/form-data">
+
+                        <div class="form-group col-md-4">
+                            <label style="font-size: larger;" class="control-label">Tên cột của bạn</label>
+                        </div>
+
+                        <div class="form-group col-md-8">
+                            <label style="font-size: larger;" class="control-label">Trường tương ứng</label>
+                        </div>
+
+                        {% for indexCol in index_column %}
+                        <div class="form-group col-md-4">
+                            <label class="control-label">{{indexCol}}</label>
+                        </div>
+                        <div class="form-group col-md-8">
+                            <select class="form-control" id="exampleSelect1" name="{{indexCol}}">
+                                {% for colName in name_column %}
+                                <option>{{colName}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endfor %}
+
+                        <div class="form-group col-md-4">
+                            <input class="btn btn-save" type="submit" value="Lưu lại" />
+                            <a class="btn btn-cancel" href="/table_lop">Hủy bỏ</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- Essential javascripts for application to work-->
+<script src="{{url_for('static', filename='doc/js/jquery-3.2.1.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/popper.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/bootstrap.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/main.js')}}"></script>
+<!-- The javascript plugin to display page loading on top-->
+<script src="{{url_for('static', filename='doc/js/plugins/pace.min.js')}}"></script>
+<script>
+    function readURL(input, thumbimage) {
+        if (input.files && input.files[0]) { //Sử dụng  cho Firefox - chrome
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $("#thumbimage").attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+        else { // Sử dụng cho IE
+            $("#thumbimage").attr('src', input.value);
+
+        }
+        $("#thumbimage").show();
+        $('.filename').text($("#uploadfile").val());
+        $('.Choicefile').css('background', '#14142B');
+        $('.Choicefile').css('cursor', 'default');
+        $(".removeimg").show();
+        $(".Choicefile").unbind('click');
+
+    }
+    $(document).ready(function () {
+        $(".Choicefile").bind('click', function () {
+            $("#uploadfile").click();
+
+        });
+        $(".removeimg").click(function () {
+            $("#thumbimage").attr('src', '').hide();
+            $("#myfileupload").html('<input type="file" id="uploadfile"  onchange="readURL(this);" />');
+            $(".removeimg").hide();
+            $(".Choicefile").bind('click', function () {
+                $("#uploadfile").click();
+            });
+            $('.Choicefile').css('background', '#14142B');
+            $('.Choicefile').css('cursor', 'pointer');
+            $(".filename").text("");
+        });
+    })
+</script>
+{% endblock %}
