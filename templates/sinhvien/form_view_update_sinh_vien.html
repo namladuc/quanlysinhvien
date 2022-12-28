@@ -120,6 +120,11 @@
 
                         <div class="col-md-8">
                             <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label" style="font-size: 1.5rem; margin-top: 30px;">Thông tin cá nhân</label>
+                                    </div>
+                                </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label">Mã sinh viên</label>
@@ -213,6 +218,160 @@
                                     <div class="form-group">
                                         <label class="control-label">Nơi sinh</label>
                                         <textarea class="form-control" id="address" name="noi_sinh" rows="2" {{mode}}>{{sinh_vien[4]}}</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label" style="font-size: 1.5rem; margin-top: 30px;">Thông tin gia đình</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label" style="font-size: 1.2rem;">Thông tin của cha</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Họ và tên</label>
+                                        <input class="form-control" value="{{gia_dinh[1]}}" type="text"
+                                            name="ten_cha" {{mode}}>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Năm sinh</label>
+                                        <input class="form-control" value="{{gia_dinh[2]}}" type="text"
+                                            name="nam_sinh_cha" {{mode}}>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Email</label>
+                                        <input class="form-control" value="{{gia_dinh[3]}}" type="text"
+                                            name="email_cha" {{mode}}>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Số điện thoại</label>
+                                        <input class="form-control" value="{{gia_dinh[4]}}" type="text"
+                                            name="sdt_cha" {{mode}}>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label">Nghề nghiệp</label>
+                                        <input class="form-control" value="{{gia_dinh[5]}}" type="text"
+                                            name="nghe_cha" {{mode}}>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Địa chỉ thường trú</label>
+                                        <textarea class="form-control" id="address" name="dia_chi_cha" rows="2" {{mode}}>{{gia_dinh[6]}}</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Nơi sinh</label>
+                                        <textarea class="form-control" id="address" name="noi_cha" rows="2" {{mode}}>{{gia_dinh[7]}}</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label" style="font-size: 1.2rem;">Thông tin của mẹ</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Họ và tên</label>
+                                        <input class="form-control" value="{{gia_dinh[8]}}" type="text"
+                                            name="ten_me" {{mode}}>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Năm sinh</label>
+                                        <input class="form-control" value="{{gia_dinh[9]}}" type="text"
+                                            name="nam_sinh_me" {{mode}}>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Email</label>
+                                        <input class="form-control" value="{{gia_dinh[10]}}" type="text"
+                                            name="email_me" {{mode}}>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Số điện thoại</label>
+                                        <input class="form-control" value="{{gia_dinh[11]}}" type="text"
+                                            name="sdt_me" {{mode}}>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label">Nghề nghiệp</label>
+                                        <input class="form-control" value="{{gia_dinh[12]}}" type="text"
+                                            name="nghe_me" {{mode}}>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Địa chỉ thường trú</label>
+                                        <textarea class="form-control" id="address" name="dia_chi_me" rows="2" {{mode}}>{{gia_dinh[13]}}</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Nơi sinh</label>
+                                        <textarea class="form-control" id="address" name="noi_me" rows="2" {{mode}}>{{gia_dinh[14]}}</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label" style="font-size: 1.2rem;">Thông tin của vợ/chồng</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Họ và tên</label>
+                                        <input class="form-control" value="{{gia_dinh[15]}}" type="text"
+                                            name="ten_vo_chong" {{mode}}>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Ngày sinh</label>
+                                        <input class="form-control" value="{{gia_dinh[16]}}" type="date"
+                                            name="ngay_sinh_vo_chong" {{mode}}>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Nghề nghiệp</label>
+                                        <input class="form-control" value="{{gia_dinh[17]}}" type="text"
+                                            name="nghe_vo_chong" {{mode}}>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Địa chỉ</label>
+                                        <input class="form-control" value="{{gia_dinh[18]}}" type="text"
+                                            name="dia_chi_vo_chong" {{mode}}>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label" style="font-size: 1.2rem;">Thông tin của anh/chị/em</label>
+                                        <textarea class="form-control" id="info" name="thong_tin_anh_chi_em" rows="2" {{mode}}>{{gia_dinh[19]}}</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label" style="font-size: 1.2rem;">Thông tin các con</label>
+                                        <textarea class="form-control" id="info" name="thong_tin_cac_con" rows="2" {{mode}}>{{gia_dinh[20]}}</textarea>
                                     </div>
                                 </div>
                             </div>

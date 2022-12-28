@@ -298,6 +298,9 @@ def form_view_update_sinh_vien(ma_sinh_vien, can_edit):
     
     data_default = data_default[0]
     
+    cur.execute("SELECT * FROM gia_dinh WHERE ma_sinh_vien = %s", (ma_sinh_vien, ))
+    gia_dinh = cur.fetchall()[0]
+    
     cur.execute("""
                 SELECT l.ma_lop, 
                 CONCAT(l.ten_lop, " _ ", n.ten_nganh, " _ ", k.ten_khoa)
@@ -348,6 +351,43 @@ def form_view_update_sinh_vien(ma_sinh_vien, can_edit):
                         WHERE ma_sinh_vien = %s AND ma_lop = %s
                         """, (ma_lop, ma_sinh_vien, data_default[-1]))
             mysql.connection.commit()
+            
+        #  Thông tin gia đình
+        ten_cha = details['ten_cha']
+        nam_sinh_cha = details['nam_sinh_cha']
+        email_cha = details['email_cha']
+        sdt_cha = details['sdt_cha']
+        nghe_cha = details['nghe_cha']
+        dia_chi_cha = details['dia_chi_cha']
+        noi_cha = details['noi_cha']
+        
+        ten_me = details['ten_me']
+        nam_sinh_me = details['nam_sinh_me']
+        email_me = details['email_me']
+        sdt_me = details['sdt_me']
+        nghe_me = details['nghe_me']
+        dia_chi_me = details['dia_chi_me']
+        noi_me = details['noi_me']
+        
+        ten_vo_chong = details['ten_vo_chong']
+        ngay_sinh_vo_chong = details['ngay_sinh_vo_chong']
+        nghe_vo_chong = details['nghe_vo_chong']
+        dia_chi_vo_chong = details['dia_chi_vo_chong']
+        
+        thong_tin_anh_chi_em = details['thong_tin_anh_chi_em']
+        thong_tin_cac_con = details['thong_tin_cac_con']
+        
+        cur.execute("""
+                    UPDATE gia_dinh
+                    SET ten_cha = %s, nam_sinh_cha = %s, email_cha = %s, sdt_cha = %s, nghe_cha = %s,
+                    dia_chi_cha = %s, noi_cha = %s, ten_me = %s, nam_sinh_me = %s, email_me = %s, 
+                    sdt_me = %s, nghe_me = %s, dia_chi_me = %s, noi_me = %s, ten_vo_chong = %s, ngay_sinh_vo_chong = %s,
+                    nghe_vo_chong = %s, dia_chi_vo_chong = %s, thong_tin_anh_chi_em = %s, thong_tin_cac_con = %s
+                    WHERE ma_sinh_vien = %s
+                    """, (ten_cha, nam_sinh_cha, email_cha, sdt_cha, nghe_cha, dia_chi_cha, noi_cha, ten_me, nam_sinh_me,
+                          email_me, sdt_me, nghe_me, dia_chi_me, noi_me, ten_vo_chong, ngay_sinh_vo_chong,
+                          nghe_vo_chong, dia_chi_vo_chong, thong_tin_anh_chi_em, thong_tin_cac_con, ma_sinh_vien))
+        mysql.connection.commit()
         
         cur.execute("""
                     UPDATE sinh_vien
@@ -358,7 +398,7 @@ def form_view_update_sinh_vien(ma_sinh_vien, can_edit):
                     WHERE ma_sinh_vien = %s
                     """, (ho_ten, gioi_tinh, ngay_sinh, quoc_tich, dan_toc, chung_minh_thu, ngay_cmt, noi_cmt, dia_chi,
                           noi_sinh, email, so_dien_thoai, id_image, session['username'][6], ma_sinh_vien))
-        
+        mysql.connection.commit()
         if (ma_sinh_vien == session['username'][3]):
                 cur.execute("""SELECT us.*, sv.ho_ten, img.path_to_image
                     FROM user us
@@ -376,6 +416,7 @@ def form_view_update_sinh_vien(ma_sinh_vien, can_edit):
     
     return render_template(session['role'] +'sinhvien/form_view_update_sinh_vien.html',
                            mode = mode,
+                           gia_dinh = gia_dinh,
                            sinh_vien = data_default,
                            cac_lop = cac_lop,
                            my_user = session['username'],
@@ -620,11 +661,15 @@ def form_infomation_one_sinh_vien(ma_sinh_vien):
     
     data_default = data_default[0]
     
+    cur.execute("SELECT * FROM gia_dinh WHERE ma_sinh_vien = %s", (ma_sinh_vien, ))
+    gia_dinh = cur.fetchall()[0]
+    
     cur.execute("SELECT * FROM truong")
     truong = cur.fetchall()
     truong = truong[0]
     
     return render_template("sinhvien/form_infomation_one_sinh_vien.html",
+                           gia_dinh = gia_dinh,
                            sinh_vien = data_default,
                            truong = truong)
 
