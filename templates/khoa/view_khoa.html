@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title%} Khoa {{khoa[1]}} {% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='doc/css/khoa.css') }}">
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb">
+            <li class="breadcrumb-item"><a href="/view_all_khoa">Khoa</a></li>
+            <li class="breadcrumb-item"><a href="">Khoa {{khoa[1]}}</a></li>
+        </ul>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <h3 class="tile-title">Tổng quan</h3>
+                <div class="tile-body">
+                    <div class="row element-button">
+
+                        <div class="col-sm-2">
+                            <a class="btn btn-warning" href="/view_all_khoa/form_update_khoa/{{khoa[0]}}" title="Chỉnh sửa thông tin khoa"><i
+                                    class="fa fa-pencil-square-o"></i>
+                                Chỉnh sửa</a>
+                        </div>
+                    </div>
+                    <div class="dash-cards">
+                        <div class="card-single">
+                            <div class="card-body">
+                                <span class='bx bx-user-pin'></span>
+                                <div>
+                                    <h5>Tống số ngành</h5>
+                                    <h4>{{khoa[2]}}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="tile">
+                        <h3 class="tile-title">Danh sách ngành</h3>
+                        <div class="tile-body">
+                            <table class="table table-hover table-bordered js-copytextarea" cellpadding="0"
+                                cellspacing="0" border="0" id="sampleTable">
+                                <thead>
+                                    <tr>
+                                        <th>Mã ngành</th>
+                                        <th>Tên ngành</th>
+                                        <th>Hình thức đào tạo</th>
+                                        <th>Hệ</th>
+                                        <th>Học phí tín chỉ</th>
+                                        <th>Tính năng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for data in cac_nganh %}
+                                        <tr>
+                                            </td>
+                                            <td>{{data[0]}}</td>
+                                            <td>{{data[1]}}</td>
+                                            <td>{{data[2]}}</td>
+                                            <td>{{data[3]}}</td>
+                                            <td>{{data[4]}}</td>
+                                            <td class="table-td-center">
+                                                <button class="btn btn-primary btn-sm trash" type="button"
+                                                    title="Xóa" onclick="deleteNganh('{{data[0]}}')"><i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</main>
+
+<!-- Essential javascripts for application to work-->
+<script src="{{url_for('static', filename='doc/js/jquery-3.2.1.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/popper.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/bootstrap.min.js')}}"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="{{url_for('static', filename='doc/js/main.js')}}"></script>
+<!-- The javascript plugin to display page loading on top-->
+<script src="{{url_for('static', filename='doc/js/plugins/pace.min.js')}}"></script>
+<!-- Page specific javascripts-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+<!-- Data table plugin-->
+<!-- <script type="text/javascript" src="js/plugins/jquery.dataTables.min.js"></script> -->
+<script src="{{url_for('static', filename='doc/js/plugins/jquery.dataTables.min.js')}}"></script>
+<!-- <script type="text/javascript" src="js/plugins/dataTables.bootstrap.min.js"></script> -->
+<script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
+<script type="text/javascript">$('#sampleTable').DataTable();</script>
+<script>
+    function deleteNganh(id) {
+        swal({
+          title: "Cảnh báo",
+          text: "Bạn có chắc chắn là muốn ngành này?", // index = 3
+          buttons: ["Hủy bỏ", "Đồng ý"],
+        })
+          .then((willDelete) => {
+    
+            if (willDelete) {
+              $.ajax({
+                url:"/delete_nganh/" + id,
+                context: document.body
+              })
+              swal("Đã xóa thành công.!", {
+    
+              });
+              location.reload();
+            }
+          });
+      }
+</script>
+
+{% endblock %}

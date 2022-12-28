@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title%} Khoa {{khoa[1]}} {% endblock %}
+{% block content %}
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb">
+            <li class="breadcrumb-item"><a href="/view_all_khoa">Khoa</a></li>
+            <li class="breadcrumb-item"><a href="">Chỉnh sửa thông tin khoa</a></li>
+        </ul>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+
+            <div class="tile">
+
+                <h3 class="tile-title">Chỉnh sửa thông tin khoa - {{khoa[1]}}</h3>
+                <div class="tile-body">
+                    <form class="row" method="post" action="/view_all_khoa/form_update_khoa/{{khoa[0]}}" enctype="multipart/form-data">
+                        <div class="form-group col-md-3">
+                            <label class="control-label">Mã khoa</label>
+                            <input class="form-control" value="{{khoa[0]}}" type="text" name="ma_khoa" disabled>
+                        </div>
+                        <div class="form-group col-md-9">
+                            <label class="control-label">Tên khoa</label>
+                            <input class="form-control" value="{{khoa[1]}}" type="text" name="ten_khoa" required>
+                        </div>
+                        <div id="toast">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <input class="btn btn-save" type="submit" onclick="showSuccessToast();"
+                                value="Lưu" />
+                            <a class="btn btn-cancel" href="/view_all_khoa/view_khoa">Hủy bỏ</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock  %}

@@ -1,2 +1,61 @@
 {% extends "base.html" %}
+{% block title%} Khoa {% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='doc/css/khoa.css') }}">
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb">
+            <li class="breadcrumb-item active"><a href="#"><b>Khoa</b></a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+              <div class="tile-body">
+                <div class="row element-button">
+                  <div class="col-sm-2">
+                    <a class="btn btn-add btn-sm" href="/view_all_khoa/form_add_khoa" title="Tạo mới khoa"><i class="fas fa-plus"></i>
+                      Tạo mới</a>
+                  </div>
 
+                </div>
+            </div>
+        </div>
+        <!--Left-->
+        <div class="col-md-12 col-lg-12">
+            <div class="row">
+                <!-- col-6 -->
+                {% for data in cac_khoa %}
+                    <div class="col-md-4">
+                        <div class="widget-small primary coloured-icon"><i class='icon bx bxs-door-open fa-3x'></i>
+                            <div class="info">
+                                <h4><a style="color: crimson; font-style: italic;" href="/view_all_khoa/view_khoa/{{data[0]}}">Khoa {{data[1]}}</a></h4>
+                                <p><b>{{data[-1]}} ngành</b></p>
+                                <p class="info-tong">Mã khoa: {{data[0]}}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+</main>
+
+<!-- Essential javascripts for application to work-->
+<script src="{{url_for('static', filename='doc/js/jquery-3.2.1.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/popper.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/bootstrap.min.js')}}"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="{{url_for('static', filename='doc/js/main.js')}}"></script>
+<!-- The javascript plugin to display page loading on top-->
+<script src="{{url_for('static', filename='doc/js/plugins/pace.min.js')}}"></script>
+<!-- Page specific javascripts-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+<!-- Data table plugin-->
+<!-- <script type="text/javascript" src="js/plugins/jquery.dataTables.min.js"></script> -->
+<script src="{{url_for('static', filename='doc/js/plugins/jquery.dataTables.min.js')}}"></script>
+<!-- <script type="text/javascript" src="js/plugins/dataTables.bootstrap.min.js"></script> -->
+<script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
+<script type="text/javascript">$('#sampleTable').DataTable();</script>
+
+{% endblock  %}

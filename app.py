@@ -141,20 +141,16 @@ def home():
 
 # -------------------------- Khoa -------------------------
 @login_required
-@app.route('/form_add_khoa')
-def form_add_khoa():
-    return "Error"
-
-@login_required
 @app.route("/view_all_khoa")
 def view_all_khoa():
     cur = mysql.connection.cursor()
     
     cur.execute("""
                 SELECT k.*, COUNT(n.ma_nganh)
-                FROM khoa k
-                JOIN nganh n ON k.ma_khoa = n.ma_khoa
-                WHERE n.is_delete = 0
+                FROM nganh n
+                RIGHT JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                WHERE n.is_delete IS NULL OR n.is_delete != 1
+                GROUP BY k.ma_khoa
                 """)
     cac_khoa = cur.fetchall()
     
@@ -164,23 +160,26 @@ def view_all_khoa():
                            truong = session['truong'])
 
 @login_required
-@app.route("/view_khoa/<string:ma_khoa>")
+@app.route("/view_all_khoa/view_khoa/<string:ma_khoa>")
 def view_khoa(ma_khoa):
     cur = mysql.connection.cursor()
     
     cur.execute("""
-                SELECT *
-                FROM khoa k
-                where k.ma_khoa = %s
+                SELECT k.*, COUNT(n.ma_nganh)
+                FROM nganh n
+                RIGHT JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                WHERE (n.is_delete IS NULL OR n.is_delete != 1) AND k.ma_khoa = %s
+                GROUP BY k.ma_khoa
                 """, (ma_khoa, ))
     khoa = cur.fetchall()
     
     if (len(khoa) == 0):
         return "Error"
     
+    khoa = khoa[0]
+    
     cur.execute("""
-                SELECT n.ma_nganh, n.ten_nganh, n.hinh_thuc_dao_tao,
-                lh.ma_he, lh.ten_he, lh.hoc_phi_tin_chi,
+                SELECT n.ma_nganh, n.ten_nganh, n.hinh_thuc_dao_tao, lh.ten_he, lh.hoc_phi_tin_chi
                 FROM nganh n 
                 JOIN loai_he lh ON lh.ma_he = n.ma_he
                 WHERE n.is_delete = 0 AND n.ma_khoa = %s
@@ -190,6 +189,70 @@ def view_khoa(ma_khoa):
     return render_template(session['role'] + 'khoa/view_khoa.html',
                            khoa = khoa,
                            cac_nganh = cac_nganh,
+                           my_user = session['username'],
+                           truong = session['truong'])
+    
+@login_required
+@app.route("/view_all_khoa/form_add_khoa", methods=['GET','POST'])
+def form_add_khoa():
+    if request.method == 'POST':
+        details = request.form
+        ma_khoa= details['ma_khoa']
+        ten_khoa = details['ten_khoa']
+        
+        cur = mysql.connection.cursor()
+        cur.execute("""
+                    SELECT * FROM khoa WHERE ma_khoa = %s
+                    """, (ma_khoa, ))
+        kiem_tra_ma_khoa = cur.fetchall()
+        if (len(kiem_tra_ma_khoa) != 0):
+            return render_template(session['role'] + 'khoa/form_add_khoa.html',
+                                   ma_err = "Mã khoa đã tồn tại",
+                                   my_user = session['username'],
+                                   truong = session['truong'])
+            
+        cur.execute("""
+                    INSERT INTO khoa(ma_khoa, ten_khoa) 
+                    VALUES (%s, %s)
+                    """, (ma_khoa, ten_khoa))
+        mysql.connection.commit()
+        return redirect(url_for('view_all_khoa'))
+        
+    return render_template(session['role'] +'khoa/form_add_khoa.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/view_all_khoa/form_update_khoa/<string:ma_khoa>", methods=['GET','POST'])
+def form_update_khoa(ma_khoa):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT * 
+                FROM khoa 
+                WHERE ma_khoa = %s
+                """, (ma_khoa, ))
+    khoa = cur.fetchall()
+    
+    if (len(khoa) != 1):
+        return "Error"
+    
+    khoa = khoa[0]
+    
+    if (request.method == 'POST'):
+        details = request.form
+        ten_khoa = details['ten_khoa']
+        
+        cur.execute("""
+                    UPDATE khoa
+                    SET ten_khoa = %s
+                    WHERE ma_khoa = %s
+                    """, (ten_khoa, ma_khoa))
+        mysql.connection.commit()
+        return redirect(url_for('view_khoa', ma_khoa = ma_khoa))
+    
+    return render_template(session['role'] +'khoa/form_update_khoa.html',
+                           khoa = khoa,
                            my_user = session['username'],
                            truong = session['truong'])
     
@@ -233,6 +296,20 @@ def view_nganh(ma_nganh):
                            nganh = nganh,
                            my_user = session['username'],
                            truong = session['truong'])
+    
+@login_required
+@app.route("/delete_nganh/<string:ma_nganh>")
+def delete_nganh(ma_nganh):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                UPDATE nganh
+                SET is_delete = 1
+                WHERE ma_nganh = %s
+                """, (ma_nganh, ))
+    mysql.connection.commit()
+    
+    return redirect(request.url)
 # -------------------------- Nganh -------------------------
 
 
