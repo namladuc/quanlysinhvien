@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 27, 2022 at 03:16 AM
+-- Generation Time: Dec 28, 2022 at 04:08 PM
 -- Server version: 10.4.21-MariaDB
 -- PHP Version: 8.0.10
 
@@ -85,6 +85,47 @@ CREATE TABLE `dot_yeu_cau_dang_ky` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `gia_dinh`
+--
+
+CREATE TABLE `gia_dinh` (
+  `ma_sinh_vien` int(11) NOT NULL,
+  `ten_cha` varchar(70) NOT NULL,
+  `nam_sinh_cha` year(4) NOT NULL,
+  `sdt_cha` varchar(11) NOT NULL,
+  `nghe_cha` varchar(50) NOT NULL,
+  `email_cha` varchar(40) NOT NULL,
+  `dia_chi_cha` varchar(100) NOT NULL,
+  `noi_cha` varchar(100) NOT NULL,
+  `ten_me` varchar(70) NOT NULL,
+  `nam_sinh_me` year(4) NOT NULL,
+  `sdt_me` varchar(11) NOT NULL,
+  `nghe_me` varchar(50) NOT NULL,
+  `email_me` varchar(40) NOT NULL,
+  `dia_chi_me` varchar(100) NOT NULL,
+  `noi_me` varchar(100) NOT NULL,
+  `ten_vo_chong` varchar(70) NOT NULL,
+  `ngay_sinh_vo_chong` date NOT NULL,
+  `nghe_vo_chong` varchar(50) NOT NULL,
+  `dia_chi_vo_chong` varchar(100) NOT NULL,
+  `thong_tin_anh_chi_em` varchar(255) NOT NULL,
+  `thong_tin_cac_con` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `gia_dinh`
+--
+
+INSERT INTO `gia_dinh` (`ma_sinh_vien`, `ten_cha`, `nam_sinh_cha`, `sdt_cha`, `nghe_cha`, `email_cha`, `dia_chi_cha`, `noi_cha`, `ten_me`, `nam_sinh_me`, `sdt_me`, `nghe_me`, `email_me`, `dia_chi_me`, `noi_me`, `ten_vo_chong`, `ngay_sinh_vo_chong`, `nghe_vo_chong`, `dia_chi_vo_chong`, `thong_tin_anh_chi_em`, `thong_tin_cac_con`) VALUES
+(20002055, '', 1978, '', '', '', '', '', '', 1972, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002062, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002076, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002077, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002080, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', '');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `hoc_ky`
 --
 
@@ -110,6 +151,7 @@ CREATE TABLE `image_data` (
 --
 
 INSERT INTO `image_data` (`id_image`, `path_to_image`) VALUES
+('Image_Profile_20002076', 'web/img/Image_Profile_20002076.jpg'),
 ('none_image_profile', 'web/img/No_Image.png');
 
 -- --------------------------------------------------------
@@ -128,7 +170,8 @@ CREATE TABLE `khoa` (
 --
 
 INSERT INTO `khoa` (`ma_khoa`, `ten_khoa`) VALUES
-('TCT', 'Toán - Cơ - Tin học');
+('TCT', 'Toán - Cơ - Tin học'),
+('VATLY', 'Vật Lý');
 
 -- --------------------------------------------------------
 
@@ -169,7 +212,11 @@ CREATE TABLE `lop` (
 --
 
 INSERT INTO `lop` (`ma_lop`, `ma_nganh`, `nam`, `ten_lop`, `ma_nguoi_quan_ly`, `is_delete`) VALUES
-('KHDL2020', 'KHDL', 2020, 'K65A5-Khoa học dữ liệu', NULL, 0);
+('KHDL2020', 'KHDL', 2020, 'K65A5', NULL, 0),
+('KHDL2021', 'KHDL', 2021, 'K66A5', NULL, 0),
+('KHDL2022', 'KHDL', 2022, 'K67A5', NULL, 0),
+('KMHTTT2020', 'KHMTTT', 2020, 'K65A7', NULL, 0),
+('TT2020', 'TT', 2020, 'K65A2', NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -237,7 +284,10 @@ CREATE TABLE `nganh` (
 --
 
 INSERT INTO `nganh` (`ma_nganh`, `ma_khoa`, `ten_nganh`, `hinh_thuc_dao_tao`, `ma_he`, `is_delete`) VALUES
-('KHDL', 'TCT', 'Khoa học dữ liệu', 'Chính Quy', 'HC', 0);
+('KHDL', 'TCT', 'Khoa học dữ liệu', 'Chính Quy', 'HC', 0),
+('KHMTTT', 'TCT', 'Khoa học máy tính và thông tin', 'Chính Quy', 'HC', 0),
+('TH', 'TCT', 'Toán Học', 'Chính Quy', 'HC', 0),
+('TT', 'TCT', 'Toán Tin', 'Chính Quy', 'HC', 0);
 
 -- --------------------------------------------------------
 
@@ -317,7 +367,7 @@ CREATE TABLE `sinh_vien` (
   `chung_minh_thu` varchar(20) DEFAULT NULL,
   `ngay_cmt` date DEFAULT NULL,
   `noi_cmt` varchar(50) DEFAULT NULL,
-  `id_image` varchar(50) DEFAULT NULL,
+  `id_image` varchar(50) DEFAULT 'none_image_profile',
   `is_delete` tinyint(1) DEFAULT 0,
   `created_at` datetime DEFAULT current_timestamp(),
   `created_by` varchar(70) DEFAULT NULL,
@@ -330,7 +380,19 @@ CREATE TABLE `sinh_vien` (
 --
 
 INSERT INTO `sinh_vien` (`ma_sinh_vien`, `ho_ten`, `gioi_tinh`, `ngay_sinh`, `noi_sinh`, `email`, `dan_toc`, `dia_chi`, `so_dien_thoai`, `quoc_tich`, `chung_minh_thu`, `ngay_cmt`, `noi_cmt`, `id_image`, `is_delete`, `created_at`, `created_by`, `update_at`, `update_by`) VALUES
-(20002077, 'Lã Đức Nam', 'Nam', '2002-11-28', NULL, 'namld@gmail.com', 'Kinh', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2022-12-26 16:49:05', 'Administrator', NULL, NULL);
+(20002055, 'Nguyễn Khắc Huy', 'Nam', '2002-07-31', 'Đan Phượng', 'khachuynguyen@gmail.com', 'None', 'Đan Phượng', 'None', 'None', 'None', '0000-00-00', 'Đan Phượng', 'none_image_profile', 0, '2022-12-27 20:35:35', 'Administrator', '2022-12-28 14:58:29', 'Administrator'),
+(20002062, 'Phạm Như Khoa', 'Nam', '2002-11-08', 'Hoài Đức', 'phamnhuga@gmail.com', 'Kinh', 'Hoài Đức', '0937718364', 'Việt Nam', '001293748284', '2020-08-03', 'Hoài Đức', 'none_image_profile', 0, '2022-12-28 08:33:49', 'Administrator', '2022-12-28 08:33:49', NULL),
+(20002076, 'Dương Văn Nam', 'Nam', '2002-10-07', 'Bắc Giang', 'duongnam@gmail.com', 'Kinh', 'Bắc Giang', '0967739865', 'Việt Nam', '0028394187', '0000-00-00', '', 'Image_Profile_20002076', 0, '2022-12-27 16:47:00', 'Administrator', '2022-12-27 22:08:03', 'Administrator'),
+(20002077, 'Lã Đức Nam', 'Nam', '2002-11-28', NULL, 'namld@gmail.com', 'Kinh', NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2022-12-26 16:49:05', 'Administrator', NULL, NULL),
+(20002080, 'Phạm Hồng Nghĩa', 'Nam', '2002-10-07', 'Phú Thọ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2022-12-27 20:35:35', 'Administrator', '2022-12-27 20:35:35', NULL);
+
+--
+-- Triggers `sinh_vien`
+--
+DELIMITER $$
+CREATE TRIGGER `insert_new_data_sinh_vien` AFTER INSERT ON `sinh_vien` FOR EACH ROW INSERT INTO gia_dinh(ma_sinh_vien) VALUES (NEW.ma_sinh_vien)
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -342,6 +404,17 @@ CREATE TABLE `sinh_vien_lop` (
   `ma_sinh_vien` int(11) NOT NULL,
   `ma_lop` varchar(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `sinh_vien_lop`
+--
+
+INSERT INTO `sinh_vien_lop` (`ma_sinh_vien`, `ma_lop`) VALUES
+(20002055, 'KHDL2020'),
+(20002062, 'KHDL2020'),
+(20002076, 'KHDL2020'),
+(20002077, 'KHDL2020'),
+(20002080, 'KHDL2020');
 
 -- --------------------------------------------------------
 
@@ -413,6 +486,12 @@ ALTER TABLE `dot_dang_ky`
 --
 ALTER TABLE `dot_yeu_cau_dang_ky`
   ADD PRIMARY KEY (`ma_dot_yeu_cau`);
+
+--
+-- Indexes for table `gia_dinh`
+--
+ALTER TABLE `gia_dinh`
+  ADD PRIMARY KEY (`ma_sinh_vien`);
 
 --
 -- Indexes for table `hoc_ky`
