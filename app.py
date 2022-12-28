@@ -256,33 +256,118 @@ def form_update_khoa(ma_khoa):
                            my_user = session['username'],
                            truong = session['truong'])
     
+@login_required
+@app.route("/delete_khoa/<string:ma_khoa>")
+def delete_khoa(ma_khoa):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT COUNT(n.ma_nganh)
+                FROM nganh n
+                RIGHT JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                WHERE (n.is_delete IS NULL OR n.is_delete != 1) AND k.ma_khoa = %s
+                GROUP BY k.ma_khoa
+                """, (ma_khoa, ))
+    data = cur.fetchall()[0][0]
+    if (data != 0):
+        return "Error"
+    
+    cur.execute("""
+                DELETE FROM khoa
+                WHERE ma_khoa = %s 
+                """, (ma_khoa, ))
+    
+    mysql.connection.commit()
+    return redirect(url_for('view_all_khoa'))
+
 # -------------------------- Khoa -------------------------
 
 
 # -------------------------- Nganh -------------------------
 
-@login_required
-@app.route('/view_all_nganh')
-def view_all_nganh():
+@app.route("/table_nganh")
+def table_nganh():
     cur = mysql.connection.cursor()
     
     cur.execute("""
-                SELECT n.ma_nganh, n.ten_nganh, n.hinh_thuc_dao_tao, k.ten_khoa, lh.ten_he
+                SELECT n.ma_nganh, n.ten_nganh, n.hinh_thuc_dao_tao, k.ten_khoa, lh.ten_he, COUNT(l.ma_lop)
                 FROM nganh n
                 JOIN khoa k ON k.ma_khoa = n.ma_khoa
                 JOIN loai_he lh ON lh.ma_he = n.ma_he
-                WHERE n.is_delete = 0
+                JOIN lop l ON l.ma_nganh = n.ma_nganh
+                WHERE n.is_delete = 0 AND (l.is_delete = 0 OR l.is_delete IS NULL)
+                GROUP BY n.ma_nganh
+                ORDER BY k.ten_khoa ASC, n.ten_nganh ASC
                 """)
     cac_nganh = cur.fetchall()
     
-    return render_template(session['role'] + 'nganh/view_all_nganh.html',
+    return render_template(session['role'] + 'nganh/table_nganh.html',
                            cac_nganh = cac_nganh,
                            my_user = session['username'],
                            truong = session['truong'])
 
 @login_required
-@app.route('/view_nganh/<string:ma_nganh>')
+@app.route("/get_table_nganh_excel")
+def get_table_nganh_excel():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT n.ma_nganh, n.ten_nganh, n.hinh_thuc_dao_tao, k.ten_khoa, lh.ten_he, COUNT(l.ma_lop)
+                FROM nganh n
+                JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                JOIN loai_he lh ON lh.ma_he = n.ma_he
+                JOIN lop l ON l.ma_nganh = n.ma_nganh
+                WHERE n.is_delete = 0 AND (l.is_delete = 0 OR l.is_delete IS NULL)
+                GROUP BY n.ma_nganh
+                ORDER BY k.ten_khoa ASC, n.ten_nganh ASC
+                """)
+    cac_nganh = cur.fetchall()
+    columnName = ['MaNganh','TenNganh','HinhThucDaoTao','TenKhoa','TenHe','SoLuongLop']
+    data = pd.DataFrame.from_records(cac_nganh, columns=columnName)
+    data = data.set_index('MaNganh')
+    pathFile = app.config['SAVE_FOLDER_EXCEL'] + "/" + "Data_Nganh.xlsx"
+    data.to_excel(pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
+@app.route("/table_print_nganh")
+def table_print_nganh():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT n.ma_nganh, n.ten_nganh, n.hinh_thuc_dao_tao, k.ten_khoa, lh.ten_he, COUNT(l.ma_lop)
+                FROM nganh n
+                JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                JOIN loai_he lh ON lh.ma_he = n.ma_he
+                JOIN lop l ON l.ma_nganh = n.ma_nganh
+                WHERE n.is_delete = 0 AND (l.is_delete = 0 OR l.is_delete IS NULL)
+                GROUP BY n.ma_nganh
+                ORDER BY k.ten_khoa ASC, n.ten_nganh ASC
+                """)
+    cac_nganh = cur.fetchall()
+    return render_template("nganh/table_print_nganh.html",
+                           cac_nganh = cac_nganh)
+
+@login_required
+@app.route("/get_table_nganh_pdf")
+def get_table_nganh_pdf():
+    pathFile = app.config['SAVE_FOLDER_PDF']  + '/Table Nganh.pdf'
+    pdfkit.from_url("/".join(request.url.split("/")[:-1:]) + '/table_print_nganh',pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
+@app.route("/table_nganh/view_nganh/<string:ma_nganh>")
 def view_nganh(ma_nganh):
+    return "Error"
+
+@app.route("/table_nganh/form_add_nganh")
+def form_add_nganh():
+    return render_template(session['role'] + 'nganh/form_add_nganh.html',
+                           my_user = session['username'],
+                           truong = session['truong']) 
+
+@app.route("/table_nganh/form_update_nganh/<string:ma_nganh>")
+def form_update_nganh(ma_nganh):
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -292,11 +377,11 @@ def view_nganh(ma_nganh):
                 """, (ma_nganh, ))
     nganh = cur.fetchall()
     
-    return render_template(session['role'] + 'nganh/view_nganh.html',
+    return render_template(session['role'] + 'nganh/form_update_nganh.html',
                            nganh = nganh,
                            my_user = session['username'],
                            truong = session['truong'])
-    
+
 @login_required
 @app.route("/delete_nganh/<string:ma_nganh>")
 def delete_nganh(ma_nganh):

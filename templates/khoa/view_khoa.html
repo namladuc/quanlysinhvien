@@ -8,6 +8,7 @@
             <li class="breadcrumb-item"><a href="/view_all_khoa">Khoa</a></li>
             <li class="breadcrumb-item"><a href="">Khoa {{khoa[1]}}</a></li>
         </ul>
+        <div id="clock"></div>
     </div>
     <div class="row">
         <div class="col-md-12">
@@ -20,6 +21,11 @@
                             <a class="btn btn-warning" href="/view_all_khoa/form_update_khoa/{{khoa[0]}}" title="Chỉnh sửa thông tin khoa"><i
                                     class="fa fa-pencil-square-o"></i>
                                 Chỉnh sửa</a>
+                        </div>
+
+                        <div class="col-sm-2">
+                            <a class="btn btn-delete btn-sm" type="button" title="Xóa khoa"
+                                href="/delete_khoa/{{khoa[0]}}"><i class="fas fa-trash-alt"></i> Xóa khoa </a>
                         </div>
                     </div>
                     <div class="dash-cards">
@@ -62,6 +68,10 @@
                                             <td>{{data[3]}}</td>
                                             <td>{{data[4]}}</td>
                                             <td class="table-td-center">
+                                                <button class="btn btn-primary btn-sm edit" type="button" title="Sửa" id="show-emp">
+                                                    <a href="/table_nganh/form_update_nganh/{{data[0]}}"><i class="fa fa-eye"
+                                                            aria-hidden="true"></i></a>
+                                                </button>
                                                 <button class="btn btn-primary btn-sm trash" type="button"
                                                     title="Xóa" onclick="deleteNganh('{{data[0]}}')"><i class="fas fa-trash-alt"></i>
                                                 </button>
