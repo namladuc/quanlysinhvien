@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %} Ngành {% endblock title %}
+{% block title %} Môn học {% endblock title %}
 {% block content %}
 <main class="app-content">
     <div class="app-title">
         <ul class="app-breadcrumb breadcrumb side">
-            <li class="breadcrumb-item active"><a href="#"><b>Ngành</b></a></li>
+            <li class="breadcrumb-item active"><a href="#"><b>Môn học</b></a></li>
         </ul>
         <div id="clock"></div>
     </div>
@@ -17,33 +17,28 @@
                     <div class="row element-button">
 
                         <div class="col-sm-2">
-                            <a class="btn btn-add btn-sm" href="/table_nganh/form_add_nganh" title="Thêm ngành mới"><i
+                            <a class="btn btn-add btn-sm" href="/table_mon_hoc/form_add_mon_hoc" title="Thêm môn học mới"><i
                                     class="fas fa-plus"></i>
                                 Thêm</a>
                         </div>
 
                         <div class="col-sm-2">
-                            <a class="btn btn-delete btn-sm nhap-tu-file" href="/table_nganh/form_add_nganh_upload_file"
+                            <a class="btn btn-delete btn-sm nhap-tu-file" href="/table_mon_hoc/form_add_mon_hoc_upload_file"
                                 type="button" title="Tải từ file"><i class="fas fa-file-upload"></i>Tải từ file</a>
                         </div>
 
                         <div class="col-sm-2">
-                          <a class="btn btn-info btn-sm" href="/table_nganh/view_nganh_he" title="Các hệ hiện có"><i class="fa fa-book"></i>
-                            Xem các hệ</a>
-                        </div>
-
-                        <div class="col-sm-2">
-                          <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printTable()"><i
+                          <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printNV()"><i
                               class="fas fa-print"></i> In thông tin</a>
                         </div>
                         <div class="col-sm-2">
-                            <a class="btn btn-excel btn-sm" href="/get_table_nganh_excel" title="Xuất Excel"><i
+                            <a class="btn btn-excel btn-sm" href="" title="Xuất Excel"><i
                                     class="fas fa-file-excel"></i> Xuất Excel</a>
                         </div>
 
                         <div class="col-sm-2">
                             <a class="btn btn-delete btn-sm pdf-file" type="button" title="Xuất PDF"
-                                href="/get_table_nganh_pdf"><i class="fas fa-file-pdf"></i>Xuất PDF</a>
+                                href=""><i class="fas fa-file-pdf"></i>Xuất PDF</a>
                         </div>
 
                         <div class="col-sm-2">
@@ -57,39 +52,27 @@
                         <thead>
                             <tr>
                                 <th width="10"><input type="checkbox" id="all"></th>
-                                <th>Mã ngành</th>
-                                <th >Tên ngành</th>
-                                <th >Tên khoa</th>
-                                <th >Hình thức đào tạo</th>
-                                <th >Hệ</th>
-                                <th >Số lượng lớp</th>
+                                <th>Mã môn</th>
+                                <th>Tên môn</th>
+                                <th>Số tín chỉ</th>
                                 <th>Tính năng</th>
                             </tr>
                         </thead>
                         <tbody>
-                          {% for data in cac_nganh %}
                             <tr>
                                 <td width="10"><input type="checkbox" id="myChecker" name="check1" value="1"></td>
-                                <td>{{data[0]}}</td>
-                                <td>{{data[1]}}</td>
-                                <td>{{data[3]}}</td>
-                                <td>{{data[2]}}</td>
-                                <td>{{data[4]}}</td>
-                                <td class="table-td-center">
-                                  <button class="btn btn-outline-primary" type="button" title="Ấn vào để xem các lớp thuộc ngành Khoa học dữ liệu"
-                                  onclick="location.href='/table_nganh/view_nganh_lop/{{data[0]}}';">{{data[5]}}
-                                  </button>
-                                </td>
+                                <td>MAT1102</td>
+                                <td>Cơ sở dữ liệu Web và hệ thống thông tin</td>
+                                <td>3</td>
                                 <td class="table-td-center"><button class="btn btn-primary btn-sm trash" type="button"
-                                        title="Xóa" onclick="deleteRow('{{data[0]}}')"><i class="fas fa-trash-alt"></i>
+                                        title="Xóa" onclick="deleteRow(this)"><i class="fas fa-trash-alt"></i>
                                     </button>
                                     <button class="btn btn-primary btn-sm edit" type="button" title="Sửa" id="show-emp">
-                                        <a href="/table_nganh/form_update_nganh/{{data[0]}}"><i class="fa fa-edit"
+                                        <a href="/table_mon_hoc/form_update_mon_hoc"><i class="fa fa-edit"
                                                 aria-hidden="true"></i></a>
                                     </button>
                                 </td>
                             </tr>
-                          {% endfor %}
 
                         </tbody>
                     </table>
@@ -115,7 +98,10 @@
  <script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
  <script type="text/javascript">$('#sampleTable').DataTable();</script>
  <script>
-   function deleteRow(id) {
+   function deleteRow(r) {
+     var i = r.parentNode.parentNode.rowIndex;
+     // document.getElementById("myTable").deleteRow(i); -->
+     var maNV = r.parentNode.parentNode.childNodes[3].textContent
      swal({
        title: "Cảnh báo",
        text: "Bạn có chắc chắn là muốn xóa ngành này?", // index = 3
@@ -125,7 +111,7 @@
         
          if (willDelete) {
            $.ajax({
-             url:"/delete_nganh/" + id,
+             url:"/delete_sinh_vien/" + maNV,
              context: document.body
            })
            swal("Đã xóa thành công.!", {
@@ -155,7 +141,7 @@
          if (willDelete) {
            for (let i = 0; i < id_nv.length; i++) {
              $.ajax({
-               url:"/delete_nganh/" + id_nv[i],
+               url:"/delete_sinh_vien/" + id_nv[i],
                context: document.body
              })
            }
@@ -174,7 +160,7 @@
    //In dữ liệu
    var myApp = new function () {
      this.printTable = function () {
-       var win = window.open('/table_print_nganh', '', 'height=700,width=1400');
+       var win = window.open('/get_print_data_employees', '', 'height=700,width=1400');
        win.document.close();
        win.print();
      }

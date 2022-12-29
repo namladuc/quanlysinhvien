@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %} Lớp {% endblock title %}
+{% block title %} Lớp {{lop[3]}}-{{lop[-1]}} {% endblock title %}
 {% block content %}
 <main class="app-content">
     <div class="app-title">
         <ul class="app-breadcrumb breadcrumb side">
-            <li class="breadcrumb-item"><a href="/table_lop">Lớp</a></li>
-            <li class="breadcrumb-item"><a href="">Danh sách sinh viên</a></li>
+            <li class="breadcrumb-item"><a href="/table_lop">Lớp </a></li>
+            <li class="breadcrumb-item"><a href="">Danh sách sinh viên lớp {{lop[3]}}-{{lop[-1]}} </a></li>
         </ul>
         <div id="clock"></div>
     </div>
@@ -17,17 +17,17 @@
 
                     <div class="row element-button">
                         <div class="col-sm-2">
-                          <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printNV()"><i
+                          <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printTable()"><i
                               class="fas fa-print"></i> In thông tin</a>
                         </div>
                         <div class="col-sm-2">
-                            <a class="btn btn-excel btn-sm" href="" title="Xuất Excel"><i
+                            <a class="btn btn-excel btn-sm" href="/get_table_lop_sinh_vien_excel/{{lop[0]}}" title="Xuất Excel"><i
                                     class="fas fa-file-excel"></i> Xuất Excel</a>
                         </div>
 
                         <div class="col-sm-2">
                             <a class="btn btn-delete btn-sm pdf-file" type="button" title="Xuất PDF"
-                                href=""><i class="fas fa-file-pdf"></i>Xuất PDF</a>
+                                href="/get_table_lop_sinh_vien_pdf/{{lop[0]}}"><i class="fas fa-file-pdf"></i>Xuất PDF</a>
                         </div>
 
                         <div class="col-sm-2">
@@ -44,34 +44,35 @@
                                 <th>Mã sinh viên</th>
                                 <th >Họ và tên</th>
                                 <th >Giới tính</th>
-                                <th >Ngày sinh <br> (dd-mm-yyyy) </th>
+                                <th >Ngày sinh </th>
                                 <th >Địa chỉ</th>
                                 <th>Email</th>
                                 <th >Số điện thoại</th>
-                                <th>CCCD/CMT</th>
                                 <th>Tính năng</th>
                             </tr>
                         </thead>
                         <tbody>
+                          {% for data in cac_sv %}
                             <tr>
                                 <td width="10"><input type="checkbox" id="myChecker" name="check1" value="1"></td>
-                                <td>20002076</td>
-                                <td>Duong Van Nam</td>
-                                <td>Nam</td>
-                                <td>1-7-2002</td>
-                                <td>Bắc Giang</td>
-                                <td>dn@gmail.com</td>
-                                <td>0977656665</td>
-                                <td>123456789</td>
-                                <td class="table-td-center"><button class="btn btn-primary btn-sm trash" type="button"
-                                        title="Xóa" onclick="deleteRow(this)"><i class="fas fa-trash-alt"></i>
+                                <td>{{data[0]}}</td>
+                                <td>{{data[1]}}</td>
+                                <td>{{data[2]}}</td>
+                                <td>{{data[3]}}</td>
+                                <td>{{data[4]}}</td>
+                                <td>{{data[5]}}</td>
+                                <td>{{data[6]}}</td>
+                                <td class="table-td-center">
+                                  <button class="btn btn-primary btn-sm trash" type="button"
+                                        title="Xóa" onclick="deleteRow('{{data[0]}}')"><i class="fas fa-trash-alt"></i>
                                     </button>
                                     <button class="btn btn-primary btn-sm edit" type="button" title="Xem chi tiết" id="show-emp">
-                                        <a href="/table_lop/view_lop_sinh_vien"><i class="fa fa-eye"
+                                        <a href="/bang_sinh_vien/form_view_update_sinh_vien/{{data[0]}}_N"><i class="fa fa-eye"
                                                 aria-hidden="true"></i></a>
                                     </button>
                                 </td>
                             </tr>
+                          {% endfor %}
 
                         </tbody>
                     </table>
@@ -97,10 +98,7 @@
  <script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
  <script type="text/javascript">$('#sampleTable').DataTable();</script>
  <script>
-   function deleteRow(r) {
-     var i = r.parentNode.parentNode.rowIndex;
-     // document.getElementById("myTable").deleteRow(i); -->
-     var maNV = r.parentNode.parentNode.childNodes[3].textContent
+   function deleteRow(id) {
      swal({
        title: "Cảnh báo",
        text: "Bạn có chắc chắn là muốn xóa sinh viên này?", // index = 3
@@ -110,7 +108,7 @@
         
          if (willDelete) {
            $.ajax({
-             url:"/delete_sinh_vien/" + maNV,
+             url:"/delete_sinh_vien/" + id,
              context: document.body
            })
            swal("Đã xóa thành công.!", {
@@ -159,7 +157,7 @@
    //In dữ liệu
    var myApp = new function () {
      this.printTable = function () {
-       var win = window.open('/get_print_data_employees', '', 'height=700,width=1400');
+       var win = window.open('/table_print_lop_sinh_vien/{{lop[0]}}', '', 'height=700,width=1400');
        win.document.close();
        win.print();
      }

@@ -38,7 +38,7 @@ app.config['SAVE_FOLDER_EXCEL'] = SAVE_FOLDER_EXCEL
 
 mysql = MySQL(app)
 
-def login_required(func): # need for some router
+def login_required(func): # need for all router
     @functools.wraps(func)
     def secure_function(*args, **kwargs):
         if "username" not in session:
@@ -144,6 +144,7 @@ def forgot():
                            truong = session['truong'])
 
 # -------------------------- Khoa -------------------------
+
 @login_required
 @app.route("/view_all_khoa")
 def view_all_khoa():
@@ -329,7 +330,7 @@ def get_table_nganh_excel():
     columnName = ['MaNganh','TenNganh','HinhThucDaoTao','TenKhoa','TenHe','SoLuongLop']
     data = pd.DataFrame.from_records(cac_nganh, columns=columnName)
     data = data.set_index('MaNganh')
-    pathFile = app.config['SAVE_FOLDER_EXCEL'] + "/" + "Data_lop.xlsx"
+    pathFile = app.config['SAVE_FOLDER_EXCEL'] + "/" + "Data_Nganh.xlsx"
     data.to_excel(pathFile)
     return send_file(pathFile, as_attachment=True)
 
@@ -359,6 +360,7 @@ def get_table_nganh_pdf():
     pdfkit.from_url("/".join(request.url.split("/")[:-1:]) + '/table_print_nganh',pathFile)
     return send_file(pathFile, as_attachment=True)
 
+@login_required
 @app.route("/table_nganh/form_add_nganh_upload_file", methods=['GET','POST'])
 def form_add_nganh_upload_file():
     if request.method == 'POST':
@@ -375,6 +377,7 @@ def form_add_nganh_upload_file():
                            my_user = session['username'],
                            truong = session['truong'])
 
+@login_required
 @app.route("/table_nganh/form_add_nganh_upload_process/<string:filename>", methods=['GET','POST'])
 def form_add_nganh_upload_process(filename):
     pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
@@ -468,6 +471,7 @@ def form_add_nganh_upload_process(filename):
                            name_column = default_name_column,
                            index_column = data_column)
 
+@login_required
 @app.route("/table_nganh/view_nganh_lop/<string:ma_nganh>")
 def view_nganh_lop(ma_nganh):
     cur = mysql.connection.cursor()
@@ -494,6 +498,7 @@ def view_nganh_lop(ma_nganh):
                            my_user = session['username'],
                            truong = session['truong'])
 
+@login_required
 @app.route("/table_nganh/form_add_nganh", methods=['GET','POST'])
 def form_add_nganh():
     cur = mysql.connection.cursor()
@@ -538,6 +543,7 @@ def form_add_nganh():
                            my_user = session['username'],
                            truong = session['truong']) 
 
+@login_required
 @app.route("/table_nganh/form_update_nganh/<string:ma_nganh>", methods = ['GET','POST'])
 def form_update_nganh(ma_nganh):
     cur = mysql.connection.cursor()
@@ -578,6 +584,89 @@ def form_update_nganh(ma_nganh):
                            nganh = nganh,
                            my_user = session['username'],
                            truong = session['truong'])
+
+@login_required
+@app.route("/table_nganh/view_nganh_he")
+def view_nganh_he():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("SELECT * FROM loai_he")
+    cac_he = cur.fetchall()
+    
+    return render_template(session['role'] + 'nganh/view_nganh_he.html',
+                           cac_he = cac_he,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@app.route("/table_nganh/form_add_he", methods=['GET','POST'])
+def form_add_he():
+    if request.method == 'POST':
+        details = request.form
+        ma_he = details['ma_he']
+        ten_he = details['ten_he']
+        hoc_phi_tin_chi = details['hoc_phi_tin_chi']
+        
+        cur = mysql.connection.cursor()
+        
+        cur.execute("SELECT * FROM loai_he WHERE ma_he = %s", (ma_he, ))
+        if (len(cur.fetchall()) != 0):
+            return render_template(session['role'] + 'nganh/form_add_he.html',
+                                   ma_err = "Mã hệ đã tồn tại",
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+            
+        cur.execute("""INSERT INTO loai_he(ma_he, ten_he, hoc_phi_tin_chi)
+                    VALUES (%s, %s, %s)
+                    """, (ma_he, ten_he, hoc_phi_tin_chi))
+        mysql.connection.commit()
+        return redirect(url_for('view_nganh_he'))
+            
+    return render_template(session['role'] + 'nganh/form_add_he.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@app.route("/table_nganh/form_update_he/<string:ma_he>", methods=['GET','POST'])
+def form_update_he(ma_he):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("SELECT * FROM loai_he WHERE ma_he = %s", (ma_he, ))
+    he = cur.fetchall()
+    
+    if (len(he) != 1):
+        return "Error"
+    
+    he = he[0]
+    
+    if request.method == 'POST':
+        details = request.form
+        ten_he = details['ten_he']
+        hoc_phi_tin_chi = details['hoc_phi_tin_chi']
+        
+        cur.execute("""
+                    UPDATE loai_he
+                    SET ten_he = %s, hoc_phi_tin_chi = %s
+                    WHERE ma_he = %s
+                    """, (ten_he, hoc_phi_tin_chi, ma_he))
+        mysql.connection.commit()
+        return redirect(url_for("view_nganh_he"))        
+        
+    return render_template(session['role'] + 'nganh/form_update_he.html',
+                           he = he,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/delete_he/<string:ma_he>")
+def delete_he(ma_he):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("SELECT COUNT(*) FROM nganh WHERE ma_he = %s", (ma_he, ))
+    if (cur.fetchall()[0][0] != 0):
+        return "Error"
+    
+    cur.execute("DELETE FROM loai_he WHERE ma_he = %s", (ma_he, ))
+    mysql.connection.commit()
+    return redirect(url_for('view_nganh_he'))
 
 @login_required
 @app.route("/delete_nganh/<string:ma_nganh>")
@@ -807,9 +896,146 @@ def form_add_lop_upload_process(filename):
                            name_column = default_name_column,
                            index_column = data_column)
     
-@app.route("/table_lop/view_lop_sinh_vien")
-def view_lop_sinh_vien():
-    return render_template('lop/view_lop_sinh_vien.html')
+@login_required
+@app.route("/table_print_lop")
+def table_print_lop():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+               SELECT l.*, n.ten_nganh, COUNT(svl.ma_sinh_vien)
+                FROM lop l 
+                LEFT JOIN sinh_vien_lop svl ON svl.ma_lop = l.ma_lop
+                LEFT JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                WHERE l.is_delete = 0
+                GROUP BY l.ma_lop
+                """)
+    cac_lop = cur.fetchall()
+    
+    return render_template('lop/table_print_lop.html', 
+                           cac_lop = cac_lop)
+    
+@login_required
+@app.route("/get_table_lop_pdf")
+def get_table_lop_pdf():
+    pathFile = app.config['SAVE_FOLDER_PDF']  + '/Table Lop.pdf'
+    pdfkit.from_url("/".join(request.url.split("/")[:-1:]) + '/table_print_lop',pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
+@app.route("/get_table_lop_excel")
+def get_table_lop_excel():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+               SELECT l.ma_lop, l.ma_nganh, l.nam, l.ten_lop, l.ma_nguoi_quan_ly, n.ten_nganh, COUNT(svl.ma_sinh_vien)
+                FROM lop l 
+                LEFT JOIN sinh_vien_lop svl ON svl.ma_lop = l.ma_lop
+                LEFT JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                WHERE l.is_delete = 0
+                GROUP BY l.ma_lop
+                """)
+    cac_lop = cur.fetchall()
+    columnName = ['MaLop','MaNganh','Nam','TenLop','MaNguoiQuanLy', 'TenNganh','SoLuongSinhVien']
+    data = pd.DataFrame.from_records(cac_lop, columns=columnName)
+    data = data.set_index('MaLop')
+    pathFile = app.config['SAVE_FOLDER_EXCEL'] + "/" + "Data_lop.xlsx"
+    data.to_excel(pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
+@app.route("/table_lop/view_lop_sinh_vien/<string:ma_lop>")
+def view_lop_sinh_vien(ma_lop):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT l.*, n.ten_nganh
+                FROM lop l
+                LEFT JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                WHERE ma_lop = %s AND l.is_delete = 0""", (ma_lop, ))
+    lop = cur.fetchall()
+    if (len(lop) != 1):
+        return "Error"
+    lop = lop[0]
+    
+    cur.execute("""
+                SELECT sv.ma_sinh_vien, sv.ho_ten, sv.gioi_tinh, sv.ngay_sinh,
+                sv.dia_chi, sv.email, sv.so_dien_thoai
+                FROM sinh_vien sv
+                JOIN sinh_vien_lop svl ON sv.ma_sinh_vien = svl.ma_sinh_vien
+                WHERE svl.ma_lop = %s AND sv.is_delete = 0
+                """, (ma_lop, ))
+    cac_sv = cur.fetchall()
+    
+    return render_template(session['role'] + 'lop/view_lop_sinh_vien.html',
+                           lop = lop,
+                           cac_sv = cac_sv,
+                           my_user = session['username'],
+                           truong =session['truong'])
+
+@login_required
+@app.route("/table_print_lop_sinh_vien/<string:ma_lop>")
+def table_print_lop_sinh_vien(ma_lop):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT l.*, n.ten_nganh
+                FROM lop l
+                LEFT JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                WHERE ma_lop = %s AND l.is_delete = 0""", (ma_lop, ))
+    lop = cur.fetchall()
+    if (len(lop) != 1):
+        return "Error"
+    lop = lop[0]
+    
+    cur.execute("""
+                SELECT sv.ma_sinh_vien, sv.ho_ten, sv.gioi_tinh, sv.ngay_sinh,
+                sv.dia_chi, sv.email, sv.so_dien_thoai
+                FROM sinh_vien sv
+                JOIN sinh_vien_lop svl ON sv.ma_sinh_vien = svl.ma_sinh_vien
+                WHERE svl.ma_lop = %s AND sv.is_delete = 0
+                """, (ma_lop, ))
+    cac_sv = cur.fetchall()
+    
+    return render_template('lop/table_print_lop_sinh_vien.html',
+                           lop = lop,
+                           cac_sv = cac_sv)
+
+@login_required
+@app.route("/get_table_lop_sinh_vien_pdf/<string:ma_lop>")
+def get_table_lop_sinh_vien_pdf(ma_lop):
+    pathFile = app.config['SAVE_FOLDER_PDF']  + '/Table Lop_' + ma_lop + '.pdf'
+    pdfkit.from_url("/".join(request.url.split("/")[:-2:]) + '/table_print_lop_sinh_vien/' + ma_lop,pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
+@app.route("/get_table_lop_sinh_vien_excel/<string:ma_lop>")
+def get_table_lop_sinh_vien_excel(ma_lop):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT l.*, n.ten_nganh
+                FROM lop l
+                LEFT JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                WHERE ma_lop = %s AND l.is_delete = 0""", (ma_lop, ))
+    lop = cur.fetchall()
+    if (len(lop) != 1):
+        return "Error"
+    lop = lop[0]
+    
+    cur.execute("""
+                SELECT sv.ma_sinh_vien, sv.ho_ten, sv.gioi_tinh, sv.ngay_sinh,
+                sv.dia_chi, sv.email, sv.so_dien_thoai
+                FROM sinh_vien sv
+                JOIN sinh_vien_lop svl ON sv.ma_sinh_vien = svl.ma_sinh_vien
+                WHERE svl.ma_lop = %s AND sv.is_delete = 0
+                """, (ma_lop, ))
+    cac_sv = cur.fetchall()
+    columnName = ['MaSinhVien','HoTen','GioiTinh','NgaySinh','DiaChi', 'Email','SoDienThoai']
+    data = pd.DataFrame.from_records(cac_sv, columns=columnName)
+    data = data.set_index('MaSinhVien')
+    pathFile = app.config['SAVE_FOLDER_EXCEL'] + "/" + "Data_Sinh_Vien_Lop_" + ma_lop + ".xlsx"
+    data.to_excel(pathFile)
+    return send_file(pathFile, as_attachment=True)
 
 @login_required
 @app.route("/delete_lop/<string:ma_lop>")
@@ -1290,7 +1516,6 @@ def table_print_sinh_vien():
     
     return render_template('sinhvien/table_print_sinh_vien.html', 
                            sinh_vien =  sinh_vien) 
-
 
 # -------------------------- Sinh vien -------------------------
 
