@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title%} Chỉnh sửa thông tin môn học {% endblock %}
+{% block title%} Chỉnh sửa thông tin môn học {{mon_hoc[1]}} {% endblock %}
 {% block content %}
 <main class="app-content">
     <div class="app-title">
         <ul class="app-breadcrumb breadcrumb">
             <li class="breadcrumb-item"><a href="/table_mon_hoc">Môn học</a></li>
-            <li class="breadcrumb-item"><a href="">Chỉnh sửa thông tin môn học</a></li>
+            <li class="breadcrumb-item"><a href="">Chỉnh sửa thông tin môn học {{mon_hoc[1]}}</a></li>
         </ul>
         <div id="clock"></div>
     </div>
@@ -16,20 +16,32 @@
 
                 <h3 class="tile-title">Chỉnh sửa thông tin môn học</h3>
                 <div class="tile-body">
-                    <form class="row" method="post" action="/form_update_mon_hoc" enctype="multipart/form-data">
+                    <form class="row" method="post" action="/table_mon_hoc/form_update_mon_hoc/{{mon_hoc[0]}}" enctype="multipart/form-data">
                         <div class="form-group col-md-3">
                             <label class="control-label">Mã môn học</label>
-                            <input class="form-control" type="text" name="ma_mon_hoc" required>
+                            <input class="form-control" value="{{mon_hoc[0]}}" type="text" name="ma_mon" disabled>
                         </div>
                         <div class="form-group col-md-5">
                             <label class="control-label">Số tín chỉ</label>
-                            <input class="form-control" type="text" name="ten_khoa" required>
+                            <input class="form-control" value="{{mon_hoc[2]}}" type="number" name="so_tin_chi" required>
                         </div>
                         <div class="form-group col-md-4">
                         </div>
                         <div class="form-group col-md-8">
                             <label class="control-label">Tên môn học</label>
-                            <input class="form-control" type="text" name="ten_mon_hoc" required>
+                            <input class="form-control" value="{{mon_hoc[1]}}" type="text" name="ten_mon" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                        </div>
+                        <div class="form-group col-md-8">
+                            <label class="control-label">Môn học này thuộc các ngành</label> <br>
+                            {% for data in cac_nganh_thuoc %}
+                                <input type="checkbox" name="{{data[0]}}" value="{{data[0]}}" checked> {{data[2]}} - Hệ {{data[-1]}} <br>
+                            {% endfor %}
+
+                            {% for data in cac_nganh %}
+                                <input type="checkbox" name="{{data[0]}}" value="{{data[0]}}"> {{data[2]}} - Hệ {{data[-1]}} <br>
+                            {% endfor %}
                         </div>
                         <div class="form-group col-md-4">
                         </div>

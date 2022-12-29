@@ -567,9 +567,9 @@ def form_update_nganh(ma_nganh):
         details = request.form
         ma_nganh = nganh[0]
         ma_khoa = nganh[1]
-        ten_nganh = details['ten_nganh']
-        hinh_thuc_dao_tao = details['hinh_thuc_dao_tao']
-        ma_he = details['ma_he']
+        ten_nganh = details['ten_nganh'].strip()
+        hinh_thuc_dao_tao = details['hinh_thuc_dao_tao'].strip()
+        ma_he = details['ma_he'].strip()
         
         cur.execute("""
                     UPDATE nganh
@@ -602,9 +602,9 @@ def view_nganh_he():
 def form_add_he():
     if request.method == 'POST':
         details = request.form
-        ma_he = details['ma_he']
-        ten_he = details['ten_he']
-        hoc_phi_tin_chi = details['hoc_phi_tin_chi']
+        ma_he = details['ma_he'].strip()
+        ten_he = details['ten_he'].strip()
+        hoc_phi_tin_chi = details['hoc_phi_tin_chi'].strip()
         
         cur = mysql.connection.cursor()
         
@@ -639,8 +639,8 @@ def form_update_he(ma_he):
     
     if request.method == 'POST':
         details = request.form
-        ten_he = details['ten_he']
-        hoc_phi_tin_chi = details['hoc_phi_tin_chi']
+        ten_he = details['ten_he'].strip()
+        hoc_phi_tin_chi = details['hoc_phi_tin_chi'].strip()
         
         cur.execute("""
                     UPDATE loai_he
@@ -1518,6 +1518,153 @@ def table_print_sinh_vien():
                            sinh_vien =  sinh_vien) 
 
 # -------------------------- Sinh vien -------------------------
+
+# -------------------------- Mon hoc -------------------------
+
+@app.route("/table_mon_hoc")
+def table_mon_hoc():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT * 
+                FROM mon_hoc
+                WHERE is_delete = 0
+                """)
+    cac_mon = cur.fetchall()
+    
+    return render_template(session['role'] + 'monhoc/table_mon_hoc.html',
+                           cac_mon = cac_mon,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@app.route("/table_mon_hoc/form_add_mon_hoc", methods = ['GET','POST'])
+def form_add_mon_hoc():
+    
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""SELECT n.*, lh.ten_he
+                FROM nganh n
+                JOIN loai_he lh ON lh.ma_he = n.ma_he
+                WHERE is_delete = 0""")
+    cac_nganh = cur.fetchall()
+    
+    if request.method == 'POST':
+        details = request.form
+        ma_mon = details['ma_mon'].strip()
+        ten_mon = details['ten_mon'].strip()
+        so_tin_chi = details['so_tin_chi'].strip()
+        
+        lst_nganh = list(details.keys())
+        lst_nganh.remove('ma_mon')
+        lst_nganh.remove('ten_mon')
+        lst_nganh.remove('so_tin_chi')
+        
+        cur.execute("SELECT * FROM mon_hoc WHERE ma_mon = %s", (ma_mon, ))
+        if (len(cur.fetchall()) != 0):
+            return render_template(session['role'] + 'monhoc/form_add_mon_hoc.html',
+                                   ma_err = "Mã môn đã tồn tại",
+                                    cac_nganh = cac_nganh,
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+        
+        cur.execute("""
+                    INSERT INTO mon_hoc(ma_mon, ten_mon, so_tin_chi)
+                    VALUES (%s, %s, %s)
+                    """, (ma_mon, ten_mon, so_tin_chi))
+        mysql.connection.commit()
+        
+        sql = "INSERT INTO mon_hoc_nganh(ma_mon, ma_nganh) VALUES " 
+        for ma_nganh in lst_nganh:
+            sql += " (\"" + ma_mon + "\","  
+            sql += "\"" + ma_nganh + "\"),"
+        sql = sql[:-1:]
+        cur.execute(sql)
+        mysql.connection.commit()
+        return redirect(url_for("table_mon_hoc"))
+    
+    return render_template(session['role'] + 'monhoc/form_add_mon_hoc.html',
+                           cac_nganh = cac_nganh,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@app.route("/table_mon_hoc/form_update_mon_hoc/<string:ma_mon>", methods = ['GET','POST'])
+def form_update_mon_hoc(ma_mon):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""SELECT n.*, lh.ten_he
+                FROM nganh n
+                JOIN loai_he lh ON lh.ma_he = n.ma_he
+                WHERE is_delete = 0 AND ma_nganh IN (
+                    SELECT ma_nganh 
+                    FROM mon_hoc_nganh
+                    WHERE ma_mon = %s
+                    )""", (ma_mon, ))
+    cac_nganh_thuoc = cur.fetchall()
+    
+    cur.execute("""SELECT n.*, lh.ten_he
+                FROM nganh n
+                JOIN loai_he lh ON lh.ma_he = n.ma_he
+                WHERE is_delete = 0 AND ma_nganh NOT IN (
+                    SELECT ma_nganh 
+                    FROM mon_hoc_nganh
+                    WHERE ma_mon = %s
+                    )""", (ma_mon, ))
+    cac_nganh = cur.fetchall()
+    
+    cur.execute("SELECT * FROM mon_hoc WHERE is_delete = 0 AND ma_mon = %s", (ma_mon, ))
+    mon_hoc = cur.fetchall()
+    
+    if (len(mon_hoc) != 1):
+        return "Error"
+    
+    mon_hoc = mon_hoc[0]
+    
+    if (request.method == 'POST'):
+        details = request.form
+        so_tin_chi = details['so_tin_chi']
+        ten_mon = details['ten_mon']
+        
+        lst_nganh = list(details.keys())
+        lst_nganh.remove('ten_mon')
+        lst_nganh.remove('so_tin_chi')
+        
+        cur.execute("""
+                    UPDATE mon_hoc
+                    SET ten_mon = %s, so_tin_chi = %s
+                    WHERE ma_mon = %s
+                    """, (ten_mon, so_tin_chi, ma_mon))
+        mysql.connection.commit()
+        
+        cur.execute("DELETE FROM mon_hoc_nganh WHERE ma_mon = %s", (ma_mon, ))
+        mysql.connection.commit()
+        
+        if len(lst_nganh) == 0:
+            return redirect(url_for("table_mon_hoc"))
+        sql = "INSERT INTO mon_hoc_nganh(ma_mon, ma_nganh) VALUES " 
+        for ma_nganh in lst_nganh:
+            sql += " (\"" + ma_mon + "\","  
+            sql += "\"" + ma_nganh + "\"),"
+        sql = sql[:-1:]
+        cur.execute(sql)
+        mysql.connection.commit()
+        return redirect(url_for("table_mon_hoc"))
+    
+    return render_template(session['role'] + 'monhoc/form_update_mon_hoc.html',
+                           mon_hoc = mon_hoc,
+                           cac_nganh = cac_nganh,
+                           cac_nganh_thuoc = cac_nganh_thuoc,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@app.route("/table_mon_hoc/form_add_mon_hoc_upload_file")
+def form_add_mon_hoc_upload_file():
+    return render_template('monhoc/form_add_mon_hoc_upload_file.html')
+
+@app.route("/table_mon_hoc/form_add_mon_hoc_upload_process")
+def form_add_mon_hoc_upload_process():
+    return render_template('monhoc/form_add_mon_hoc_upload_process.html')
+
+# -------------------------- Mon hoc -------------------------
 
 def take_image_to_save(id_image, path_to_img):
     cur = mysql.connection.cursor()

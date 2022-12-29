@@ -59,21 +59,22 @@
                             </tr>
                         </thead>
                         <tbody>
+                          {% for data in cac_mon %}
                             <tr>
                                 <td width="10"><input type="checkbox" id="myChecker" name="check1" value="1"></td>
-                                <td>MAT1102</td>
-                                <td>Cơ sở dữ liệu Web và hệ thống thông tin</td>
-                                <td>3</td>
+                                <td>{{data[0]}}</td>
+                                <td>{{data[1]}}</td>
+                                <td>{{data[2]}}</td>
                                 <td class="table-td-center"><button class="btn btn-primary btn-sm trash" type="button"
-                                        title="Xóa" onclick="deleteRow(this)"><i class="fas fa-trash-alt"></i>
+                                        title="Xóa" onclick="deleteRow('{{data[0]}}')"><i class="fas fa-trash-alt"></i>
                                     </button>
                                     <button class="btn btn-primary btn-sm edit" type="button" title="Sửa" id="show-emp">
-                                        <a href="/table_mon_hoc/form_update_mon_hoc"><i class="fa fa-edit"
+                                        <a href="/table_mon_hoc/form_update_mon_hoc/{{data[0]}}"><i class="fa fa-edit"
                                                 aria-hidden="true"></i></a>
                                     </button>
                                 </td>
                             </tr>
-
+                          {% endfor %}
                         </tbody>
                     </table>
                 </div>
