@@ -366,7 +366,7 @@ def form_add_nganh_upload_file():
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
         if data_file.filename != '':
-            if data_file.filename.split(".")[-1] not in ['txt', 'xlsx', 'csv', 'xls', 'xlsm']:
+            if data_file.filename.split(".")[-1] not in ['xlsx', 'csv', 'xls', 'xlsm']:
                 return redirect(url_for("form_add_nganh_upload_file"))
             filename = "TMP_" + data_file.filename 
             pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
@@ -801,7 +801,7 @@ def form_add_lop_upload_file():
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
         if data_file.filename != '':
-            if data_file.filename.split(".")[-1] not in ['txt', 'xlsx', 'csv', 'xls', 'xlsm']:
+            if data_file.filename.split(".")[-1] not in ['xlsx', 'csv', 'xls', 'xlsm']:
                 return redirect(url_for("form_add_nganh_upload_file"))
             filename = "TMP_" + data_file.filename 
             pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
@@ -1245,8 +1245,8 @@ def form_add_sinh_vien_upload_file():
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
         if data_file.filename != '':
-            if data_file.filename.split(".")[-1] not in ['txt', 'xlsx', 'csv', 'xls', 'xlsm']:
-                return redirect(url_for("form_add_data_employees_upload_file"))
+            if data_file.filename.split(".")[-1] not in ['xlsx', 'csv', 'xls', 'xlsm']:
+                return redirect(url_for("form_add_sinh_vien_upload_file"))
             filename = "TMP_" + data_file.filename 
             pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
             data_file.save(pathToFile)
@@ -1661,8 +1661,8 @@ def form_add_mon_hoc_upload_file():
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
         if data_file.filename != '':
-            if data_file.filename.split(".")[-1] not in ['txt', 'xlsx', 'csv', 'xls', 'xlsm']:
-                return redirect(url_for("form_add_data_employees_upload_file"))
+            if data_file.filename.split(".")[-1] not in ['xlsx', 'csv', 'xls', 'xlsm']:
+                return redirect(url_for("form_add_mon_hoc_upload_file"))
             filename = "TMP_" + data_file.filename 
             pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
             data_file.save(pathToFile)
@@ -1832,6 +1832,7 @@ def delete_mon_hoc(ma_mon):
 @app.route("/table_kqht_sv")
 def table_kqht_sv():
     cur = mysql.connection.cursor()
+
     return render_template(session['role'] + 'ketquahoctap/table_kqht_sv.html',
                            my_user = session['username'],
                            truong = session['truong'])
@@ -1844,27 +1845,264 @@ def table_kqht():
 def table_kqht_chi_tiet():
     return render_template('ketquahoctap/table_kqht_chi_tiet.html')
 
-@app.route("/table_kqht_sv/form_add_kqht")
+@login_required
+@app.route("/table_kqht_sv/form_add_kqht", methods = ['GET','POST'])
 def form_add_kqht():
-    return render_template('ketquahoctap/form_add_kqht.html')
-
-@app.route("/table_kqht_sv/form_update_kqht")
-def form_update_kqht():
-    return render_template('ketquahoctap/form_update_kqht.html')
-
-@app.route("/table_kqht_sv/table_hoc_ky")
-def table_hoc_ky():
-    return render_template(session['role'] + 'ketquahoctap/table_hoc_ky.html',
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT ma_hoc_ky, ten_hoc_ky
+                FROM hoc_ky
+                """)
+    cac_hk = cur.fetchall()
+    
+    if request.method == 'POST':
+        details = request.form
+        ma_sinh_vien = details['ma_sinh_vien'].strip()
+        ma_mon = details['ma_mon'].strip()
+        ma_hoc_ky = details['ma_hoc_ky'].split("_")[0].strip()
+        he_so_1 = details['he_so_1']
+        diem_he_1 = details['diem_he_1']
+        he_so_2 = details['he_so_2']
+        diem_he_2 = details['diem_he_2']
+        he_so_3 = details['he_so_3']
+        diem_he_3 = details['diem_he_3']
+        
+        cur.execute("SELECT ma_sinh_vien FROM sinh_vien WHERE ma_sinh_vien = %s",
+                    (ma_sinh_vien, ))
+        if (len(cur.fetchall()) != 1):
+            return render_template(session['role'] + 'ketquahoctap/form_add_kqht.html',
+                                   ma_err = "Mã sinh viên không tồn tại",
+                                    cac_hk = cac_hk,
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+            
+        cur.execute("""
+                    SELECT ma_mon
+                    FROM mon_hoc_nganh
+                    WHERE ma_mon = %s
+                    AND ma_nganh IN (SELECT ma_nganh
+                                    FROM lop 
+                                    WHERE ma_lop IN (
+                                        SELECT ma_lop
+                                        FROM sinh_vien_lop
+                                        WHERE ma_sinh_vien = %s
+                                    ))
+                    """,  (ma_mon, ma_sinh_vien))
+        if (len(cur.fetchall()) == 0):
+            return render_template(session['role'] + 'ketquahoctap/form_add_kqht.html',
+                                   ma_err = "Môn học không tồn tại, môn học không đúng với ngành của sinh viên",
+                                    cac_hk = cac_hk,
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+        
+        if (int(float(he_so_1) + float(he_so_2) + float(he_so_3)) != 1) or float(he_so_3) != 0.6:
+            return render_template(session['role'] + 'ketquahoctap/form_add_kqht.html',
+                                   ma_err = "Tổng các hệ số không bằng 1, hoặc vượt quá giá trị quy định",
+                                    cac_hk = cac_hk,
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+        
+        cur.execute("""
+                    INSERT INTO diem(ma_sinh_vien, ma_mon, ma_hoc_ky, he_so_1, he_so_2, he_so_3,
+                    diem_he_1, diem_he_2, diem_he_3) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) 
+                    """, (ma_sinh_vien, ma_mon, ma_hoc_ky, he_so_1, he_so_2, he_so_3, diem_he_1,
+                          diem_he_2, diem_he_3))
+        mysql.connection.commit()
+        return redirect(url_for('table_kqht_sv'))
+    
+    return render_template(session['role'] + 'ketquahoctap/form_add_kqht.html',
+                           cac_hk = cac_hk,
                            my_user = session['username'],
                            truong = session['truong'])
 
-@app.route("/table_kqht_sv/form_add_hoc_ky")
-def form_add_hoc_ky():
-    return render_template('ketquahoctap/form_add_hoc_ky.html')
+@login_required
+@app.route("/table_kqht_sv/form_add_kqht_upload_file", methods = ['GET','POST'])
+def form_add_kqht_upload_file():
+    if request.method == 'POST':
+        data_file = request.files['FileDataUpload']
+        if data_file.filename != '':
+            if data_file.filename.split(".")[-1] not in ['xlsx', 'csv', 'xls', 'xlsm']:
+                return redirect(url_for("form_add_kqht_upload_file"))
+            filename = "TMP_" + data_file.filename 
+            pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
+            data_file.save(pathToFile)
+            return redirect(url_for("form_add_kqht_upload_process", filename=filename))
+        return redirect(url_for("form_add_kqht_upload_file"))
+    return render_template(session['role'] + 'ketquahoctap/form_add_kqht_upload_file.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
+    
+@login_required
+@app.route("/table_kqht_sv/form_add_kqht_upload_process/<string:filename>", methods=['GET','POST'])
+def form_add_kqht_upload_process(filename):
+    pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
+    
+    default_tag_column = ['ma_sinh_vien', 'ma_mon', 'ma_hoc_ky', 'he_so_1', 'he_so_2',
+                          'he_so_3', 'diem_he_1', 'diem_he_2', 'diem_he_3']
+    
+    default_name_column = ['Mã sinh viên', 'Mã môn', 'Mã học kỳ', 'Hệ số 1', 'Hệ số 2', 'Hệ số 3',
+                           'Điểm hệ 1', 'Điểm hệ 2', 'Điểm hệ 3']
+    
+    data_kqht = pd.read_excel(pathToFile)
+    data_column = list(data_kqht.columns)
+    
+    if (len(data_column) > len(default_tag_column)) or len(data_column)  < 9:
+        return "Error"
 
-@app.route("/table_kqht_sv/form_update_hoc_ky")
-def form_update_hoc_ky():
-    return render_template('ketquahoctap/form_update_hoc_ky.html')
+@app.route("/table_kqht_sv/form_update_kqht/<string:id_diem>")
+def form_update_kqht(id_diem):                                     
+    return render_template(session['role'] + 'ketquahoctap/form_update_kqht.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+# -- HK
+@login_required
+@app.route("/table_kqht_sv/table_hoc_ky")
+def table_hoc_ky():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""SELECT * 
+            FROM hoc_ky
+            ORDER BY nam_hoc DESC, ten_hoc_ky DESC
+            """)
+    
+    cac_hk = cur.fetchall()
+    
+    return render_template(session['role'] + 'ketquahoctap/table_hoc_ky.html',
+                           cac_hk = cac_hk,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/table_print_hoc_ky")
+def table_print_hoc_ky():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""SELECT * 
+            FROM hoc_ky
+            ORDER BY nam_hoc DESC, ten_hoc_ky DESC
+            """)
+    
+    cac_hk = cur.fetchall()
+    
+    return render_template('ketquahoctap/table_print_hoc_ky.html',
+                           cac_hk = cac_hk)
+
+@login_required
+@app.route("/get_table_hoc_ky_excel")
+def get_table_hoc_ky_excel():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""SELECT * 
+            FROM hoc_ky
+            ORDER BY nam_hoc DESC, ten_hoc_ky DESC
+            """)
+    
+    cac_hk = cur.fetchall()
+    columnName = ['MaHK','TenHocKy','Nam']
+    data = pd.DataFrame.from_records(cac_hk, columns=columnName)
+    data = data.set_index('MaHK')
+    pathFile = app.config['SAVE_FOLDER_EXCEL'] + "/" + "Data_Hoc_Ky.xlsx"
+    data.to_excel(pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
+@app.route("/get_table_hoc_ky_pdf")
+def get_table_hoc_ky_pdf():
+    pathFile = app.config['SAVE_FOLDER_PDF']  + '/Table Hoc Ky.pdf'
+    pdfkit.from_url("/".join(request.url.split("/")[:-1:]) + '/table_print_hoc_ky',pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
+@app.route("/table_kqht_sv/form_add_hoc_ky", methods = ['GET','POST'])
+def form_add_hoc_ky():
+    if request.method == 'POST':
+        details = request.form
+        ma_hoc_ky = details['ma_hoc_ky'].strip()
+        ten_hoc_ky = details['ten_hoc_ky'].strip()
+        nam_hoc = details['nam_hoc'].strip()
+        
+        cur = mysql.connection.cursor()
+        
+        cur.execute("SELECT * FROM hoc_ky WHERE ma_hoc_ky = %s", (ma_hoc_ky, ))
+        if (len(cur.fetchall()) != 0):
+            return render_template(session['role'] + 'ketquahoctap/form_add_hoc_ky.html',
+                                   ma_err = "Mã học kỳ đã tồn tại",
+                           my_user = session['username'],
+                           truong = session['truong'])
+            
+        cur.execute("INSERT INTO hoc_ky(ma_hoc_ky,ten_hoc_ky,nam_hoc) VALUES (%s,%s,%s)",
+                    (ma_hoc_ky,ten_hoc_ky,nam_hoc))
+        mysql.connection.commit()
+        return redirect(url_for('table_hoc_ky'))
+    
+    return render_template(session['role'] + 'ketquahoctap/form_add_hoc_ky.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/table_kqht_sv/form_update_hoc_ky/<string:ma_hoc_ky>", methods = ['GET','POST'])
+def form_update_hoc_ky(ma_hoc_ky):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT * 
+                FROM hoc_ky
+                WHERE ma_hoc_ky = %s
+                """, (ma_hoc_ky, ))
+    hoc_ky = cur.fetchall()
+    if (len(hoc_ky) != 1):
+        return "Error"
+    
+    hoc_ky = hoc_ky[0]
+    
+    if request.method == 'POST':
+        details = request.form
+        ten_hoc_ky = details['ten_hoc_ky'].strip()
+        nam_hoc = details['nam_hoc'].strip()
+        
+        cur.execute("""
+                    UPDATE hoc_ky
+                    SET ten_hoc_ky = %s, nam_hoc = %s
+                    WHERE ma_hoc_ky = %s
+                    """, (ten_hoc_ky, nam_hoc, ma_hoc_ky))
+        mysql.connection.commit()
+        return redirect(url_for('table_hoc_ky'))
+    
+    return render_template(session['role'] + 'ketquahoctap/form_update_hoc_ky.html',
+                           hoc_ky = hoc_ky,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/delete_hoc_ky/<string:ma_hoc_ky>")
+def delete_hoc_ky(ma_hoc_ky):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT COUNT(*) 
+                FROM diem
+                WHERE ma_hoc_ky = %s
+                """, (ma_hoc_ky, ))
+    if (cur.fetchall()[0][0] != 0):
+        return redirect(url_for('table_hoc_ky'))
+    
+    cur.execute("""
+                SELECT COUNT(*)
+                FROM dot_dang_ky
+                WHERE ma_hoc_ky = %s
+                """, (ma_hoc_ky, ))
+    if (cur.fetchall()[0][0] != 0):
+        return redirect(url_for('table_hoc_ky'))
+    
+    cur.execute("""
+                DELETE FROM hoc_ky
+                WHERE ma_hoc_ky = %s
+                """, (ma_hoc_ky, ))
+    mysql.connection.commit()
+    return redirect(url_for('table_hoc_ky'))
+
 # -------------------------- Ket Qua Hoc Tap -------------------------
 
 def take_image_to_save(id_image, path_to_img):

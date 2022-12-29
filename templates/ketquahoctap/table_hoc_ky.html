@@ -23,16 +23,15 @@
                         </div>
                         <div class="col-sm-2">
                             <a class="btn btn-delete btn-sm print-file" type="button" title="In"
-                                onclick="myApp.printNV()"><i class="fas fa-print"></i> In thông tin</a>
+                                onclick="myApp.printHK()"><i class="fas fa-print"></i> In thông tin</a>
                         </div>
                         <div class="col-sm-2">
-                            <a class="btn btn-excel btn-sm" href="" title="Xuất Excel"><i class="fas fa-file-excel"></i>
-                                Xuất
-                                Excel</a>
+                            <a class="btn btn-excel btn-sm" href="/get_table_hoc_ky_excel" title="Xuất Excel"><i class="fas fa-file-excel"></i>
+                                Xuất Excel</a>
                         </div>
 
                         <div class="col-sm-2">
-                            <a class="btn btn-delete btn-sm pdf-file" type="button" title="Xuất PDF" href=""><i
+                            <a class="btn btn-delete btn-sm pdf-file" type="button" title="Xuất PDF" href="/get_table_hoc_ky_pdf"><i
                                     class="fas fa-file-pdf"></i>Xuất PDF</a>
                         </div>
 
@@ -54,21 +53,23 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {% for data in cac_hk %}
                             <tr>
                                 <td width="10"><input type="checkbox" id="myChecker" name="check1" value="1"></td>
-                                <td>HK1</td>
-                                <td>Học kỳ 1</td>
-                                <td>2022-2023</td>
+                                <td>{{data[0]}}</td>
+                                <td>{{data[1]}}</td>
+                                <td>{{data[2]}}</td>
                                 <td class="table-td-center">
                                     <button class="btn btn-primary btn-sm trash" type="button" title="Xóa"
-                                        onclick="deleteRow(this)"><i class="fas fa-trash-alt"></i>
+                                        onclick="deleteRow('{{data[0]}}')"><i class="fas fa-trash-alt"></i>
                                     </button>
                                     <button class="btn btn-primary btn-sm edit" type="button" title="Sửa" id="show-emp">
-                                        <a href="/table_kqht_sv/form_update_hoc_ky"><i class="fa fa-edit"
+                                        <a href="/table_kqht_sv/form_update_hoc_ky/{{data[0]}}"><i class="fa fa-edit"
                                                 aria-hidden="true"></i></a>
                                     </button>
                                 </td>
                             </tr>
+                            {% endfor %}
 
                         </tbody>
                     </table>
@@ -94,10 +95,7 @@
 <script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
 <script type="text/javascript">$('#sampleTable').DataTable();</script>
 <script>
-    function deleteRow(r) {
-        var i = r.parentNode.parentNode.rowIndex;
-        // document.getElementById("myTable").deleteRow(i); -->
-        var maNV = r.parentNode.parentNode.childNodes[3].textContent
+    function deleteRow(id) {
         swal({
             title: "Cảnh báo",
             text: "Bạn có chắc chắn là muốn xóa học kỳ này?", // index = 3
@@ -107,7 +105,7 @@
 
                 if (willDelete) {
                     $.ajax({
-                        url: "/delete_sinh_vien/" + maNV,
+                        url: "/delete_hoc_ky/" + maNV,
                         context: document.body
                     })
                     swal("Đã xóa thành công.!", {
@@ -137,7 +135,7 @@
                 if (willDelete) {
                     for (let i = 0; i < id_nv.length; i++) {
                         $.ajax({
-                            url: "/delete_sinh_vien/" + id_nv[i],
+                            url: "/delete_hoc_ky/" + id_nv[i],
                             context: document.body
                         })
                     }
@@ -155,8 +153,8 @@
 
     //In dữ liệu
     var myApp = new function () {
-        this.printTable = function () {
-            var win = window.open('/get_print_data_employees', '', 'height=700,width=1400');
+        this.printHK = function () {
+            var win = window.open('/table_print_hoc_ky', '', 'height=700,width=1400');
             win.document.close();
             win.print();
         }
