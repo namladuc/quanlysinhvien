@@ -1,0 +1,39 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='doc/css/main.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+<!-- or -->
+<link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+<!-- Font-icon css-->
+<link rel="stylesheet" type="text/css"
+    href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+
+<table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0"
+                        border="0" id="sampleTable">
+                        <thead>
+                            <tr>
+                                <th>Mã môn</th>
+                                <th>Tên môn</th>
+                                <th>Số tín chỉ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                          {% for data in cac_mon %}
+                            <tr>
+                                <td>{{data[0]}}</td>
+                                <td>{{data[1]}}</td>
+                                <td>{{data[2]}}</td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                    </table>
+ <!-- Essential javascripts for application to work-->
+ <script src="{{url_for('static', filename='doc/js/jquery-3.2.1.min.js')}}"></script>
+ <script src="{{url_for('static', filename='doc/js/popper.min.js')}}"></script>
+ <script src="{{url_for('static', filename='doc/js/bootstrap.min.js')}}"></script>
+ <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+ <script src="{{url_for('static', filename='doc/js/main.js')}}"></script>
+ <!-- The javascript plugin to display page loading on top-->
+ <script src="{{url_for('static', filename='doc/js/plugins/pace.min.js')}}"></script>
+ <!-- Page specific javascripts-->

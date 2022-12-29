@@ -386,8 +386,8 @@ def form_add_nganh_upload_process(filename):
     
     default_name_column = ['Mã ngành', 'Tên ngành', 'Hình thức đào tạo', 'Mã khoa', 'Mã hệ']
     
-    data_lop = pd.read_excel(pathToFile)
-    data_column = list(data_lop.columns)
+    data_mon_hoc = pd.read_excel(pathToFile)
+    data_column = list(data_mon_hoc.columns)
     
     if (len(data_column) > len(default_tag_column)) or len(data_column) < 3:
         return "Error"
@@ -405,7 +405,7 @@ def form_add_nganh_upload_process(filename):
             return "Error"
         
         # Kiểm tra xem mã ngành có tồn tại không
-        tmp = tuple(set(data_lop[data_column[column_match.index(0)]]))
+        tmp = tuple(set(data_mon_hoc[data_column[column_match.index(0)]]))
         if len(tmp) == 1:
             cur.execute("SELECT ma_nganh FROM nganh WHERE ma_nganh = %s", tmp)
         else:
@@ -419,7 +419,7 @@ def form_add_nganh_upload_process(filename):
             return "Error"
         
         # Kiểm tra xem mã khoa có tồn tại không
-        tmp = tuple(set(data_lop[data_column[column_match.index(3)]]))
+        tmp = tuple(set(data_mon_hoc[data_column[column_match.index(3)]]))
         if len(tmp) == 1:
             cur.execute("SELECT ma_khoa FROM khoa WHERE ma_khoa = %s", tmp)
         else:
@@ -433,7 +433,7 @@ def form_add_nganh_upload_process(filename):
             return "Error"
         
         # Kiểm tra xem mã hệ có tồn tại không
-        tmp = tuple(set(data_lop[data_column[column_match.index(4)]]))
+        tmp = tuple(set(data_mon_hoc[data_column[column_match.index(4)]]))
         if len(tmp) == 1:
             cur.execute("SELECT ma_he FROM loai_he WHERE ma_he = %s", tmp)
         else:
@@ -451,10 +451,10 @@ def form_add_nganh_upload_process(filename):
             sql += default_tag_column[index] + ","
         sql = sql[:-1:]
         sql += ") VALUES "
-        for index_row in range(data_lop.shape[0]):
+        for index_row in range(data_mon_hoc.shape[0]):
             sql += "("
             for col in data_column:
-                sql +=  "\"" + str(data_lop[col][index_row]) + "\"" + ","
+                sql +=  "\"" + str(data_mon_hoc[col][index_row]) + "\"" + ","
             sql = sql[:-1:]
             sql += "),"
         sql = sql[:-1:]  
@@ -821,8 +821,8 @@ def form_add_lop_upload_process(filename):
     
     default_name_column = ['Mã Lớp', 'Mã Ngành', 'Năm', 'Tên Lớp', 'Mã Người Quản Lý']
     
-    data_lop = pd.read_excel(pathToFile)
-    data_column = list(data_lop.columns)
+    data_mon_hoc = pd.read_excel(pathToFile)
+    data_column = list(data_mon_hoc.columns)
     
     if (len(data_column) > len(default_tag_column)) or len(data_column) < 3:
         return "Error"
@@ -839,12 +839,12 @@ def form_add_lop_upload_process(filename):
         if (len(column_match) != 5):
             return "Error"
         
-        if (len(tuple(set(data_lop[data_column[column_match.index(4)]]))) 
-            != len(tuple(data_lop[data_column[column_match.index(4)]]))):
+        if (len(tuple(set(data_mon_hoc[data_column[column_match.index(4)]]))) 
+            != len(tuple(data_mon_hoc[data_column[column_match.index(4)]]))):
             return "Error"
         
         # Kiểm tra xem mã nganh có tồn tại không
-        tmp = tuple(set(data_lop[data_column[column_match.index(1)]]))
+        tmp = tuple(set(data_mon_hoc[data_column[column_match.index(1)]]))
         if len(tmp) == 1:
             cur.execute("SELECT ma_nganh FROM nganh WHERE ma_nganh = %s", tmp)
         else:
@@ -858,7 +858,7 @@ def form_add_lop_upload_process(filename):
             return "Error"
         
         # Kiểm tra xem mã lớp có tồn tại không
-        tmp = tuple(set(data_lop[data_column[column_match.index(0)]]))
+        tmp = tuple(set(data_mon_hoc[data_column[column_match.index(0)]]))
         if len(tmp) == 1:
             cur.execute("SELECT ma_lop FROM lop WHERE ma_lop = %s", tmp)
         else:
@@ -876,10 +876,10 @@ def form_add_lop_upload_process(filename):
             sql += default_tag_column[index] + ","
         sql = sql[:-1:]
         sql += ") VALUES "
-        for index_row in range(data_lop.shape[0]):
+        for index_row in range(data_mon_hoc.shape[0]):
             sql += "("
             for col in data_column:
-                sql +=  "\"" + str(data_lop[col][index_row]) + "\"" + ","
+                sql +=  "\"" + str(data_mon_hoc[col][index_row]) + "\"" + ","
             sql = sql[:-1:]
             sql += "),"
         sql = sql[:-1:]  
@@ -938,7 +938,7 @@ def get_table_lop_excel():
     columnName = ['MaLop','MaNganh','Nam','TenLop','MaNguoiQuanLy', 'TenNganh','SoLuongSinhVien']
     data = pd.DataFrame.from_records(cac_lop, columns=columnName)
     data = data.set_index('MaLop')
-    pathFile = app.config['SAVE_FOLDER_EXCEL'] + "/" + "Data_lop.xlsx"
+    pathFile = app.config['SAVE_FOLDER_EXCEL'] + "/" + "Data_mon_hoc.xlsx"
     data.to_excel(pathFile)
     return send_file(pathFile, as_attachment=True)
 
@@ -1270,8 +1270,8 @@ def form_add_sinh_vien_upload_process(filename):
                            'Email', 'Dân tộc', 'Địa chỉ', 'Số điện thoại', 'Quốc tịch',
                            'CMT / Thẻ căn cước', 'Nơi cấp CMT', 'Ngày cấp CMT', 'Mã Lớp']
     
-    data_sv = pd.read_excel(pathToFile)
-    data_column = list(data_sv.columns)
+    data_mon_hoc = pd.read_excel(pathToFile)
+    data_column = list(data_mon_hoc.columns)
     
     if (len(data_column) > len(default_tag_column)) or len(data_column) < 3:
         return "Error"
@@ -1291,7 +1291,7 @@ def form_add_sinh_vien_upload_process(filename):
             return "Error"
         
         # Kiểm tra xem mã lớp có tồn tại không
-        tmp = tuple(set(data_sv[data_column[column_match.index(13)]]))
+        tmp = tuple(set(data_mon_hoc[data_column[column_match.index(13)]]))
         if len(tmp) == 1:
             cur.execute("SELECT ma_lop FROM lop WHERE ma_lop = %s", tmp)
         else:
@@ -1305,9 +1305,9 @@ def form_add_sinh_vien_upload_process(filename):
             return "Error"
         
         # Tách cột mã lớp ra so với các cột còn lại để import vào bảng khác
-        msv_ma_lop = data_sv[[data_column[column_match.index(0)], data_column[column_match.index(13)]]]
+        ma_mon_ma_nganh = data_mon_hoc[[data_column[column_match.index(0)], data_column[column_match.index(13)]]]
         col_ma_lop = [data_column[column_match.index(0)], data_column[column_match.index(13)]]
-        data_sv = data_sv.drop(data_column[column_match.index(13)], axis=1)
+        data_mon_hoc = data_mon_hoc.drop(data_column[column_match.index(13)], axis=1)
         data_column.remove(data_column[column_match.index(13)])
         column_match.remove(13)
         
@@ -1316,20 +1316,20 @@ def form_add_sinh_vien_upload_process(filename):
             sql += default_tag_column[index] + ","
         sql += 'created_by'
         sql += ") VALUES "
-        for index_row in range(data_sv.shape[0]):
+        for index_row in range(data_mon_hoc.shape[0]):
             sql += "("
             for col in data_column:
-                sql +=  "\"" + str(data_sv[col][index_row]) + "\"" + ","
+                sql +=  "\"" + str(data_mon_hoc[col][index_row]) + "\"" + ","
             sql += "\"" + session['username'][6] + "\""
             sql += "),"
         sql = sql[:-1:]    
         cur.execute(sql)
         
         sql = "INSERT INTO `sinh_vien_lop` ( ma_sinh_vien, ma_lop ) VALUES "
-        for index_row in range(msv_ma_lop.shape[0]):
+        for index_row in range(ma_mon_ma_nganh.shape[0]):
             sql += "("
             for col in col_ma_lop:
-                sql += "\"" + str(msv_ma_lop[col][index_row]) + "\"" + ","
+                sql += "\"" + str(ma_mon_ma_nganh[col][index_row]) + "\"" + ","
             sql = sql[:-1:]
             sql += "),"
         sql = sql[:-1:]
@@ -1656,15 +1656,216 @@ def form_update_mon_hoc(ma_mon):
                            my_user = session['username'],
                            truong = session['truong'])
 
-@app.route("/table_mon_hoc/form_add_mon_hoc_upload_file")
+@app.route("/table_mon_hoc/form_add_mon_hoc_upload_file", methods=['GET','POST'])
 def form_add_mon_hoc_upload_file():
-    return render_template('monhoc/form_add_mon_hoc_upload_file.html')
+    if request.method == 'POST':
+        data_file = request.files['FileDataUpload']
+        if data_file.filename != '':
+            if data_file.filename.split(".")[-1] not in ['txt', 'xlsx', 'csv', 'xls', 'xlsm']:
+                return redirect(url_for("form_add_data_employees_upload_file"))
+            filename = "TMP_" + data_file.filename 
+            pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
+            data_file.save(pathToFile)
+            return redirect(url_for("form_add_mon_hoc_upload_process", filename=filename))
+        return redirect(url_for("form_add_mon_hoc_upload_file"))
+    return render_template(session['role'] + 'monhoc/form_add_mon_hoc_upload_file.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
 
-@app.route("/table_mon_hoc/form_add_mon_hoc_upload_process")
-def form_add_mon_hoc_upload_process():
-    return render_template('monhoc/form_add_mon_hoc_upload_process.html')
+@app.route("/table_mon_hoc/form_add_mon_hoc_upload_process/<string:filename>", methods=['GET','POST'])
+def form_add_mon_hoc_upload_process(filename):
+    pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
+    
+    default_tag_column = ['ma_mon', 'ten_mon', 'so_tin_chi', 'ma_nganh']
+    
+    default_name_column = ['Mã môn', 'Tên môn', 'Số tín chỉ', 'Mã ngành']
+    
+    data_mon_hoc = pd.read_excel(pathToFile)
+    data_column = list(data_mon_hoc.columns)
+    
+    if (len(data_column) > len(default_tag_column)) or len(data_column) < 3:
+        return "Error"
+        
+    if request.method == 'POST':
+        cur = mysql.connection.cursor()
+        details = request.form
+        column_link = [details[col] for col in data_column]
+        column_match = [default_name_column.index(elm) for elm in column_link]
+        
+        if (len(set(column_match)) != len(column_link)):
+            return "Error"
+        
+        if (len(column_match) != 4):
+            return "Error"
+        
+        # Kiểm tra xem mã môn có tồn tại không
+        tmp = tuple(set(data_mon_hoc[data_column[column_match.index(0)]]))
+        if len(tmp) == 1:
+            cur.execute("SELECT ma_mon FROM mon_hoc WHERE ma_mon = %s", tmp)
+        else:
+            new_tmp = ["\"" + text +"\"" for text in tmp]
+            cur.execute("SELECT ma_mon FROM mon_hoc WHERE ma_mon IN (" + ", ".join(new_tmp) + ")")
+        data_tuple = cur.fetchall()
+        data_tmp_take = []
+        for elm in data_tuple:
+            data_tmp_take.append(elm[0])
+        if (len(data_tmp_take) != 0):
+            return "Error"
+        
+        # Tách cột mã nganh ra so với các cột còn lại để import vào bảng khác
+        ma_mon_ma_nganh = data_mon_hoc[[data_column[column_match.index(0)], data_column[column_match.index(3)]]]
+        col_ma_nganh = [data_column[column_match.index(0)], data_column[column_match.index(3)]]
+        data_mon_hoc = data_mon_hoc.drop(data_column[column_match.index(3)], axis=1)
+        data_column.remove(data_column[column_match.index(3)])
+        column_match.remove(3)
+        
+        sql = "INSERT INTO `mon_hoc` ("
+        for index in column_match:
+            sql += default_tag_column[index] + ","
+        sql = sql[:-1:]
+        sql += ") VALUES "
+        for index_row in range(data_mon_hoc.shape[0]):
+            sql += "("
+            for col in data_column:
+                sql +=  "\"" + str(data_mon_hoc[col][index_row]) + "\"" + ","
+            sql = sql[:-1:]
+            sql += "),"
+        sql = sql[:-1:]  
+        cur.execute(sql)
+        mysql.connection.commit()
+        
+        ma_mon_ma_nganh[col_ma_nganh[1]] = ma_mon_ma_nganh[col_ma_nganh[1]].str.split(",")
+        ma_mon_ma_nganh = ma_mon_ma_nganh.explode(col_ma_nganh[1])
+        ma_mon_ma_nganh = ma_mon_ma_nganh.reset_index()
+        
+        # Kiểm tra xem mã ngành có tồn tại không
+        tmp = tuple(set(ma_mon_ma_nganh[col_ma_nganh[1]]))
+        if len(tmp) == 1:
+            cur.execute("SELECT ma_nganh FROM nganh WHERE ma_nganh = %s", tmp)
+        else:
+            new_tmp = ["\"" + text +"\"" for text in tmp]
+            cur.execute("SELECT ma_nganh FROM nganh WHERE ma_nganh IN (" + ", ".join(new_tmp) + ")")
+        data_tuple = cur.fetchall()
+        data_tmp_take = []
+        for elm in data_tuple:
+            data_tmp_take.append(elm[0])
+        if (len(data_tmp_take) != len(tmp)):
+            return "Error"
+        
+        
+        sql = "INSERT INTO `mon_hoc_nganh` ( ma_mon, ma_nganh ) VALUES "
+        for index_row in range(ma_mon_ma_nganh.shape[0]):
+            sql += "("
+            for col in col_ma_nganh:
+                sql += "\"" + str(ma_mon_ma_nganh[col][index_row]) + "\"" + ","
+            sql = sql[:-1:]
+            sql += "),"
+        sql = sql[:-1:]
+        
+        cur.execute(sql)
+        mysql.connection.commit()
+        os.remove(pathToFile)
+        return redirect(url_for("table_mon_hoc"))         
+     
+    return render_template(session['role'] + 'monhoc/form_add_mon_hoc_upload_process.html',
+                           filename = filename,
+                           truong = session['truong'],
+                           my_user = session['username'],
+                           name_column = default_name_column,
+                           index_column = data_column)
 
+@login_required
+@app.route("/table_print_mon_hoc")
+def table_print_mon_hoc():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT * 
+                FROM mon_hoc
+                WHERE is_delete = 0
+                """)
+    cac_mon = cur.fetchall()
+    return render_template('monhoc/table_print_mon_hoc.html',
+                           cac_mon = cac_mon)
+
+@login_required
+@app.route("/get_table_mon_hoc_pdf")
+def get_table_mon_hoc():
+    pathFile = app.config['SAVE_FOLDER_PDF']  + '/Table Mon Hoc.pdf'
+    pdfkit.from_url("/".join(request.url.split("/")[:-1:]) + '/table_print_mon_hoc',pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
+@app.route("/get_table_mon_hoc_excel")
+def get_table_mon_hoc_excel():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT ma_mon, ten_mon, so_tin_chi
+                FROM mon_hoc
+                WHERE is_delete = 0
+                """)
+    cac_mon = cur.fetchall()
+    columnName = ['MaMon','TenMon','SoTC']
+    data = pd.DataFrame.from_records(cac_mon, columns=columnName)
+    data = data.set_index('MaMon')
+    pathFile = app.config['SAVE_FOLDER_EXCEL'] + "/" + "Data_Mon_Hoc.xlsx"
+    data.to_excel(pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
+@app.route("/delete_mon_hoc/<string:ma_mon>")
+def delete_mon_hoc(ma_mon):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                UPDATE mon_hoc
+                SET is_delete = 1
+                WHERE ma_mon = %s
+                """, (ma_mon, ))
+    mysql.connection.commit()
+    return redirect(url_for('table_mon_hoc'))
 # -------------------------- Mon hoc -------------------------
+
+# -------------------------- Ket Qua Hoc Tap -------------------------
+
+@app.route("/table_kqht_sv")
+def table_kqht_sv():
+    cur = mysql.connection.cursor()
+    return render_template(session['role'] + 'ketquahoctap/table_kqht_sv.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@app.route("/table_kqht_sv/table_kqht")
+def table_kqht():
+    return render_template('ketquahoctap/table_kqht.html')
+
+@app.route("/table_kqht_sv/table_kqht_chi_tiet")
+def table_kqht_chi_tiet():
+    return render_template('ketquahoctap/table_kqht_chi_tiet.html')
+
+@app.route("/table_kqht_sv/form_add_kqht")
+def form_add_kqht():
+    return render_template('ketquahoctap/form_add_kqht.html')
+
+@app.route("/table_kqht_sv/form_update_kqht")
+def form_update_kqht():
+    return render_template('ketquahoctap/form_update_kqht.html')
+
+@app.route("/table_kqht_sv/table_hoc_ky")
+def table_hoc_ky():
+    return render_template(session['role'] + 'ketquahoctap/table_hoc_ky.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@app.route("/table_kqht_sv/form_add_hoc_ky")
+def form_add_hoc_ky():
+    return render_template('ketquahoctap/form_add_hoc_ky.html')
+
+@app.route("/table_kqht_sv/form_update_hoc_ky")
+def form_update_hoc_ky():
+    return render_template('ketquahoctap/form_update_hoc_ky.html')
+# -------------------------- Ket Qua Hoc Tap -------------------------
 
 def take_image_to_save(id_image, path_to_img):
     cur = mysql.connection.cursor()

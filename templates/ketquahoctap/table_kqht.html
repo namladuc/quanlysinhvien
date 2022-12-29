@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block title %} Môn học {% endblock title %}
+{% block title %} Kết quả học tập {% endblock title %}
 {% block content %}
 <main class="app-content">
     <div class="app-title">
         <ul class="app-breadcrumb breadcrumb side">
-            <li class="breadcrumb-item active"><a href="#"><b>Môn học</b></a></li>
+            <li class="breadcrumb-item active"><a href="/table_kqht_sv"><b>Kết quả học tập</b></a></li>
+            <li class="breadcrumb-item active"><a href="#"><b>Sinh viên A</b></a></li>
         </ul>
         <div id="clock"></div>
     </div>
@@ -17,28 +18,28 @@
                     <div class="row element-button">
 
                         <div class="col-sm-2">
-                            <a class="btn btn-add btn-sm" href="/table_mon_hoc/form_add_mon_hoc" title="Thêm môn học mới"><i
+                            <a class="btn btn-add btn-sm" href="/table_kqht_sv/form_add_kqht" title="Thêm kết quả học tập mới"><i
                                     class="fas fa-plus"></i>
                                 Thêm</a>
                         </div>
 
                         <div class="col-sm-2">
-                            <a class="btn btn-delete btn-sm nhap-tu-file" href="/table_mon_hoc/form_add_mon_hoc_upload_file"
+                          <a class="btn btn-delete btn-sm nhap-tu-file" href="/table_kqht_sv/form_add_kqht_upload_file"
                                 type="button" title="Tải từ file"><i class="fas fa-file-upload"></i>Tải từ file</a>
                         </div>
 
                         <div class="col-sm-2">
-                          <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printMon()"><i
+                          <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printNV()"><i
                               class="fas fa-print"></i> In thông tin</a>
                         </div>
                         <div class="col-sm-2">
-                            <a class="btn btn-excel btn-sm" href="/get_table_mon_hoc_excel" title="Xuất Excel"><i
+                            <a class="btn btn-excel btn-sm" href="" title="Xuất Excel"><i
                                     class="fas fa-file-excel"></i> Xuất Excel</a>
                         </div>
 
                         <div class="col-sm-2">
                             <a class="btn btn-delete btn-sm pdf-file" type="button" title="Xuất PDF"
-                                href="/get_table_mon_hoc_pdf"><i class="fas fa-file-pdf"></i>Xuất PDF</a>
+                                href=""><i class="fas fa-file-pdf"></i>Xuất PDF</a>
                         </div>
 
                         <div class="col-sm-2">
@@ -51,32 +52,59 @@
                         border="0" id="sampleTable">
                         <thead>
                             <tr>
+                                <th colspan="10" style="text-align: center; background-color: #eee">Học kỳ 1 năm 2022/2023</th>
+                            </tr>
+                            <tr>
                                 <th width="10"><input type="checkbox" id="all"></th>
-                                <th>Mã môn</th>
-                                <th>Tên môn</th>
-                                <th>Số tín chỉ</th>
-                                <th>Tính năng</th>
+                                <th>STT</th>
+                                <th>Mã MH</th>
+                                <th>Môn học</th>
+                                <th>Số TC</th>
+                                <th>Điểm hệ 10</th>
+                                <th>Điểm chữ</th>
+                                <th>Điểm hệ 4</th>
+                                <th width="50">Chi tiết</th>
+                                <th width="100">Tính năng</th>
                             </tr>
                         </thead>
                         <tbody>
-                          {% for data in cac_mon %}
                             <tr>
                                 <td width="10"><input type="checkbox" id="myChecker" name="check1" value="1"></td>
-                                <td>{{data[0]}}</td>
-                                <td>{{data[1]}}</td>
-                                <td>{{data[2]}}</td>
-                                <td class="table-td-center"><button class="btn btn-primary btn-sm trash" type="button"
-                                        title="Xóa" onclick="deleteRow('{{data[0]}}')"><i class="fas fa-trash-alt"></i>
+                                <td>1</td>
+                                <td>MAT3508</td>
+                                <td>Nhập môn Trí tuệ nhân tạo</td>
+                                <td>3</td>
+                                <td>9.1</td>
+                                <td>A+</td>  
+                                <td>4</td>  
+                                <td>
+                                    <button class="btn btn-primary btn-sm edit" type="button" title="Chi tiết" id="show-emp">
+                                        <a href="/table_kqht_sv/table_kqht_chi_tiet"><i class="fa fa-book"
+                                                aria-hidden="true"></i></a>
+                                    </button>
+                                </td>  
+                                <td class="table-td-center">
+                                    <button class="btn btn-primary btn-sm trash" type="button"
+                                        title="Xóa" onclick="deleteRow(this)"><i class="fas fa-trash-alt"></i>
                                     </button>
                                     <button class="btn btn-primary btn-sm edit" type="button" title="Sửa" id="show-emp">
-                                        <a href="/table_mon_hoc/form_update_mon_hoc/{{data[0]}}"><i class="fa fa-edit"
+                                        <a href="/table_kqht_sv/form_update_kqht"><i class="fa fa-edit"
                                                 aria-hidden="true"></i></a>
                                     </button>
                                 </td>
                             </tr>
-                          {% endfor %}
+
                         </tbody>
                     </table>
+                </div>
+                <div class="form-group col-md-12">
+                    <label class="control-label">Tổng tín chỉ: </label>
+                </div>
+                <div class="form-group col-md-12">
+                    <label class="control-label">Tổng tín chỉ tích lũy: </label>
+                </div>
+                <div class="form-group col-md-12">
+                    <label class="control-label"> Điểm trung bình tích lũy hệ 4: </label>
                 </div>
             </div>
         </div>
@@ -99,17 +127,20 @@
  <script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
  <script type="text/javascript">$('#sampleTable').DataTable();</script>
  <script>
-   function deleteRow(id) {
+   function deleteRow(r) {
+     var i = r.parentNode.parentNode.rowIndex;
+     // document.getElementById("myTable").deleteRow(i); -->
+     var maNV = r.parentNode.parentNode.childNodes[3].textContent
      swal({
        title: "Cảnh báo",
-       text: "Bạn có chắc chắn là muốn xóa ngành này?", // index = 3
+       text: "Bạn có chắc chắn là muốn xóa kết quả này?", // index = 3
        buttons: ["Hủy bỏ", "Đồng ý"],
      })
        .then((willDelete) => {
         
          if (willDelete) {
            $.ajax({
-             url:"/delete_mon_hoc/" + id,
+             url:"/delete_sinh_vien/" + maNV,
              context: document.body
            })
            swal("Đã xóa thành công.!", {
@@ -132,14 +163,14 @@
 
      swal({
        title: "Cảnh báo",
-       text: "Bạn có chắc chắn là muốn xóa những ngành này?", // index = 3
+       text: "Bạn có chắc chắn là muốn xóa những kết quả này?", // index = 3
        buttons: ["Hủy bỏ", "Đồng ý"],
      })
        .then((willDelete) => {
          if (willDelete) {
            for (let i = 0; i < id_nv.length; i++) {
              $.ajax({
-               url:"/delete_mon_hoc/" + id_nv[i],
+               url:"/delete_sinh_vien/" + id_nv[i],
                context: document.body
              })
            }
@@ -157,8 +188,8 @@
    
    //In dữ liệu
    var myApp = new function () {
-     this.printMon = function () {
-       var win = window.open('/table_print_mon_hoc', '', 'height=700,width=1400');
+     this.printTable = function () {
+       var win = window.open('/get_print_data_employees', '', 'height=700,width=1400');
        win.document.close();
        win.print();
      }

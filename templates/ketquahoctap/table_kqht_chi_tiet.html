@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %} Kết quả học tập {% endblock title %}
+{% block content %}
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item active"><a href="/table_kqht_sv"><b>Kết quả học tập</b></a></li>
+            <li class="breadcrumb-item active"><a href="#"><b>Sinh viên A</b></a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <div class="tile-body">
+                    <table class="table table-hover table-bordered js-copytextarea">
+                        <thead>
+                            <tr>
+                                <th colspan="6" style="text-align: center; background-color: #eee">Điểm chi tiết môn học
+                                    <br>
+                                    Học kỳ 1 năm 2022-2023. Mã học kỳ 221</th>
+                            </tr>
+                            <tr>
+                                <th style="background-color: #eee">STT</th>
+                                <th style="background-color: #eee">Bản chất kỳ thi</th>
+                                <th style="background-color: #eee">TS</th>
+                                <th style="background-color: #eee">Lần thi</th>
+                                <th style="background-color: #eee">Điểm</th>
+                                <th style="background-color: #eee">Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Thi cuối kỳ</td>
+                                <td>0.6</td>
+                                <td>1</td>
+                                <td>8</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Kiểm tra</td>
+                                <td>0.2</td>
+                                <td>1</td>
+                                <td>8</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Giữa kỳ</td>
+                                <td>0.2</td>
+                                <td>1</td>
+                                <td>8</td>
+                                <td></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-group col-md-12">
+                    <label class="control-label">Tổng điểm: 8.0</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- Essential javascripts for application to work-->
+<script src="{{url_for('static', filename='doc/js/jquery-3.2.1.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/popper.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/bootstrap.min.js')}}"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="{{url_for('static', filename='doc/js/main.js')}}"></script>
+<!-- The javascript plugin to display page loading on top-->
+<script src="{{url_for('static', filename='doc/js/plugins/pace.min.js')}}"></script>
+<!-- Page specific javascripts-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+<!-- Data table plugin-->
+<!-- <script type="text/javascript" src="js/plugins/jquery.dataTables.min.js"></script> -->
+<script src="{{url_for('static', filename='doc/js/plugins/jquery.dataTables.min.js')}}"></script>
+<!-- <script type="text/javascript" src="js/plugins/dataTables.bootstrap.min.js"></script> -->
+<script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
+<script type="text/javascript">$('#sampleTable').DataTable();</script>
+<script>
+    function deleteRow(r) {
+        var i = r.parentNode.parentNode.rowIndex;
+        // document.getElementById("myTable").deleteRow(i); -->
+        var maNV = r.parentNode.parentNode.childNodes[3].textContent
+        swal({
+            title: "Cảnh báo",
+            text: "Bạn có chắc chắn là muốn xóa kết quả này?", // index = 3
+            buttons: ["Hủy bỏ", "Đồng ý"],
+        })
+            .then((willDelete) => {
+
+                if (willDelete) {
+                    $.ajax({
+                        url: "/delete_sinh_vien/" + maNV,
+                        context: document.body
+                    })
+                    swal("Đã xóa thành công.!", {
+
+                    });
+                    location.reload();
+                }
+            });
+    }
+
+    function deleteMoreRow(r) {
+        var numRow = document.getElementById("sampleTable").rows.length;
+        var id_nv = [];
+        $('#sampleTable tbody :checkbox').each(function () {
+            let i = this.parentNode.parentNode.rowIndex;
+            if (this.checked) {
+                id_nv.push(this.parentNode.parentNode.childNodes[3].textContent);
+            }
+        });
+
+        swal({
+            title: "Cảnh báo",
+            text: "Bạn có chắc chắn là muốn xóa những kết quả này?", // index = 3
+            buttons: ["Hủy bỏ", "Đồng ý"],
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    for (let i = 0; i < id_nv.length; i++) {
+                        $.ajax({
+                            url: "/delete_sinh_vien/" + id_nv[i],
+                            context: document.body
+                        })
+                    }
+                    swal("Đã xóa thành công.!", {});
+                }
+                location.reload();
+            });
+    }
+
+    oTable = $('#sampleTable').dataTable();
+    $('#all').click(function (e) {
+        $('#sampleTable tbody :checkbox').prop('checked', $(this).is(':checked'));
+        e.stopImmediatePropagation();
+    });
+
+    //In dữ liệu
+    var myApp = new function () {
+        this.printTable = function () {
+            var win = window.open('/get_print_data_employees', '', 'height=700,width=1400');
+            win.document.close();
+            win.print();
+        }
+    }
+</script>
+{% endblock content %}

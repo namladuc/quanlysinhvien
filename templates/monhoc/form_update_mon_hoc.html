@@ -35,13 +35,15 @@
                         </div>
                         <div class="form-group col-md-8">
                             <label class="control-label">Môn học này thuộc các ngành</label> <br>
+                            {% for data in cac_nganh %}
+                                <input type="checkbox" name="{{data[0]}}" value="{{data[0]}}"> {{data[2]}} - Hệ {{data[-1]}} <br>
+                            {% endfor %}
+
                             {% for data in cac_nganh_thuoc %}
                                 <input type="checkbox" name="{{data[0]}}" value="{{data[0]}}" checked> {{data[2]}} - Hệ {{data[-1]}} <br>
                             {% endfor %}
 
-                            {% for data in cac_nganh %}
-                                <input type="checkbox" name="{{data[0]}}" value="{{data[0]}}"> {{data[2]}} - Hệ {{data[-1]}} <br>
-                            {% endfor %}
+                           
                         </div>
                         <div class="form-group col-md-4">
                         </div>
