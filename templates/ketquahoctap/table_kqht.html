@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %} Kết quả học tập {% endblock title %}
+{% block title %} Kết quả học tập Sinh viên {{sinh_vien[1]}} {% endblock title %}
 {% block content %}
 <main class="app-content">
     <div class="app-title">
         <ul class="app-breadcrumb breadcrumb side">
             <li class="breadcrumb-item active"><a href="/table_kqht_sv"><b>Kết quả học tập</b></a></li>
-            <li class="breadcrumb-item active"><a href="#"><b>Sinh viên A</b></a></li>
+            <li class="breadcrumb-item active"><a href="#"><b>Sinh viên {{sinh_vien[1]}}</b></a></li>
         </ul>
         <div id="clock"></div>
     </div>
@@ -37,54 +37,76 @@
                         </div>
 
                     </div>
+                    <div class="form-group col-md-12">
+                      <label class="control-label">Mã sinh viên: {{sinh_vien[0]}}</label>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label class="control-label">Họ tên: {{sinh_vien[1]}}</label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="control-label"> Lớp: {{sinh_vien[2]}} </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="control-label"> Ngành: {{sinh_vien[3]}} </label>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label class="control-label">Khoa: {{sinh_vien[4]}}</label>
+                    </div>
+                    {% for index in index_hk %}
                     <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0"
                         border="0" id="sampleTable">
                         <thead>
                             <tr>
-                                <th colspan="10" style="text-align: center; background-color: #eee">Học kỳ 1 năm 2022/2023</th>
+                                <th colspan="9" style="text-align: center; background-color: #eee">{{hk[index]}}</th>
                             </tr>
                             <tr>
-                                <th width="10"><input type="checkbox" id="all"></th>
-                                <th>STT</th>
-                                <th>Mã MH</th>
-                                <th>Môn học</th>
-                                <th>Số TC</th>
-                                <th>Điểm hệ 10</th>
-                                <th>Điểm chữ</th>
-                                <th>Điểm hệ 4</th>
-                                <th width="50">Chi tiết</th>
-                                <th width="100">Tính năng</th>
+                                <th style="text-align: left; background-color: #eee" width="50">STT</th>
+                                <th style="text-align: left; background-color: #eee" width="100">Mã MH</th>
+                                <th style="text-align: left; background-color: #eee" width="500">Môn học</th>
+                                <th style="text-align: left; background-color: #eee" width="70">Số TC</th>
+                                <th style="text-align: left; background-color: #eee" width="100">Điểm hệ 10</th>
+                                <th style="text-align: left; background-color: #eee" width="100">Điểm chữ</th>
+                                <th style="text-align: left; background-color: #eee" width="100">Điểm hệ 4</th>
+                                <th style="text-align: left; background-color: #eee" width="50">Chi tiết</th>
+                                <th style="text-align: left; background-color: #eee" width="100">Tính năng</th>
                             </tr>
                         </thead>
                         <tbody>
+                            {% for index_diem in index_diem_hk[index] %}
                             <tr>
-                                <td width="10"><input type="checkbox" id="myChecker" name="check1" value="1"></td>
-                                <td>1</td>
-                                <td>MAT3508</td>
-                                <td>Nhập môn Trí tuệ nhân tạo</td>
-                                <td>3</td>
-                                <td>9.1</td>
-                                <td>A+</td>  
-                                <td>4</td>  
+                                <td>{{index_diem + 1}}</td>
+                                <td>{{data_diem_hk[index][index_diem][1]}}</td>
+                                <td>{{data_diem_hk[index][index_diem][2]}}</td>
+                                <td>{{data_diem_hk[index][index_diem][3]}}</td>
+                                {% if data_diem_hk[index][index_diem][4] == None %}
+                                  <td></td>
+                                  <td>{{data_diem_hk[index][index_diem][5]}}</td>  
+                                  <td></td>  
+                                {% else %}
+                                  <td>{{data_diem_hk[index][index_diem][4]}}</td>
+                                  <td>{{data_diem_hk[index][index_diem][5]}}</td>  
+                                  <td>{{data_diem_hk[index][index_diem][6]}}</td>   
+                                {% endif %}
                                 <td>
                                     <button class="btn btn-primary btn-sm edit" type="button" title="Chi tiết" id="show-emp">
-                                        <a href="/table_kqht_sv/table_kqht_chi_tiet"><i class="fa fa-book"
+                                        <a href="/table_kqht_sv/table_kqht_chi_tiet/{{sinh_vien[0]}}_{{data_diem_hk[index][index_diem][0]}}"><i class="fa fa-book"
                                                 aria-hidden="true"></i></a>
                                     </button>
                                 </td>  
                                 <td class="table-td-center">
                                     <button class="btn btn-primary btn-sm trash" type="button"
-                                        title="Xóa" onclick="deleteRow(this)"><i class="fas fa-trash-alt"></i>
+                                        title="Xóa" onclick="deleteRow('{{data_diem_hk[index][index_diem][1]}}')"><i class="fas fa-trash-alt"></i>
                                     </button>
                                     <button class="btn btn-primary btn-sm edit" type="button" title="Sửa" id="show-emp">
-                                        <a href="/table_kqht_sv/form_update_kqht"><i class="fa fa-edit"
+                                        <a href="/table_kqht_sv/form_update_kqht/{{data_diem_hk[index][index_diem][1]}}"><i class="fa fa-edit"
                                                 aria-hidden="true"></i></a>
                                     </button>
                                 </td>
                             </tr>
-
+                            {% endfor %}
                         </tbody>
                     </table>
+                    {% endfor %}
                 </div>
                 <div class="form-group col-md-12">
                     <label class="control-label">Tổng tín chỉ: </label>
@@ -111,10 +133,10 @@
  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
  <!-- Data table plugin-->
  <!-- <script type="text/javascript" src="js/plugins/jquery.dataTables.min.js"></script> -->
- <script src="{{url_for('static', filename='doc/js/plugins/jquery.dataTables.min.js')}}"></script>
+ <!--<script src="{{url_for('static', filename='doc/js/plugins/jquery.dataTables.min.js')}}"></script>-->
  <!-- <script type="text/javascript" src="js/plugins/dataTables.bootstrap.min.js"></script> -->
- <script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
- <script type="text/javascript">$('#sampleTable').DataTable();</script>
+ <!--<script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>-->
+ <!--<script type="text/javascript">$('#sampleTable').DataTable();</script>-->
  <script>
    function deleteRow(r) {
      var i = r.parentNode.parentNode.rowIndex;

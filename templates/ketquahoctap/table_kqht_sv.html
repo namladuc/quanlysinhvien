@@ -61,22 +61,23 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {% for data in diem_sinh_vien %}
                             <tr>
-                                <td>20002076</td>
-                                <td>Dương Văn Nam</td>
-                                <td>1-7-2002</td>
-                                <td>K65A5-KHDL</td>
-                                <td>Khoa học dữ liệu</td>
-                                <td>Toán - Cơ - Tin học</td>  
-                                <td>4.0</td>  
+                                <td>{{data[0]}}</td>
+                                <td>{{data[1]}}</td>
+                                <td>{{data[2]}}</td>
+                                <td>{{data[3]}}</td>
+                                <td>{{data[4]}}</td>
+                                <td>{{data[5]}}</td>  
+                                <td>{{data[6]}}</td>  
                                 <td class="table-td-center">
                                     <button class="btn btn-primary btn-sm edit" type="button" title="Xem" id="show-emp">
-                                        <a href="/table_kqht_sv/table_kqht"><i class="fa fa-eye"
+                                        <a href="/table_kqht_sv/table_kqht/{{data[0]}}"><i class="fa fa-eye"
                                                 aria-hidden="true"></i></a>
                                     </button>
                                 </td>
                             </tr>
-
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>

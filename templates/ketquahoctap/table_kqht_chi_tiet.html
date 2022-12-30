@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %} Kết quả học tập {% endblock title %}
+{% block title %} Kết quả học tập sinh viên {{sinh_vien[1]}} - {{diem_mon[-1]}}{% endblock title %}
 {% block content %}
 <main class="app-content">
     <div class="app-title">
         <ul class="app-breadcrumb breadcrumb side">
             <li class="breadcrumb-item active"><a href="/table_kqht_sv"><b>Kết quả học tập</b></a></li>
-            <li class="breadcrumb-item active"><a href="#"><b>Sinh viên A</b></a></li>
+            <li class="breadcrumb-item active"><a href="#"><b>Sinh viên {{sinh_vien[1]}} - {{diem_mon[-1]}}</b></a></li>
         </ul>
         <div id="clock"></div>
     </div>
@@ -17,15 +17,14 @@
                     <table class="table table-hover table-bordered js-copytextarea">
                         <thead>
                             <tr>
-                                <th colspan="6" style="text-align: center; background-color: #eee">Điểm chi tiết môn học
+                                <th colspan="6" style="text-align: center; background-color: #eee">Điểm chi tiết môn học {{diem_mon[-1]}}
                                     <br>
-                                    Học kỳ 1 năm 2022-2023. Mã học kỳ 221</th>
+                                    {{diem_mon[14]}}. Mã học kỳ : {{diem_mon[13]}}</th>
                             </tr>
                             <tr>
                                 <th style="background-color: #eee">STT</th>
                                 <th style="background-color: #eee">Bản chất kỳ thi</th>
                                 <th style="background-color: #eee">TS</th>
-                                <th style="background-color: #eee">Lần thi</th>
                                 <th style="background-color: #eee">Điểm</th>
                                 <th style="background-color: #eee">Ghi chú</th>
                             </tr>
@@ -34,25 +33,22 @@
                             <tr>
                                 <td>1</td>
                                 <td>Thi cuối kỳ</td>
-                                <td>0.6</td>
-                                <td>1</td>
-                                <td>8</td>
+                                <td>{{diem_mon[6]}}</td>
+                                <td>{{diem_mon[9]}}</td>
                                 <td></td>
                             </tr>
                             <tr>
                                 <td>2</td>
                                 <td>Kiểm tra</td>
-                                <td>0.2</td>
-                                <td>1</td>
-                                <td>8</td>
+                                <td>{{diem_mon[4]}}</td>
+                                <td>{{diem_mon[7]}}</td>
                                 <td></td>
                             </tr>
                             <tr>
                                 <td>3</td>
                                 <td>Giữa kỳ</td>
-                                <td>0.2</td>
-                                <td>1</td>
-                                <td>8</td>
+                                <td>{{diem_mon[5]}}</td>
+                                <td>{{diem_mon[8]}}</td>
                                 <td></td>
                             </tr>
 
@@ -60,7 +56,13 @@
                     </table>
                 </div>
                 <div class="form-group col-md-12">
-                    <label class="control-label">Tổng điểm: 8.0</label>
+                    <label class="control-label">Tổng điểm thang 10: {{diem_mon[10]}}</label>
+                </div>
+                <div class="form-group col-md-12">
+                    <label class="control-label">Điểm chữ: {{diem_mon[12]}}</label>
+                </div>
+                <div class="form-group col-md-12">
+                    <label class="control-label">Tổng điểm thang 4: {{diem_mon[11]}}</label>
                 </div>
             </div>
         </div>
