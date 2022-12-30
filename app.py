@@ -1829,13 +1829,14 @@ def delete_mon_hoc(ma_mon):
 
 # -------------------------- Ket Qua Hoc Tap -------------------------
 
+@login_required
 @app.route("/table_kqht_sv")
 def table_kqht_sv():
     cur = mysql.connection.cursor()
 
     cur.execute("""
                 SELECT d.ma_sinh_vien, sv.ho_ten, sv.ngay_sinh, l.ten_lop, n.ten_nganh,
-                k.ten_khoa, SUM(d.thang_4 * mh.so_tin_chi)/SUM(mh.so_tin_chi)
+                k.ten_khoa, ROUND(SUM(d.thang_4 * mh.so_tin_chi)/SUM(mh.so_tin_chi),2)
                 FROM diem d
                 JOIN sinh_vien sv ON d.ma_sinh_vien = sv.ma_sinh_vien
                 JOIN sinh_vien_lop svl ON svl.ma_sinh_vien = sv.ma_sinh_vien
@@ -1847,7 +1848,7 @@ def table_kqht_sv():
                     SELECT DISTINCT mhn.ma_mon 
                     FROM mon_hoc_nganh mhn
                     WHERE mhn.ma_nganh = n.ma_nganh
-                )
+                ) AND d.thang_10 >= 4
                 GROUP BY d.ma_sinh_vien
                 """)
     diem_sinh_vien = cur.fetchall()
@@ -1857,6 +1858,70 @@ def table_kqht_sv():
                            my_user = session['username'],
                            truong = session['truong'])
 
+@login_required
+@app.route("/table_print_kqht_sv")
+def table_print_kqht_sv():
+    cur = mysql.connection.cursor()
+
+    cur.execute("""
+                SELECT d.ma_sinh_vien, sv.ho_ten, sv.ngay_sinh, l.ten_lop, n.ten_nganh,
+                k.ten_khoa, ROUND(SUM(d.thang_4 * mh.so_tin_chi)/SUM(mh.so_tin_chi),2)
+                FROM diem d
+                JOIN sinh_vien sv ON d.ma_sinh_vien = sv.ma_sinh_vien
+                JOIN sinh_vien_lop svl ON svl.ma_sinh_vien = sv.ma_sinh_vien
+                JOIN lop l ON l.ma_lop = svl.ma_lop
+                JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                JOIN mon_hoc mh ON mh.ma_mon = d.ma_mon
+                WHERE d.diem_he_3 != -1 AND d.ma_mon IN (
+                    SELECT DISTINCT mhn.ma_mon 
+                    FROM mon_hoc_nganh mhn
+                    WHERE mhn.ma_nganh = n.ma_nganh
+                ) AND d.thang_10 >= 4
+                GROUP BY d.ma_sinh_vien
+                """)
+    diem_sinh_vien = cur.fetchall()
+    return render_template('ketquahoctap/table_print_kqht_sv.html',
+                           diem_sinh_vien = diem_sinh_vien)
+
+@login_required
+@app.route("/get_table_kqht_sv_excel")
+def get_table_kqht_sv_excel():
+    cur = mysql.connection.cursor()
+
+    cur.execute("""
+                SELECT d.ma_sinh_vien, sv.ho_ten, sv.ngay_sinh, l.ten_lop, n.ten_nganh,
+                k.ten_khoa, ROUND(SUM(d.thang_4 * mh.so_tin_chi)/SUM(mh.so_tin_chi),2)
+                FROM diem d
+                JOIN sinh_vien sv ON d.ma_sinh_vien = sv.ma_sinh_vien
+                JOIN sinh_vien_lop svl ON svl.ma_sinh_vien = sv.ma_sinh_vien
+                JOIN lop l ON l.ma_lop = svl.ma_lop
+                JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                JOIN mon_hoc mh ON mh.ma_mon = d.ma_mon
+                WHERE d.diem_he_3 != -1 AND d.ma_mon IN (
+                    SELECT DISTINCT mhn.ma_mon 
+                    FROM mon_hoc_nganh mhn
+                    WHERE mhn.ma_nganh = n.ma_nganh
+                ) AND d.thang_10 >= 4
+                GROUP BY d.ma_sinh_vien
+                """)
+    diem_sinh_vien = cur.fetchall()
+    columnName = ['MSV','HoTen','NgaySinh','TenLop','TenNganh','TenKhoa','GPA']
+    data = pd.DataFrame.from_records(diem_sinh_vien, columns=columnName)
+    data = data.set_index('MSV')
+    pathFile = app.config['SAVE_FOLDER_EXCEL'] + "/" + "Data_KQHT_SV.xlsx"
+    data.to_excel(pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
+@app.route("/get_table_kqht_sv_pdf")
+def get_table_kqht_sv_pdf():
+    pathFile = app.config['SAVE_FOLDER_PDF']  + '/Table Kqht SV.pdf'
+    pdfkit.from_url("/".join(request.url.split("/")[:-1:]) + '/table_print_kqht_sv',pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
 @app.route("/table_kqht_sv/table_kqht/<string:ma_sinh_vien>")
 def table_kqht(ma_sinh_vien):
     cur = mysql.connection.cursor()
@@ -1907,6 +1972,29 @@ def table_kqht(ma_sinh_vien):
         data_diem_hk.append(cur.fetchall())
         index_diem_hk.append([i for i in range(len(data_diem_hk[-1]))])
     
+    cur.execute("""
+                SELECT d.ma_sinh_vien, ROUND(SUM(d.thang_4 * mh.so_tin_chi)/SUM(mh.so_tin_chi),2), sum(mh.so_tin_chi)
+                FROM diem d
+                JOIN sinh_vien sv ON d.ma_sinh_vien = sv.ma_sinh_vien
+                JOIN sinh_vien_lop svl ON svl.ma_sinh_vien = sv.ma_sinh_vien
+                JOIN lop l ON l.ma_lop = svl.ma_lop
+                JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                JOIN mon_hoc mh ON mh.ma_mon = d.ma_mon
+                WHERE d.diem_he_3 != -1 AND d.ma_mon IN (
+                    SELECT DISTINCT mhn.ma_mon 
+                    FROM mon_hoc_nganh mhn
+                    WHERE mhn.ma_nganh = n.ma_nganh
+                ) AND d.thang_10 >= 4 AND d.ma_sinh_vien = %s
+                GROUP BY d.ma_sinh_vien
+                """, (ma_sinh_vien, ))
+    tk_diem_sinh_vien = cur.fetchall()
+    
+    if (len(tk_diem_sinh_vien) != 1):
+        return "Error"
+    
+    tk_diem_sinh_vien = tk_diem_sinh_vien[0]
+    
     hk = []
     for elm in tmp_hoc_ky:
         hk.append(elm[1])
@@ -1914,12 +2002,14 @@ def table_kqht(ma_sinh_vien):
     return render_template(session['role'] + 'ketquahoctap/table_kqht.html',
                            sinh_vien = sinh_vien,
                            index_hk = index_hk,
+                           tk_diem_sinh_vien = tk_diem_sinh_vien,
                            hk = hk,
                            index_diem_hk = index_diem_hk,
                            data_diem_hk = data_diem_hk,
                            my_user = session['username'],
                            truong = session['truong'])
 
+@login_required
 @app.route("/table_kqht_sv/table_kqht_chi_tiet/<string:ma_sinh_vien>_<string:id_diem>")
 def table_kqht_chi_tiet(ma_sinh_vien, id_diem):
     cur = mysql.connection.cursor()
@@ -1956,6 +2046,130 @@ def table_kqht_chi_tiet(ma_sinh_vien, id_diem):
                            sinh_vien = sinh_vien,
                            my_user = session['username'],
                            truong = session['truong'])
+
+@login_required
+@app.route("/table_print_kqht/<string:ma_sinh_vien>")
+def table_print_kqht(ma_sinh_vien):
+    cur = mysql.connection.cursor()
+    cur.execute("""
+                SELECT sv.ma_sinh_vien, sv.ho_ten, l.ten_lop, n.ten_nganh, k.ten_khoa
+                FROM sinh_vien sv
+                JOIN sinh_vien_lop svl ON sv.ma_sinh_vien = svl.ma_sinh_vien
+                JOIN lop l ON l.ma_lop = svl.ma_lop
+                JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                WHERE sv.ma_sinh_vien = %s
+                """, (ma_sinh_vien, ))
+    sinh_vien = cur.fetchall()
+    
+    if (len(sinh_vien) != 1):
+        return "Error"
+    
+    sinh_vien = sinh_vien[0]
+    
+    cur.execute("""
+                SELECT hk.ma_hoc_ky, hk.ten_hoc_ky
+                FROM diem d
+                JOIN hoc_ky hk ON d.ma_hoc_ky = hk.ma_hoc_ky
+                WHERE d.ma_sinh_vien = %s
+                GROUP BY hk.ma_hoc_ky
+                ORDER BY hk.ma_hoc_ky DESC
+                """, (ma_sinh_vien, ))
+    tmp_hoc_ky = cur.fetchall()
+    
+    index_hk = []
+    hk = []
+    index = 0
+    for elm in tmp_hoc_ky:
+        index_hk.append(index)
+        hk.append(elm[0])
+        index += 1
+    
+    index_diem_hk = []
+    data_diem_hk = []
+    for elm in hk:
+        cur.execute("""
+                    SELECT d.id_diem, d.ma_mon, mh.ten_mon, mh.so_tin_chi, d.thang_10, d.thang_chu, d.thang_4
+                    FROM diem d
+                    JOIN mon_hoc mh ON mh.ma_mon = d.ma_mon
+                    WHERE d.ma_hoc_ky = %s AND d.ma_sinh_vien = %s 
+                    ORDER BY mh.ma_mon
+                    """, (elm, ma_sinh_vien))
+        data_diem_hk.append(cur.fetchall())
+        index_diem_hk.append([i for i in range(len(data_diem_hk[-1]))])
+    
+    cur.execute("""
+                SELECT d.ma_sinh_vien, SUM(d.thang_4 * mh.so_tin_chi)/SUM(mh.so_tin_chi), sum(mh.so_tin_chi)
+                FROM diem d
+                JOIN sinh_vien sv ON d.ma_sinh_vien = sv.ma_sinh_vien
+                JOIN sinh_vien_lop svl ON svl.ma_sinh_vien = sv.ma_sinh_vien
+                JOIN lop l ON l.ma_lop = svl.ma_lop
+                JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                JOIN mon_hoc mh ON mh.ma_mon = d.ma_mon
+                WHERE d.diem_he_3 != -1 AND d.ma_mon IN (
+                    SELECT DISTINCT mhn.ma_mon 
+                    FROM mon_hoc_nganh mhn
+                    WHERE mhn.ma_nganh = n.ma_nganh
+                ) AND d.thang_10 >= 4 AND d.ma_sinh_vien = %s
+                GROUP BY d.ma_sinh_vien
+                """, (ma_sinh_vien, ))
+    tk_diem_sinh_vien = cur.fetchall()
+    
+    if (len(tk_diem_sinh_vien) != 1):
+        return "Error"
+    
+    tk_diem_sinh_vien = tk_diem_sinh_vien[0]
+    
+    hk = []
+    for elm in tmp_hoc_ky:
+        hk.append(elm[1])
+    
+    return render_template('ketquahoctap/table_print_kqht.html',
+                           sinh_vien = sinh_vien,
+                           index_hk = index_hk,
+                           tk_diem_sinh_vien = tk_diem_sinh_vien,
+                           hk = hk,
+                           index_diem_hk = index_diem_hk,
+                           data_diem_hk = data_diem_hk)
+
+@login_required
+@app.route("/get_table_kqht_pdf/<string:ma_sinh_vien>")
+def get_table_kqht_pdf(ma_sinh_vien):
+    pathFile = app.config['SAVE_FOLDER_PDF']  + '/Bang Diem ' + ma_sinh_vien + '.pdf'
+    pdfkit.from_url("/".join(request.url.split("/")[:-2:]) + '/table_print_kqht/' + ma_sinh_vien,pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
+@app.route("/get_table_kqht_excel/<string:ma_sinh_vien>")
+def get_table_kqht_excel(ma_sinh_vien):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT d.ma_sinh_vien, d.ma_hoc_ky, d.ma_mon, mh.ten_mon,
+                d.thang_10, d.thang_4, d.thang_chu 
+                FROM diem d
+                JOIN mon_hoc mh ON d.ma_mon = mh.ma_mon
+                WHERE d.diem_he_3 != -1 AND d.ma_sinh_vien = %s
+                ORDER BY d.ma_hoc_ky DESC
+                """, (ma_sinh_vien, ))
+    cac_diem = cur.fetchall()
+    columnName = ['MSV','MaHocKy','MaMon','TenMon','ThangDiem10','ThangDiem4','ThangDiemChu']
+    data = pd.DataFrame.from_records(cac_diem, columns=columnName)
+    data = data.set_index('MaMon')
+    pathFile = app.config['SAVE_FOLDER_EXCEL'] + "/" + "Data_Diem_" + ma_sinh_vien + ".xlsx"
+    data.to_excel(pathFile)
+    return send_file(pathFile, as_attachment=True)
+    
+@login_required
+@app.route("/delete_diem/<string:id_diem>")
+def delete_diem(id_diem):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""DELETE FROM diem
+                WHERE id_diem = %s""", (id_diem, ))
+    mysql.connection.commit()
+    return redirect(url_for('table_kqht_sv'))
 
 @login_required
 @app.route("/table_kqht_sv/form_add_kqht", methods = ['GET','POST'])
@@ -2087,11 +2301,25 @@ def form_add_kqht_upload_process(filename):
         if (len(set(column_match)) != len(column_link)):
             return "Error"
         
-        if (len(column_match) != 4):
+        if (len(column_match) != 9):
+            return "Error"
+        
+        # Kiểm tra xem mã sinh viên có tồn tại không
+        tmp = tuple(set(data_kqht[data_column[column_match.index(0)]]))
+        if len(tmp) == 1:
+            cur.execute("SELECT ma_sinh_vien FROM sinh_vien WHERE ma_sinh_vien = %s", tmp)
+        else:
+            new_tmp = ["\"" + str(text) +"\"" for text in tmp]
+            cur.execute("SELECT ma_sinh_vien FROM sinh_vien WHERE ma_sinh_vien IN (" + ", ".join(new_tmp) + ")")
+        data_tuple = cur.fetchall()
+        data_tmp_take = []
+        for elm in data_tuple:
+            data_tmp_take.append(elm[0])
+        if (len(data_tmp_take) != len(tmp)):
             return "Error"
         
         # Kiểm tra xem mã môn có tồn tại không
-        tmp = tuple(set(data_mon_hoc[data_column[column_match.index(0)]]))
+        tmp = tuple(set(data_kqht[data_column[column_match.index(1)]]))
         if len(tmp) == 1:
             cur.execute("SELECT ma_mon FROM mon_hoc WHERE ma_mon = %s", tmp)
         else:
@@ -2101,42 +2329,16 @@ def form_add_kqht_upload_process(filename):
         data_tmp_take = []
         for elm in data_tuple:
             data_tmp_take.append(elm[0])
-        if (len(data_tmp_take) != 0):
+        if (len(data_tmp_take) != len(tmp)):
             return "Error"
         
-        # Tách cột mã nganh ra so với các cột còn lại để import vào bảng khác
-        ma_mon_ma_nganh = data_mon_hoc[[data_column[column_match.index(0)], data_column[column_match.index(3)]]]
-        col_ma_nganh = [data_column[column_match.index(0)], data_column[column_match.index(3)]]
-        data_mon_hoc = data_mon_hoc.drop(data_column[column_match.index(3)], axis=1)
-        data_column.remove(data_column[column_match.index(3)])
-        column_match.remove(3)
-        
-        sql = "INSERT INTO `mon_hoc` ("
-        for index in column_match:
-            sql += default_tag_column[index] + ","
-        sql = sql[:-1:]
-        sql += ") VALUES "
-        for index_row in range(data_mon_hoc.shape[0]):
-            sql += "("
-            for col in data_column:
-                sql +=  "\"" + str(data_mon_hoc[col][index_row]) + "\"" + ","
-            sql = sql[:-1:]
-            sql += "),"
-        sql = sql[:-1:]  
-        cur.execute(sql)
-        mysql.connection.commit()
-        
-        ma_mon_ma_nganh[col_ma_nganh[1]] = ma_mon_ma_nganh[col_ma_nganh[1]].str.split(",")
-        ma_mon_ma_nganh = ma_mon_ma_nganh.explode(col_ma_nganh[1])
-        ma_mon_ma_nganh = ma_mon_ma_nganh.reset_index()
-        
-        # Kiểm tra xem mã ngành có tồn tại không
-        tmp = tuple(set(ma_mon_ma_nganh[col_ma_nganh[1]]))
+        # Kiểm tra xem mã HK có tồn tại không
+        tmp = tuple(set(data_kqht[data_column[column_match.index(2)]]))
         if len(tmp) == 1:
-            cur.execute("SELECT ma_nganh FROM nganh WHERE ma_nganh = %s", tmp)
+            cur.execute("SELECT ma_hoc_ky FROM hoc_ky WHERE ma_hoc_ky = %s", tmp)
         else:
             new_tmp = ["\"" + text +"\"" for text in tmp]
-            cur.execute("SELECT ma_nganh FROM nganh WHERE ma_nganh IN (" + ", ".join(new_tmp) + ")")
+            cur.execute("SELECT ma_hoc_ky FROM hoc_ky WHERE ma_hoc_ky IN (" + ", ".join(new_tmp) + ")")
         data_tuple = cur.fetchall()
         data_tmp_take = []
         for elm in data_tuple:
@@ -2145,19 +2347,83 @@ def form_add_kqht_upload_process(filename):
             return "Error"
         
         
-        sql = "INSERT INTO `mon_hoc_nganh` ( ma_mon, ma_nganh ) VALUES "
-        for index_row in range(ma_mon_ma_nganh.shape[0]):
+        # Kiểm tra các môn mà các sinh viên được học
+        # nếu ko sẽ tự xóa bản ghi đó
+        msv_lst = list(set(data_kqht[data_column[column_match.index(0)]]))
+        for elm in msv_lst:
+            cur.execute("""
+                        SELECT mhn.ma_mon
+                        FROM mon_hoc_nganh mhn
+                        JOIN lop l ON mhn.ma_nganh = l.ma_nganh
+                        JOIN sinh_vien_lop svl ON svl.ma_lop = l.ma_lop
+                        WHERE svl.ma_sinh_vien = %s;
+                        """, (elm, ))
+            data_mon = cur.fetchall()
+            cac_mon_duoc_hoc = []
+            for data in data_mon:
+                cac_mon_duoc_hoc.append(data[0])
+            
+            cac_mon =  data_kqht[data_kqht[data_column[column_match.index(0)]] == elm][data_column[column_match.index(1)]]
+            index_mon = list(cac_mon.index)
+            cac_mon = list(cac_mon)
+            for i in range(len(index_mon)):
+                if (cac_mon[i] not in cac_mon_duoc_hoc):
+                    print("Check")
+                    data_kqht = data_kqht.drop(index_mon[i])
+                    
+        data_kqht = data_kqht.reset_index()
+        
+        
+        # Kiểm tra xem sinh viên này đã có điểm môn đó chưa
+        # Nếu có rồi thì update
+        for index_row in range(data_kqht.shape[0]):
+            sql = "SELECT id_diem FROM diem WHERE ma_sinh_vien = %s AND ma_mon = %s"
+            val = (data_kqht[data_column[column_match.index(0)]][index_row],
+                   data_kqht[data_column[column_match.index(1)]][index_row])
+            cur.execute(sql,val)
+            diem_sv = cur.fetchall()
+            if (len(diem_sv) >= 2):
+                return "Error"
+            if (len(diem_sv) == 1):
+                sql = """
+                    UPDATE diem
+                    SET he_so_1 = %s, he_so_2 = %s, he_so_3 = %s,
+                    diem_he_1 = %s, diem_he_2 = %s, diem_he_3 = %s,
+                    ma_hoc_ky = %s
+                    WHERE id_diem = %s
+                """
+                val = (
+                    data_kqht[data_column[column_match.index(3)]][index_row],
+                    data_kqht[data_column[column_match.index(4)]][index_row],
+                    data_kqht[data_column[column_match.index(5)]][index_row],
+                    data_kqht[data_column[column_match.index(6)]][index_row],
+                    data_kqht[data_column[column_match.index(7)]][index_row],
+                    data_kqht[data_column[column_match.index(8)]][index_row],
+                    data_kqht[data_column[column_match.index(2)]][index_row],
+                    diem_sv[0][0]
+                )
+                cur.execute(sql,val)
+                mysql.connection.commit()
+                data_kqht = data_kqht.drop(index_row)
+        
+        data_kqht = data_kqht.reset_index()
+    
+        sql = "INSERT INTO `diem` ("
+        for index in column_match:
+            sql += default_tag_column[index] + ","
+        sql = sql[:-1:]
+        sql += ") VALUES "
+        for index_row in range(data_kqht.shape[0]):
             sql += "("
-            for col in col_ma_nganh:
-                sql += "\"" + str(ma_mon_ma_nganh[col][index_row]) + "\"" + ","
+            for col in data_column:
+                sql +=  "\"" + str(data_kqht[col][index_row]) + "\"" + ","
             sql = sql[:-1:]
             sql += "),"
-        sql = sql[:-1:]
-        
+        sql = sql[:-1:]  
         cur.execute(sql)
         mysql.connection.commit()
         os.remove(pathToFile)
-        return redirect(url_for("table_mon_hoc"))         
+        return redirect(url_for('table_kqht_sv'))         
      
     return render_template(session['role'] + 'ketquahoctap/form_add_kqht_upload_process.html',
                            filename = filename,
@@ -2165,11 +2431,70 @@ def form_add_kqht_upload_process(filename):
                            my_user = session['username'],
                            name_column = default_name_column,
                            index_column = data_column)
-    
 
-@app.route("/table_kqht_sv/form_update_kqht/<string:id_diem>")
-def form_update_kqht(id_diem):                                     
+@app.route("/table_kqht_sv/form_update_kqht/<string:id_diem>", methods = ['GET','POST'])
+def form_update_kqht(id_diem):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT * 
+                FROM diem
+                WHERE id_diem = %s
+                """, (id_diem, ))
+    diem = cur.fetchall()
+    
+    if (len(diem) != 1):
+        return "Error"
+    
+    diem = diem[0]
+    
+    cur.execute("""
+                SELECT ma_sinh_vien, ho_ten
+                FROM sinh_vien sv
+                WHERE sv.ma_sinh_vien = %s
+                """, (diem[1], ))
+    ten_sv = cur.fetchall()[0]
+    
+    if request.method == 'POST':
+        details = request.form
+        he_so_1 = details['he_so_1']
+        diem_he_1 = details['diem_he_1']
+        he_so_2 = details['he_so_2']
+        diem_he_2 = details['diem_he_2']
+        he_so_3 = details['he_so_3']
+        diem_he_3 = details['diem_he_3']
+        
+        if diem_he_3 == "":
+            diem_he_3 = -1
+        
+        if (int(float(he_so_1) + float(he_so_2) + float(he_so_3)) != 1):
+            return render_template(session['role'] + 'ketquahoctap/form_update_kqht.html',
+                    ma_err = "Tổng các hệ số không bằng 1, hoặc các giá trị điểm và hệ số vượt quá giá trị quy định",
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+            
+        if float(he_so_3) != 0.6 or float(diem_he_1) < 0 or float(diem_he_1) > 10:
+            return render_template(session['role'] + 'ketquahoctap/form_update_kqht.html',
+                    ma_err = "Tổng các hệ số không bằng 1, hoặc các giá trị điểm và hệ số vượt quá giá trị quy định",
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+            
+        if float(diem_he_2) < 0 or float(diem_he_2) > 10 or float(diem_he_3) > 10 or float(diem_he_3) < -1:
+            return render_template(session['role'] + 'ketquahoctap/form_update_kqht.html',
+                    ma_err = "Tổng các hệ số không bằng 1, hoặc các giá trị điểm và hệ số vượt quá giá trị quy định",
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+        cur.execute("""
+                    UPDATE diem
+                    SET he_so_1 = %s, he_so_2 = %s, he_so_3 = %s,
+                    diem_he_1 = %s, diem_he_2 = %s, diem_he_3 = %s
+                    WHERE id_diem = %s
+                    """, (he_so_1, he_so_2, he_so_3, diem_he_1, diem_he_2, diem_he_3, id_diem))
+        mysql.connection.commit()
+        return redirect(url_for('table_kqht_sv'))
     return render_template(session['role'] + 'ketquahoctap/form_update_kqht.html',
+                           ten_sv = ten_sv,
+                           diem = diem,
                            my_user = session['username'],
                            truong = session['truong'])
 

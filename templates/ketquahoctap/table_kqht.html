@@ -18,22 +18,17 @@
                     <div class="row element-button">
 
                         <div class="col-sm-2">
-                          <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printNV()"><i
+                          <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printTable()"><i
                               class="fas fa-print"></i> In thông tin</a>
                         </div>
                         <div class="col-sm-2">
-                            <a class="btn btn-excel btn-sm" href="" title="Xuất Excel"><i
+                            <a class="btn btn-excel btn-sm" href="/get_table_kqht_excel/{{sinh_vien[0]}}" title="Xuất Excel"><i
                                     class="fas fa-file-excel"></i> Xuất Excel</a>
                         </div>
 
                         <div class="col-sm-2">
                             <a class="btn btn-delete btn-sm pdf-file" type="button" title="Xuất PDF"
-                                href=""><i class="fas fa-file-pdf"></i>Xuất PDF</a>
-                        </div>
-
-                        <div class="col-sm-2">
-                            <a class="btn btn-delete btn-sm" type="button" title="Xóa tất cả các phần tử đã chọn"
-                                onclick="deleteMoreRow(this)"><i class="fas fa-trash-alt"></i> Xóa phần tử đã chọn </a>
+                                href="/get_table_kqht_pdf/{{sinh_vien[0]}}"><i class="fas fa-file-pdf"></i>Xuất PDF</a>
                         </div>
 
                     </div>
@@ -54,7 +49,7 @@
                     </div>
                     {% for index in index_hk %}
                     <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0"
-                        border="0" id="sampleTable">
+                        border="0" id="sampleTable1">
                         <thead>
                             <tr>
                                 <th colspan="9" style="text-align: center; background-color: #eee">{{hk[index]}}</th>
@@ -95,10 +90,10 @@
                                 </td>  
                                 <td class="table-td-center">
                                     <button class="btn btn-primary btn-sm trash" type="button"
-                                        title="Xóa" onclick="deleteRow('{{data_diem_hk[index][index_diem][1]}}')"><i class="fas fa-trash-alt"></i>
+                                        title="Xóa" onclick="deleteRow('{{data_diem_hk[index][index_diem][0]}}')"><i class="fas fa-trash-alt"></i>
                                     </button>
                                     <button class="btn btn-primary btn-sm edit" type="button" title="Sửa" id="show-emp">
-                                        <a href="/table_kqht_sv/form_update_kqht/{{data_diem_hk[index][index_diem][1]}}"><i class="fa fa-edit"
+                                        <a href="/table_kqht_sv/form_update_kqht/{{data_diem_hk[index][index_diem][0]}}"><i class="fa fa-edit"
                                                 aria-hidden="true"></i></a>
                                     </button>
                                 </td>
@@ -109,13 +104,13 @@
                     {% endfor %}
                 </div>
                 <div class="form-group col-md-12">
-                    <label class="control-label">Tổng tín chỉ: </label>
+                    <label class="control-label">Tổng tín chỉ: {{tk_diem_sinh_vien[-1]}}</label>
                 </div>
                 <div class="form-group col-md-12">
-                    <label class="control-label">Tổng tín chỉ tích lũy: </label>
+                    <label class="control-label">Tổng tín chỉ tích lũy: {{tk_diem_sinh_vien[-1]}}</label>
                 </div>
                 <div class="form-group col-md-12">
-                    <label class="control-label"> Điểm trung bình tích lũy hệ 4: </label>
+                    <label class="control-label"> Điểm trung bình tích lũy hệ 4: {{tk_diem_sinh_vien[1]}}</label>
                 </div>
             </div>
         </div>
@@ -133,15 +128,12 @@
  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
  <!-- Data table plugin-->
  <!-- <script type="text/javascript" src="js/plugins/jquery.dataTables.min.js"></script> -->
- <!--<script src="{{url_for('static', filename='doc/js/plugins/jquery.dataTables.min.js')}}"></script>-->
+ <script src="{{url_for('static', filename='doc/js/plugins/jquery.dataTables.min.js')}}"></script>
  <!-- <script type="text/javascript" src="js/plugins/dataTables.bootstrap.min.js"></script> -->
- <!--<script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>-->
+ <script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
  <!--<script type="text/javascript">$('#sampleTable').DataTable();</script>-->
  <script>
-   function deleteRow(r) {
-     var i = r.parentNode.parentNode.rowIndex;
-     // document.getElementById("myTable").deleteRow(i); -->
-     var maNV = r.parentNode.parentNode.childNodes[3].textContent
+   function deleteRow(id) {
      swal({
        title: "Cảnh báo",
        text: "Bạn có chắc chắn là muốn xóa kết quả này?", // index = 3
@@ -151,7 +143,7 @@
         
          if (willDelete) {
            $.ajax({
-             url:"/delete_sinh_vien/" + maNV,
+             url:"/delete_diem/" + id,
              context: document.body
            })
            swal("Đã xóa thành công.!", {
@@ -161,46 +153,11 @@
          }
        });
    }
-
-   function deleteMoreRow(r) {
-     var numRow = document.getElementById("sampleTable").rows.length;
-     var id_nv = [];
-     $('#sampleTable tbody :checkbox').each(function () {
-         let i = this.parentNode.parentNode.rowIndex;
-         if (this.checked) {
-           id_nv.push(this.parentNode.parentNode.childNodes[3].textContent);
-         }
-     });
-
-     swal({
-       title: "Cảnh báo",
-       text: "Bạn có chắc chắn là muốn xóa những kết quả này?", // index = 3
-       buttons: ["Hủy bỏ", "Đồng ý"],
-     })
-       .then((willDelete) => {
-         if (willDelete) {
-           for (let i = 0; i < id_nv.length; i++) {
-             $.ajax({
-               url:"/delete_sinh_vien/" + id_nv[i],
-               context: document.body
-             })
-           }
-           swal("Đã xóa thành công.!", {});
-         }
-         location.reload();
-       });
-   }
-
-   oTable = $('#sampleTable').dataTable();
-   $('#all').click(function (e) {
-     $('#sampleTable tbody :checkbox').prop('checked', $(this).is(':checked'));
-     e.stopImmediatePropagation();
-   });
    
    //In dữ liệu
    var myApp = new function () {
      this.printTable = function () {
-       var win = window.open('/get_print_data_employees', '', 'height=700,width=1400');
+       var win = window.open('/table_print_kqht/{{sinh_vien[0]}}', '', 'height=700,width=1400');
        win.document.close();
        win.print();
      }

@@ -36,13 +36,13 @@
                               class="fas fa-print"></i> In thông tin</a>
                         </div>
                         <div class="col-sm-2">
-                            <a class="btn btn-excel btn-sm" href="" title="Xuất Excel"><i
+                            <a class="btn btn-excel btn-sm" href="/get_table_kqht_sv_excel" title="Xuất Excel"><i
                                     class="fas fa-file-excel"></i> Xuất Excel</a>
                         </div>
 
                         <div class="col-sm-2">
                             <a class="btn btn-delete btn-sm pdf-file" type="button" title="Xuất PDF"
-                                href=""><i class="fas fa-file-pdf"></i>Xuất PDF</a>
+                                href="/get_table_kqht_sv_pdf"><i class="fas fa-file-pdf"></i>Xuất PDF</a>
                         </div>
 
                     </div>
@@ -105,7 +105,7 @@
    //In dữ liệu
    var myApp = new function () {
      this.printTable = function () {
-       var win = window.open('/get_print_data_employees', '', 'height=700,width=1400');
+       var win = window.open('/table_print_kqht_sv', '', 'height=700,width=1400');
        win.document.close();
        win.print();
      }

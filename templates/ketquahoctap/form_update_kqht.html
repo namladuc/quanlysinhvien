@@ -5,7 +5,7 @@
     <div class="app-title">
         <ul class="app-breadcrumb breadcrumb">
             <li class="breadcrumb-item"><a href="/table_kqht_sv">Kết quả học tập</a></li>
-            <li class="breadcrumb-item"><a href="/table_kqht_sv/table_kqht"><b>Sinh viên A</b></a></li>
+            <li class="breadcrumb-item"><a href="/table_kqht_sv/table_kqht/{{ten_sv[0]}}"><b>Sinh viên {{ten_sv[1]}}</b></a></li>
             <li class="breadcrumb-item"><a href="">Chỉnh sửa kết quả học tập</a></li>
         </ul>
         <div id="clock"></div>
@@ -17,50 +17,50 @@
 
                 <h3 class="tile-title">Chỉnh sửa kết quả học tập</h3>
                 <div class="tile-body">
-                    <form class="row" method="post" action="/form_add_kqht" enctype="multipart/form-data">
+                    <form class="row" method="post" action="/table_kqht_sv/form_update_kqht/{{diem[0]}}" enctype="multipart/form-data">
+                        {% if ma_err %}
+                        <div class="form-group col-md-12">
+                            <div class="alert alert-danger" style="text-align: left; font-size: 12px; background-color: red;">
+                            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                            <strong>{{ma_err}}</strong> 
+                            </div>
+                        </div>
+                        {% endif %}
                         <div class="form-group col-md-4">
                             <label class="control-label">Mã sinh viên</label>
-                            <input class="form-control" type="text" name="ma_sinh_vien" required>
+                            <input class="form-control" value="{{diem[1]}}" type="text" name="ma_sinh_vien" disabled>
                         </div>
                         <div class="form-group col-md-4">
                             <label class="control-label">Mã môn học</label>
-                            <input class="form-control" type="text" name="ma_mon" required>
+                            <input class="form-control" value="{{diem[2]}}" type="text" name="ma_mon" disabled>
                         </div>
                         <div class="form-group col-md-4">
                             <label class="control-label">Mã học kỳ</label>
-                            <input class="form-control" type="text" name="ma_hoc_ky" required>
+                            <input class="form-control" value="{{diem[3]}}" type="text" name="ma_hoc_ky" disabled>
                         </div>
                         <div class="form-group col-md-4">
                             <label class="control-label">Hệ số 1</label>
-                            <input class="form-control" type="text" name="he_so_1" required>
+                            <input class="form-control" value="{{diem[4]}}" type="text" pattern="[+-]?([0-9]*[.])?[0-9]+" name="he_so_1" required>
                         </div>
                         <div class="form-group col-md-4">
                             <label class="control-label">Hệ số 2</label>
-                            <input class="form-control" type="text" name="he_so_2" required>
+                            <input class="form-control" value="{{diem[5]}}" type="text" pattern="[+-]?([0-9]*[.])?[0-9]+" name="he_so_2" required>
                         </div>
                         <div class="form-group col-md-4">
                             <label class="control-label">Hệ số 3</label>
-                            <input class="form-control" type="text" name="he_so_3" required>
+                            <input class="form-control" value="{{diem[6]}}" type="text" pattern="[+-]?([0-9]*[.])?[0-9]+" name="he_so_3" required>
                         </div>
                         <div class="form-group col-md-4">
                             <label class="control-label">Điểm hệ 1</label>
-                            <input class="form-control" type="text" name="diem_he_1" required>
+                            <input class="form-control" value="{{diem[7]}}" type="text" pattern="[+-]?([0-9]*[.])?[0-9]+" name="diem_he_1" required>
                         </div>
                         <div class="form-group col-md-4">
                             <label class="control-label">Điểm hệ 2</label>
-                            <input class="form-control" type="text" name="diem_he_2" required>
+                            <input class="form-control" value="{{diem[8]}}" type="text" pattern="[+-]?([0-9]*[.])?[0-9]+"  name="diem_he_2" required>
                         </div>
                         <div class="form-group col-md-4">
                             <label class="control-label">Điểm hệ 3</label>
-                            <input class="form-control" type="text" name="diem_he_3" required>
-                        </div>
-                        <div class="form-group col-md-8">
-                            <label class="control-label">Thang 10</label>
-                            <input class="form-control" type="text" name="thang_10" required>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label class="control-label">Thang 4</label>
-                            <input class="form-control" type="text" name="thang_4" required>
+                            <input class="form-control" value="{{diem[9]}}" type="text" pattern="[+-]?([0-9]*[.])?[0-9]+" name="diem_he_3" >
                         </div>
                         <div id="toast">
                         </div>
