@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %} Danh sách sinh viên đăng ký {% endblock title %}
+{% block content %}
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item active"><a href="/table_dang_ky_hoc"><b>Đăng ký học</b></a></li>
+            <li class="breadcrumb-item active"><a href="#"><b>Danh sách sinh viên đăng ký</b></a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <div class="tile-body">
+
+                    <div class="row element-button">
+                        <div class="col-sm-2">
+                          <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printNV()"><i
+                              class="fas fa-print"></i> In thông tin</a>
+                        </div>
+                        <div class="col-sm-2">
+                            <a class="btn btn-excel btn-sm" href="" title="Xuất Excel"><i
+                                    class="fas fa-file-excel"></i> Xuất Excel</a>
+                        </div>
+
+                        <div class="col-sm-2">
+                            <a class="btn btn-delete btn-sm pdf-file" type="button" title="Xuất PDF"
+                                href=""><i class="fas fa-file-pdf"></i>Xuất PDF</a>
+                        </div>
+                        <div class="col-sm-2">
+                            <a class="btn btn-delete btn-sm" type="button" title="Xóa tất cả các phần tử đã chọn"
+                              onclick="deleteMoreRow(this)"><i class="fas fa-trash-alt"></i> Xóa phần tử đã chọn </a>
+                          </div>
+                    </div>
+                    <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0"
+                        border="0" id="sampleTable">
+                        <thead>
+                            <tr>
+                                <th width="10"><input type="checkbox" id="all"></th>
+                                <th>Mã sinh viên</th>
+                                <th >Họ và tên</th>
+                                <th>Lớp</th>
+                                <th>Ngành</th>
+                                <th width="50">Tính năng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td width="10"><input type="checkbox" id="myChecker" name="check1" value="1"></td>
+                                <td>20002076</td>
+                                <td>Duong Van Nam</td>
+                                <td>K65A5-KHDL</td>
+                                <td>Khoa học dữ liệu</td>
+                                <td class="table-td-center"><button class="btn btn-primary btn-sm trash" type="button"
+                                        title="Xóa" onclick="deleteRow(this)"><i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+ <!-- Essential javascripts for application to work-->
+ <script src="{{url_for('static', filename='doc/js/jquery-3.2.1.min.js')}}"></script>
+ <script src="{{url_for('static', filename='doc/js/popper.min.js')}}"></script>
+ <script src="{{url_for('static', filename='doc/js/bootstrap.min.js')}}"></script>
+ <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+ <script src="{{url_for('static', filename='doc/js/main.js')}}"></script>
+ <!-- The javascript plugin to display page loading on top-->
+ <script src="{{url_for('static', filename='doc/js/plugins/pace.min.js')}}"></script>
+ <!-- Page specific javascripts-->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+ <!-- Data table plugin-->
+ <!-- <script type="text/javascript" src="js/plugins/jquery.dataTables.min.js"></script> -->
+ <script src="{{url_for('static', filename='doc/js/plugins/jquery.dataTables.min.js')}}"></script>
+ <!-- <script type="text/javascript" src="js/plugins/dataTables.bootstrap.min.js"></script> -->
+ <script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
+ <script type="text/javascript">$('#sampleTable').DataTable();</script>
+ <script>
+   function deleteRow(r) {
+     var i = r.parentNode.parentNode.rowIndex;
+     // document.getElementById("myTable").deleteRow(i); -->
+     var maNV = r.parentNode.parentNode.childNodes[3].textContent
+     swal({
+       title: "Cảnh báo",
+       text: "Bạn có chắc chắn là muốn xóa sinh viên này?", // index = 3
+       buttons: ["Hủy bỏ", "Đồng ý"],
+     })
+       .then((willDelete) => {
+        
+         if (willDelete) {
+           $.ajax({
+             url:"/delete_sinh_vien/" + maNV,
+             context: document.body
+           })
+           swal("Đã xóa thành công.!", {
+             
+           });
+           location.reload();
+         }
+       });
+   }
+
+   function deleteMoreRow(r) {
+     var numRow = document.getElementById("sampleTable").rows.length;
+     var id_nv = [];
+     $('#sampleTable tbody :checkbox').each(function () {
+         let i = this.parentNode.parentNode.rowIndex;
+         if (this.checked) {
+           id_nv.push(this.parentNode.parentNode.childNodes[3].textContent);
+         }
+     });
+
+     swal({
+       title: "Cảnh báo",
+       text: "Bạn có chắc chắn là muốn xóa các sinh viên này?", // index = 3
+       buttons: ["Hủy bỏ", "Đồng ý"],
+     })
+       .then((willDelete) => {
+         if (willDelete) {
+           for (let i = 0; i < id_nv.length; i++) {
+             $.ajax({
+               url:"/delete_sinh_vien/" + id_nv[i],
+               context: document.body
+             })
+           }
+           swal("Đã xóa thành công.!", {});
+         }
+         location.reload();
+       });
+   }
+
+   oTable = $('#sampleTable').dataTable();
+   $('#all').click(function (e) {
+     $('#sampleTable tbody :checkbox').prop('checked', $(this).is(':checked'));
+     e.stopImmediatePropagation();
+   });
+   
+   //In dữ liệu
+   var myApp = new function () {
+     this.printTable = function () {
+       var win = window.open('/get_print_data_employees', '', 'height=700,width=1400');
+       win.document.close();
+       win.print();
+     }
+   }
+ </script>
+{% endblock content %}

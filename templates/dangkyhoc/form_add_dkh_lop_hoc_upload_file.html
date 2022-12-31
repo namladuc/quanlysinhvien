@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %} Thêm lớp học {% endblock title %}
+{% block content %}
+</aside>
+<main class="app-content">
+  <div class="app-title">
+    <ul class="app-breadcrumb breadcrumb">
+      <li class="breadcrumb-item"><a href="/table_dang_ky_hoc">Đăng ký học</a></li>
+      <li class="breadcrumb-item"><a href="/table_dang_ky_hoc/table_dkh_lop_hoc">Danh sách lớp học</a></li>
+      <li class="breadcrumb-item active"> <a href="#">Thêm lớp học từ file </a></li>
+    </ul>
+    <div id="clock"></div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="tile">
+        <h3 class="tile-title">Thêm lớp học - Upload file excel</h3>
+        <div class="tile-body">
+          <form class="row" method="post" action="/form_add_mon_hoc_upload_file" enctype="multipart/form-data">
+            <div class="form-group col-md-4">
+              <label class="control-label">Upload file</label>
+              <input type="file" style="height:45px;" name="FileDataUpload" class="form-control" id="customFile" />
+            </div>
+            <div class="form-group col-md-4">
+              <label class="control-label"></label>
+            </div>
+            <div class="form-group col-md-4">
+              <label class="control-label"></label>
+            </div>
+            <div class="form-group col-md-4">
+              <input class="btn btn-save" type="submit" value="Lưu lại" />
+              <a class="btn btn-cancel" href="/table_dang_ky_hoc/table_dkh_lop_hoc">Hủy bỏ</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<!-- Essential javascripts for application to work-->
+<script src="{{url_for('static', filename='doc/js/jquery-3.2.1.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/popper.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/bootstrap.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/main.js')}}"></script>
+<!-- The javascript plugin to display page loading on top-->
+<script src="{{url_for('static', filename='doc/js/plugins/pace.min.js')}}"></script>
+
+
+{% endblock %}

@@ -120,6 +120,17 @@ def login():
         role_id = cur.fetchall()[0][0]
         session['role_id'] = role_id
         
+        cur.execute("SHOW PROCESSLIST")
+        data = cur.fetchall()
+        check = True
+        for elm in data:
+            if ('event_scheduler' in elm):
+                check = False
+                
+        if (check):
+            mysql.connection.cursor().execute("SET GLOBAL event_scheduler = ON;")
+            mysql.connection.commit()
+        
         cur.close()
         return redirect(url_for("home"))
     return render_template('general/login.html',
@@ -2647,6 +2658,435 @@ def delete_hoc_ky(ma_hoc_ky):
 
 # -------------------------- Ket Qua Hoc Tap -------------------------
 
+# -------------------------- Dang Ky Hoc -------------------------
+
+@app.route("/table_dang_ky_hoc", methods=['GET','POST'])
+def table_dang_ky_hoc():
+    cur = mysql.connection.cursor()
+    cur.execute("""
+                SELECT ddk.ma_dot, ddk.ma_hoc_ky, hk.ten_hoc_ky
+                FROM dot_dang_ky ddk
+                JOIN hoc_ky hk ON ddk.ma_hoc_ky = hk.ma_hoc_ky
+                ORDER BY ddk.ngay_bat_dau DESC
+                """)
+    cac_ddk = cur.fetchall()
+    
+    if (len(cac_ddk) != 0):
+        ma_dot = str(cac_ddk[0][0]) + " _ " + str(cac_ddk[0][1]) + " _ " + str(cac_ddk[0][2])
+        ma_dot_dang_ky = str(cac_ddk[0][0])
+    else:
+        ma_dot = ''
+        ma_dot_dang_ky = ''
+        
+    if request.method == 'POST':
+        details = request.form
+        ma_dot = details['ma_dot_dang_ky'].strip()
+        ma_dot_dang_ky = details['ma_dot_dang_ky'].split("_")[0].strip()
+        
+    return render_template(session['role'] + 'dangkyhoc/table_dang_ky_hoc.html',
+                           ma_dot_dang_ky = ma_dot_dang_ky,
+                           ma_dot = ma_dot,
+                           cac_ddk = cac_ddk,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@app.route("/table_dang_ky_hoc/form_add_dot_dk", methods = ['GET','POST'])
+def form_add_dot_dk():
+    cur = mysql.connection.cursor()
+    # DROP EVENT IF EXISTS `dk_hoc_end_202001`
+    cur.execute("""
+                SELECT ma_hoc_ky, ten_hoc_ky
+                FROM hoc_ky
+                ORDER BY ma_hoc_ky DESC, ten_hoc_ky DESC
+                """)
+    cac_hk = cur.fetchall()
+    
+    if request.method == 'POST':
+        details = request.form
+        ma_dot = details['ma_dot'].strip()
+        ma_hoc_ky = details['ma_hoc_ky'].split("_")[0].strip()
+        ngay_bat_dau = datetime.datetime.strptime(details['ngay_bat_dau'].strip(), '%Y-%m-%dT%H:%M')
+        ngay_ket_thuc = datetime.datetime.strptime(details['ngay_ket_thuc'].strip(), '%Y-%m-%dT%H:%M')
+        # datetime.datetime.strptime(detail['Ngay'].strip(), '%Y-%m-%d')
+        # datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if (ngay_bat_dau - datetime.datetime.now() < datetime.timedelta(hours=6)):
+            return render_template(session['role'] + 'dangkyhoc/form_add_dot_dk.html',
+                                   ma_err = "Ngày bắt đầu không được từ quá khứ",
+                                    cac_hk = cac_hk,
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+        
+        if (ngay_ket_thuc - ngay_bat_dau < datetime.timedelta(days=1)):
+            return render_template(session['role'] + 'dangkyhoc/form_add_dot_dk.html',
+                                   ma_err = "Ngày kết thúc phải sau ngày bắt đầu ít nhất 1 ngày",
+                                    cac_hk = cac_hk,
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+            
+        cur.execute("SELECT * FROM dot_dang_ky WHERE ma_dot = %s", (ma_dot, ))
+        if (len(cur.fetchall()) != 0):
+            return render_template(session['role'] + 'dangkyhoc/form_add_dot_dk.html',
+                                   ma_err = "Mã đợt đăng ký đã tồn tại",
+                                    cac_hk = cac_hk,
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+
+        cur.execute("""
+                    SELECT COUNT(*)
+                    FROM dot_dang_ky ddk
+                    LEFT JOIN dot_yeu_cau_dang_ky ks ON ddk.ma_dot = ks.ma_dot_dang_ky
+                    WHERE 
+                    (STR_TO_DATE('""" +
+                    ngay_bat_dau.strftime("%Y-%m-%d %H:%M:%S")
+                    + """', '%Y-%m-%d %H:%i:%s') BETWEEN ks.ngay_bat_dau AND ddk.ngay_ket_thuc)
+                    OR
+                    (STR_TO_DATE('""" + 
+                    ngay_bat_dau.strftime("%Y-%m-%d %H:%M:%S") 
+                    + """', '%Y-%m-%d %H:%i:%s') BETWEEN ddk.ngay_bat_dau AND ddk.ngay_ket_thuc)
+                    """)
+        if cur.fetchall()[0][0] != 0:
+            return render_template(session['role'] + 'dangkyhoc/form_add_dot_dk.html',
+                                   ma_err = "Bị trùng với các đợt đăng ký đã có trước đó",
+                                    cac_hk = cac_hk,
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+            
+        cur.execute("""
+                    SELECT COUNT(*)
+                    FROM dot_dang_ky ddk
+                    LEFT JOIN dot_yeu_cau_dang_ky ks ON ddk.ma_dot = ks.ma_dot_dang_ky
+                    WHERE 
+                    (STR_TO_DATE('""" +
+                    ngay_ket_thuc.strftime("%Y-%m-%d %H:%M:%S")
+                    + """', '%Y-%m-%d %H:%i:%s') BETWEEN ks.ngay_bat_dau AND ddk.ngay_ket_thuc)
+                    OR
+                    (STR_TO_DATE('""" + 
+                    ngay_ket_thuc.strftime("%Y-%m-%d %H:%M:%S") 
+                    + """', '%Y-%m-%d %H:%i:%s') BETWEEN ddk.ngay_bat_dau AND ddk.ngay_ket_thuc)
+                    """)
+        if cur.fetchall()[0][0] != 0:
+            return render_template(session['role'] + 'dangkyhoc/form_add_dot_dk.html',
+                                   ma_err = "Bị trùng với các đợt đăng ký đã có trước đó",
+                                    cac_hk = cac_hk,
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+        
+        if details['co_ks'] == 'yes':
+            ma_dot_khao_sat = details['ma_dot_khao_sat']
+            ngay_bat_dau_ks = datetime.datetime.strptime(details['ngay_bat_dau_ks'].strip(), '%Y-%m-%dT%H:%M')
+            ngay_ket_thuc_ks = datetime.datetime.strptime(details['ngay_ket_thuc_ks'].strip(), '%Y-%m-%dT%H:%M')
+            
+            if (ngay_bat_dau - datetime.datetime.now() < datetime.timedelta(days=5) ):
+                return render_template(session['role'] + 'dangkyhoc/form_add_dot_dk.html',
+                                    ma_err = "Ngày bắt đầu không được từ quá khứ, khi có đợt khảo sát phải mở đợt khảo sát ít nhất 5 ngày",
+                                        cac_hk = cac_hk,
+                                        my_user = session['username'],
+                                        truong = session['truong'])
+ 
+            if (ngay_bat_dau_ks - datetime.datetime.now() < datetime.timedelta(hours=6)):
+                return render_template(session['role'] + 'dangkyhoc/form_add_dot_dk.html',
+                                   ma_err = "Ngày bắt đầu khảo sát không được từ quá khứ",
+                                    cac_hk = cac_hk,
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+ 
+            if (ngay_bat_dau < ngay_bat_dau_ks):
+                return render_template(session['role'] + 'dangkyhoc/form_add_dot_dk.html',
+                                   ma_err = "Ngày bắt đầu khảo sát phải trước ngày bắt đầu chính thức",
+                                    cac_hk = cac_hk,
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+                
+            if (ngay_ket_thuc_ks > ngay_bat_dau_ks and ngay_bat_dau - ngay_ket_thuc_ks < datetime.timedelta(days=1)):
+                return render_template(session['role'] + 'dangkyhoc/form_add_dot_dk.html',
+                                   ma_err = "Ngày kết thúc khảo sát phải kết thúc trước ngày bắt đầu ít nhất 1 ngày",
+                                    cac_hk = cac_hk,
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+                
+            if (ngay_ket_thuc_ks - ngay_bat_dau_ks < datetime.timedelta(days=5)):
+                return render_template(session['role'] + 'dangkyhoc/form_add_dot_dk.html',
+                                   ma_err = "Ngày kết thúc khảo sát phải kết thúc sau ngày bắt đầu khảo sát ít nhất 5 ngày",
+                                    cac_hk = cac_hk,
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+            
+            cur.execute("SELECT * FROM dot_yeu_cau_dang_ky WHERE ma_dot_yeu_cau = %s", (ma_dot_khao_sat, ))
+            if (len(cur.fetchall()) != 0):
+                return render_template(session['role'] + 'dangkyhoc/form_add_dot_dk.html',
+                                   ma_err = "Mã đợt khảo sát đã tồn tại",
+                                    cac_hk = cac_hk,
+                                    my_user = session['username'],
+                                    truong = session['truong'])
+                
+            cur.execute("""
+                    SELECT COUNT(*)
+                    FROM dot_dang_ky ddk
+                    LEFT JOIN dot_yeu_cau_dang_ky ks ON ddk.ma_dot = ks.ma_dot_dang_ky
+                    WHERE 
+                    (STR_TO_DATE('""" +
+                    ngay_bat_dau_ks.strftime("%Y-%m-%d %H:%M:%S")
+                    + """', '%Y-%m-%d %H:%i:%s') BETWEEN ks.ngay_bat_dau AND ddk.ngay_ket_thuc)
+                    OR
+                    (STR_TO_DATE('""" + 
+                    ngay_bat_dau_ks.strftime("%Y-%m-%d %H:%M:%S") 
+                    + """', '%Y-%m-%d %H:%i:%s') BETWEEN ddk.ngay_bat_dau AND ddk.ngay_ket_thuc)
+                    """)
+            if cur.fetchall()[0][0] != 0:
+                return render_template(session['role'] + 'dangkyhoc/form_add_dot_dk.html',
+                                    ma_err = "Đợt khảo sát bị trùng với các đợt đăng ký đã có trước đó",
+                                        cac_hk = cac_hk,
+                                        my_user = session['username'],
+                                        truong = session['truong'])
+                
+            cur.execute("""
+                    SELECT COUNT(*)
+                    FROM dot_dang_ky ddk
+                    LEFT JOIN dot_yeu_cau_dang_ky ks ON ddk.ma_dot = ks.ma_dot_dang_ky
+                    WHERE 
+                    (STR_TO_DATE('""" +
+                    ngay_ket_thuc_ks.strftime("%Y-%m-%d %H:%M:%S")
+                    + """', '%Y-%m-%d %H:%i:%s') BETWEEN ks.ngay_bat_dau AND ddk.ngay_ket_thuc)
+                    OR
+                    (STR_TO_DATE('""" + 
+                    ngay_ket_thuc_ks.strftime("%Y-%m-%d %H:%M:%S") 
+                    + """', '%Y-%m-%d %H:%i:%s') BETWEEN ddk.ngay_bat_dau AND ddk.ngay_ket_thuc)
+                    """)
+            if cur.fetchall()[0][0] != 0:
+                return render_template(session['role'] + 'dangkyhoc/form_add_dot_dk.html',
+                                    ma_err = "Đợt khảo sát bị trùng với các đợt đăng ký đã có trước đó",
+                                        cac_hk = cac_hk,
+                                        my_user = session['username'],
+                                        truong = session['truong'])
+                
+            cur.execute("""
+                        INSERT INTO dot_yeu_cau_dang_ky(ma_dot_yeu_cau,ma_dot_dang_ky,ma_hoc_ky,ngay_bat_dau,ngay_ket_thuc)
+                        VALUES (%s, %s, %s, %s, %s)
+                        """, (
+                            ma_dot_khao_sat,
+                            ma_dot,
+                            ma_hoc_ky,
+                            ngay_bat_dau_ks.strftime("%Y-%m-%d %H:%M:%S"),
+                            ngay_ket_thuc_ks.strftime("%Y-%m-%d %H:%M:%S")
+                        ))
+            mysql.connection.commit()
+            
+            sql = "CREATE EVENT IF NOT EXISTS "
+            sql += "ks_hoc_start_" + ma_dot + " "
+            sql += "ON SCHEDULE AT \'" + ngay_bat_dau_ks.strftime("%Y-%m-%d %H:%M:%S") + "\' "
+            sql += "DO "
+            sql += """
+                UPDATE dot_yeu_cau_dang_ky
+                SET trang_thai = "Đang mở"
+                WHERE ma_dot_dang_ky = \'""" + ma_dot + "\' AND ma_dot_yeu_cau = '" + ma_dot_khao_sat + "' ;"
+            cur.execute(sql)
+            mysql.connection.commit()
+            
+            sql = "CREATE EVENT IF NOT EXISTS "
+            sql += "ks_hoc_end_" + ma_dot + " "
+            sql += "ON SCHEDULE AT \'" + ngay_ket_thuc_ks.strftime("%Y-%m-%d %H:%M:%S") + "\' "
+            sql += "DO "
+            sql += """
+                UPDATE dot_yeu_cau_dang_ky
+                SET trang_thai = "Đã đóng"
+                WHERE ma_dot_dang_ky = \'""" + ma_dot + "\' AND ma_dot_yeu_cau = '" + ma_dot_khao_sat + "' ;"
+            cur.execute(sql)
+            mysql.connection.commit()
+            
+        cur.execute("""INSERT INTO dot_dang_ky(ma_dot, ma_hoc_ky, ngay_bat_dau, ngay_ket_thuc)
+                    VALUES (%s, %s, %s, %s)
+                    """, (
+                        ma_dot,
+                        ma_hoc_ky,
+                        ngay_bat_dau.strftime("%Y-%m-%d %H:%M:%S"),
+                        ngay_ket_thuc.strftime("%Y-%m-%d %H:%M:%S")
+                    ))
+        mysql.connection.commit()
+        
+        
+        sql = "CREATE EVENT IF NOT EXISTS "
+        sql += "dk_hoc_start_" + ma_dot + " "
+        sql += "ON SCHEDULE AT \'" + ngay_bat_dau.strftime("%Y-%m-%d %H:%M:%S") + "\' "
+        sql += "DO "
+        sql += """
+            UPDATE dot_dang_ky
+            SET trang_thai = "Đang mở"
+            WHERE ma_dot = \'""" + ma_dot + "\' ;"
+        cur.execute(sql)
+        mysql.connection.commit()
+        
+        sql = "CREATE EVENT IF NOT EXISTS "
+        sql += "dk_hoc_end_" + ma_dot + " "
+        sql += "ON SCHEDULE AT \'" + ngay_ket_thuc.strftime("%Y-%m-%d %H:%M:%S") + "\' "
+        sql += "DO "
+        sql += """
+            UPDATE dot_dang_ky
+            SET trang_thai = "Đã đóng"
+            WHERE ma_dot = \'""" + ma_dot + "\' ;"
+        cur.execute(sql)
+        mysql.connection.commit()
+        return redirect(url_for('table_dang_ky_hoc'))
+    return render_template(session['role'] + 'dangkyhoc/form_add_dot_dk.html',
+                           cac_hk = cac_hk,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@app.route("/table_dang_ky_hoc/table_dkh_sv")
+def table_dkh_sv():
+    return render_template(session['role'] + 'dangkyhoc/table_dkh_sv.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@app.route("/table_dang_ky_hoc/table_dkh_lop_hoc/<string:ma_dot>")
+def table_dkh_lop_hoc(ma_dot):
+    cur = mysql.connection.cursor()
+    cur.execute("""
+                SELECT ddk.ma_dot, ddk.ma_hoc_ky, hk.ten_hoc_ky
+                FROM dot_dang_ky ddk
+                JOIN hoc_ky hk ON ddk.ma_hoc_ky = hk.ma_hoc_ky
+                WHERE ddk.ma_dot = %s
+                """, (ma_dot, ))
+    thong_tin_dot = cur.fetchall()
+    if (len(thong_tin_dot) == 0):
+        return "Error"
+    thong_tin_dot = thong_tin_dot[0]
+    
+    cur.execute("""
+                SELECT mhdk.id_dang_ky, mh.ten_mon, mh.so_tin_chi, mhdk.ma_so_lop, mhdk.so_luong, mhdk.so_luong_da_dang_ky,
+                CONCAT("T",mhdk.thu,"(",mhdk.tiet_bat_dau,"-",mhdk.tiet_ket_thuc,")",mhdk.phong_hoc)
+                FROM mon_hoc_dot_dang_ky mhdk
+                JOIN mon_hoc mh ON mhdk.ma_mon = mh.ma_mon
+                WHERE mhdk.ma_dot = %s
+                ORDER BY mhdk.ma_so_lop ASC;
+                """, (ma_dot, ))
+    column_name = ['id_dang_ky', 'ten_mon','so_tin_chi', 'ma_so_lop', 'so_luong', 'so_luong_da_dang_ky', 'lich_hoc']
+    cac_mon_dk = cur.fetchall()
+    data = pd.DataFrame.from_records(cac_mon_dk, columns=column_name)
+    
+    def f(x):
+        return pd.Series(dict(lich_hoc = "%s" % ','.join(x['lich_hoc'])))
+    
+    data = data.groupby(by=['id_dang_ky', 'ten_mon','so_tin_chi',
+                            'ma_so_lop', 'so_luong', 'so_luong_da_dang_ky']).apply(f).reset_index()
+    data = data.values.tolist()
+    return render_template(session['role'] + 'dangkyhoc/table_dkh_lop_hoc.html',
+                           tt_dot = thong_tin_dot,
+                           cac_mon_dk = data,
+                           ma_dot = ma_dot,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@app.route("/table_dang_ky_hoc/form_add_dkh_lop_hoc_upload_file/<string:ma_dot>")
+def form_add_dkh_lop_hoc_upload_file(ma_dot):
+    return render_template(session['role'] + 'dangkyhoc/form_add_dkh_lop_hoc_upload_file.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@app.route("/table_dang_ky_hoc/form_add_dkh_lop_hoc/<string:ma_dot>", methods=['GET','POST'])
+def form_add_dkh_lop_hoc(ma_dot):
+    if request.method == 'POST':
+        cur = mysql.connection.cursor()
+        details = request.form
+        ma_mon = details['ma_mon'].strip()
+        ma_so_lop = details['ma_so_lop'].strip()
+        thu = details['thu'].split()[0].strip()
+        phong_hoc = details['phong_hoc'].strip()
+        th_lt = details['th_lt'].split()[0].strip()
+        tiet_bat_dau = details['tiet_bat_dau'].strip()
+        tiet_ket_thuc = details['tiet_ket_thuc'].strip()
+        so_luong = details['so_luong']
+        
+        # kiem tra ma mon
+        cur.execute("""
+                    SELECT ma_mon
+                    FROM mon_hoc
+                    WHERE ma_mon = %s
+                    """, (ma_mon, ))
+        if len(cur.fetchall()) == 0:
+            return render_template(session['role'] + 'dangkyhoc/form_add_dkh_lop_hoc.html',
+                                   ma_err = "Mã môn không tồn tại",
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+        cur.execute("SELECT ma_dot_yeu_cau FROM dot_yeu_cau_dang_ky WHERE ma_dot_dang_ky = %s", (ma_dot, ))
+        ma_dot_yeu_cau = cur.fetchall()
+        if len(ma_dot_yeu_cau) == 0:
+            ma_dot_yeu_cau = '-1'
+        else:
+            ma_dot_yeu_cau = ma_dot_yeu_cau[0][0]
+
+        cur.execute("""
+                    SELECT id_dang_ky
+                    FROM mon_hoc_dot_dang_ky
+                    WHERE ma_so_lop = %s
+                    """, (ma_so_lop, ))
+        lop = cur.fetchall()
+        if len(lop) != 0:
+            cur.execute("""
+                        SELECT th_lt
+                        FROM mon_hoc_dot_dang_ky
+                        WHERE id_dang_ky = %s AND th_lt = %s
+                        """, (lop[0][0], th_lt))
+            if (len(cur.fetchall()) != 0):
+                return render_template(session['role'] + 'dangkyhoc/form_add_dkh_lop_hoc.html',
+                                    ma_err = "Mã số lớp đã tồn tại",
+                            my_user = session['username'],
+                            truong = session['truong'])
+            else:
+                cur.execute("""
+                    INSERT INTO mon_hoc_dot_dang_ky(id_dang_ky,ma_mon, ma_so_lop, ma_dot_yeu_cau, ma_dot, th_lt,
+                    thu, phong_hoc, tiet_bat_dau, tiet_ket_thuc, so_luong, so_luong_con_lai) VALUES
+                    (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """, (
+                        lop[0][0],
+                        ma_mon,
+                        ma_so_lop,
+                        ma_dot_yeu_cau,
+                        ma_dot,
+                        th_lt,
+                        thu,
+                        phong_hoc,
+                        tiet_bat_dau,
+                        tiet_ket_thuc,
+                        so_luong,
+                        so_luong
+                    ))
+                mysql.connection.commit()
+                return redirect(url_for('table_dkh_lop_hoc', ma_dot = ma_dot))
+        
+        if int(tiet_bat_dau) >= int(tiet_ket_thuc):
+            return render_template(session['role'] + 'dangkyhoc/form_add_dkh_lop_hoc.html',
+                                   ma_err = "Phải bắt đầu trước tiết kết thúc",
+                           my_user = session['username'],
+                           truong = session['truong'])
+            
+    
+            
+        cur.execute("""
+                    INSERT INTO mon_hoc_dot_dang_ky(ma_mon, ma_so_lop, ma_dot_yeu_cau, ma_dot, th_lt,
+                    thu, phong_hoc, tiet_bat_dau, tiet_ket_thuc, so_luong, so_luong_con_lai) VALUES
+                    (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """, (
+                        ma_mon,
+                        ma_so_lop,
+                        ma_dot_yeu_cau,
+                        ma_dot,
+                        th_lt,
+                        thu,
+                        phong_hoc,
+                        tiet_bat_dau,
+                        tiet_ket_thuc,
+                        so_luong,
+                        so_luong
+                    ))
+        mysql.connection.commit()
+        return redirect(url_for('table_dkh_lop_hoc', ma_dot = ma_dot))
+    return render_template(session['role'] + 'dangkyhoc/form_add_dkh_lop_hoc.html',
+                           ma_dot = ma_dot,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+# -------------------------- Dang Ky Hoc -------------------------
 def take_image_to_save(id_image, path_to_img):
     cur = mysql.connection.cursor()
     cur.execute("""SELECT * FROM image_data""")

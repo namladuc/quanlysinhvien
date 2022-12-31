@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %} Thêm đợt đăng ký {% endblock title %}
+{% block content %}
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb">
+            <li class="breadcrumb-item"><a href="/table_dang_ky_hoc">Đăng ký học</a></li>
+            <li class="breadcrumb-item active"><a href="">Thêm đợt</a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+
+            <div class="tile">
+
+                <h3 class="tile-title">Thêm đợt đăng ký</h3>
+                <div class="tile-body">
+                    <form class="row" action="/table_dang_ky_hoc/form_add_dot_dk" method="post" enctype="multipart/form-data">
+                        {% if ma_err %}
+                        <div class="form-group col-md-12">
+                            <div class="alert alert-danger" style="text-align: left; font-size: 12px; background-color: red;">
+                            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                            <strong>{{ma_err}}</strong> 
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label" style="font-size: 1.5rem; margin-top: 30px;">Khảo sát đăng ký học</label>
+                                        <input type="radio" id="html" name="co_ks" onchange="ChoiceKS(this)" value="yes" checked>
+                                        <label class="control-label" >Có</label>
+                                        <input type="radio" id="html" name="co_ks" onchange="ChoiceKS(this)" value="no">
+                                        <label class="control-label" >Không</label><br>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Mã đợt yêu cầu</label>
+                                        <input type="text" class="form-control" value="" id="dot_ks1" name="ma_dot_khao_sat"
+                                            required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Ngày bắt đầu</label>
+                                        <input type="datetime-local" class="form-control" value="" id="dot_ks3" name="ngay_bat_dau_ks"
+                                            id="ngay_bat_dau">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Ngày kết thúc</label>
+                                        <input type="datetime-local" class="form-control" value="" id="dot_ks4" name="ngay_ket_thuc_ks"
+                                            id="ngay_ket_thuc">
+                                    </div>
+                                </div>
+                            
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="control-label" style="font-size: 1.5rem; margin-top: 30px;">Đăng ký học</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Mã đợt</label>
+                                        <input class="form-control" value="" type="text"
+                                            name="ma_dot">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Mã học kỳ</label>
+                                        <select class="form-control" id="" name="ma_hoc_ky" required>
+                                            {% for data in cac_hk %}
+                    
+                                            <option>{{data[0]}}_{{data[1]}} </option>
+                            
+                                            {% endfor %}
+                                            </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Ngày bắt đầu</label>
+                                        <input type="datetime-local" class="form-control" value="" name="ngay_bat_dau"
+                                            id="ngay_bat_dau">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Ngày kết thúc</label>
+                                        <input type="datetime-local" class="form-control" value="" name="ngay_ket_thuc"
+                                            id="ngay_ket_thuc">
+                                    </div>
+                                </div>
+                               
+                                <div id="toast">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <input class="btn btn-save" type="submit" onclick="showSuccessToast();"
+                                        value="Thêm" />
+                                    <a class="btn btn-cancel" href="/table_dang_ky_hoc">Hủy bỏ</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <br><br>
+        </div>
+    </div>
+</main>
+<!-- Essential javascripts for application to work-->
+<script src="{{url_for('static', filename='doc/js/jquery-3.2.1.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/popper.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/bootstrap.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/main.js')}}"></script>
+<!-- The javascript plugin to display page loading on top-->
+<script src="{{url_for('static', filename='doc/js/plugins/pace.min.js')}}"></script>
+<script>
+  // get_information_one_employee
+  function ChoiceKS(event) {
+    if (event.value == "no") {
+        $( "#dot_ks1" ).prop( "disabled", true );
+        $( "#dot_ks2" ).prop( "disabled", true );
+        $( "#dot_ks3" ).prop( "disabled", true );
+        $( "#dot_ks4" ).prop( "disabled", true );
+        $( "#dot_ks5" ).prop( "disabled", true );
+    } else {
+        $( "#dot_ks1" ).prop( "disabled", false );
+        $( "#dot_ks2" ).prop( "disabled", false );
+        $( "#dot_ks3" ).prop( "disabled", false );
+        $( "#dot_ks4" ).prop( "disabled", false );
+        $( "#dot_ks5" ).prop( "disabled", false );
+    }
+   
+  }
+  
+</script>
+{% endblock content %}

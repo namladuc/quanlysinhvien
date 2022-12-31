@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title%} Thêm lớp đăng ký học {% endblock %}
+{% block content %}
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb">
+            <li class="breadcrumb-item"><a href="/table_dang_ky_hoc"><b>Đăng ký học</b></a></li>
+            <li class="breadcrumb-item"><a href="/table_dang_ky_hoc/table_dkh_lop_hoc"><b>Danh sách lớp học</b></a></li>
+            <li class="breadcrumb-item"><a href=""><b>Thêm lớp học</b></a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+
+            <div class="tile">
+
+                <h3 class="tile-title">Thêm mới lớp học</h3>
+                <div class="tile-body">
+                    <form class="row" method="post" action="/table_dang_ky_hoc/form_add_dkh_lop_hoc/{{ma_dot}}" enctype="multipart/form-data">
+                        {% if ma_err %}
+                        <div class="form-group col-md-12">
+                            <div class="alert alert-danger" style="text-align: left; font-size: 12px; background-color: red;">
+                            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                            <strong>{{ma_err}}</strong> 
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="form-group col-md-7">
+                            <label class="control-label">Mã môn</label>
+                            <input class="form-control" type="text" name="ma_mon" required>
+                        </div>
+                        <div class="form-group col-md-5">
+                            <label class="control-label">Mã số lớp (Ex: MAT3500 01, ...)</label>
+                            <input class="form-control" type="text" name="ma_so_lop" required>
+                        </div>
+                        <div class="form-group col-md-7">
+                            <label class="control-label">Ngày học</label>
+                            <select class="form-control" id="department" name="thu">
+                                <option>2 (Thứ 2)</option>
+                                <option>3 (Thứ 3)</option>
+                                <option>4 (Thứ 4)</option>
+                                <option>5 (Thứ 5)</option>
+                                <option>6 (Thứ 6)</option>
+                                <option>7 (Thứ 7)</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-5">
+                            <label class="control-label">Phòng học</label>
+                            <input class="form-control" type="text" name="phong_hoc" required>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label class="control-label">Hình thức học</label>
+                            <select class="form-control" id="department" name="th_lt">
+                                <option>TH (Thực hành)</option>
+                                <option>LT (Lý thuyết)</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label class="control-label">Tiết bắt đầu</label>
+                            <input class="form-control" type="number" min="1" max="10" name="tiet_bat_dau" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label class="control-label">Tiết kết thúc</label>
+                            <input class="form-control" type="number" min="1" max="10" name="tiet_ket_thuc" required>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label class="control-label">Số lượng</label>
+                            <input class="form-control" type="number" min="1" name="so_luong" required>
+                        </div>
+                        <div id="toast">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <input class="btn btn-save" type="submit" onclick="showSuccessToast();" value="Thêm" />
+                            <a class="btn btn-cancel" href="/table_dang_ky_hoc/table_dkh_lop_hoc">Hủy bỏ</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
