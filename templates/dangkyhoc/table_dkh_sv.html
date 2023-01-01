@@ -17,23 +17,24 @@
 
                     <div class="row element-button">
                         <div class="col-sm-2">
-                          <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printNV()"><i
+                          <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printTable()"><i
                               class="fas fa-print"></i> In thông tin</a>
                         </div>
                         <div class="col-sm-2">
-                            <a class="btn btn-excel btn-sm" href="" title="Xuất Excel"><i
+                            <a class="btn btn-excel btn-sm" href="/get_table_dkh_sv_excel/{{id_dang_ky}}_{{thong_tin[3]}}" title="Xuất Excel"><i
                                     class="fas fa-file-excel"></i> Xuất Excel</a>
                         </div>
 
                         <div class="col-sm-2">
                             <a class="btn btn-delete btn-sm pdf-file" type="button" title="Xuất PDF"
-                                href=""><i class="fas fa-file-pdf"></i>Xuất PDF</a>
+                                href="/get_table_dkh_sv_pdf/{{id_dang_ky}}_{{thong_tin[3]}}"><i class="fas fa-file-pdf"></i>Xuất PDF</a>
                         </div>
                         <div class="col-sm-2">
                             <a class="btn btn-delete btn-sm" type="button" title="Xóa tất cả các phần tử đã chọn"
                               onclick="deleteMoreRow(this)"><i class="fas fa-trash-alt"></i> Xóa phần tử đã chọn </a>
                           </div>
                     </div>
+                    <p> {{thong_tin[0]}} | {{thong_tin[1]}} | {{thong_tin[2]}} | {{thong_tin[3]}}</p>
                     <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0"
                         border="0" id="sampleTable">
                         <thead>
@@ -47,18 +48,19 @@
                             </tr>
                         </thead>
                         <tbody>
+                          {% for data in cac_sv %}
                             <tr>
                                 <td width="10"><input type="checkbox" id="myChecker" name="check1" value="1"></td>
-                                <td>20002076</td>
-                                <td>Duong Van Nam</td>
-                                <td>K65A5-KHDL</td>
-                                <td>Khoa học dữ liệu</td>
+                                <td>{{data[0]}}</td>
+                                <td>{{data[1]}}</td>
+                                <td>{{data[2]}}</td>
+                                <td>{{data[3]}}</td>
                                 <td class="table-td-center"><button class="btn btn-primary btn-sm trash" type="button"
-                                        title="Xóa" onclick="deleteRow(this)"><i class="fas fa-trash-alt"></i>
+                                        title="Xóa" onclick="deleteRow('{{data[0]}}')"><i class="fas fa-trash-alt"></i>
                                     </button>
                                 </td>
                             </tr>
-
+                          {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -83,10 +85,7 @@
  <script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
  <script type="text/javascript">$('#sampleTable').DataTable();</script>
  <script>
-   function deleteRow(r) {
-     var i = r.parentNode.parentNode.rowIndex;
-     // document.getElementById("myTable").deleteRow(i); -->
-     var maNV = r.parentNode.parentNode.childNodes[3].textContent
+   function deleteRow(id) {
      swal({
        title: "Cảnh báo",
        text: "Bạn có chắc chắn là muốn xóa sinh viên này?", // index = 3
@@ -96,7 +95,7 @@
         
          if (willDelete) {
            $.ajax({
-             url:"/delete_sinh_vien/" + maNV,
+             url:"/huy_dang_ky_sv/{{id_dang_ky}}_" + id,
              context: document.body
            })
            swal("Đã xóa thành công.!", {
@@ -126,7 +125,7 @@
          if (willDelete) {
            for (let i = 0; i < id_nv.length; i++) {
              $.ajax({
-               url:"/delete_sinh_vien/" + id_nv[i],
+               url:"/huy_dang_ky_sv/{{id_dang_ky}}_" + id_nv[i],
                context: document.body
              })
            }
@@ -145,7 +144,7 @@
    //In dữ liệu
    var myApp = new function () {
      this.printTable = function () {
-       var win = window.open('/get_print_data_employees', '', 'height=700,width=1400');
+       var win = window.open('/get_print_table_dkh_sv/{{id_dang_ky}}', '', 'height=700,width=1400');
        win.document.close();
        win.print();
      }

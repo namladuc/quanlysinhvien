@@ -23,11 +23,11 @@
             </div>
 
             <div class="col-sm-2">
-              <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printNV()"><i
+              <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printTable()"><i
                   class="fas fa-print"></i> In thông tin</a>
             </div>
             <div class="col-sm-2">
-              <a class="btn btn-excel btn-sm" href="/get_table_dang_ky_hoc_pdf/{{ma_dot_dang_ky}}" title="Xuất Excel"><i class="fas fa-file-excel"></i> Xuất
+              <a class="btn btn-excel btn-sm" href="/get_table_dang_ky_hoc_excel/{{ma_dot_dang_ky}}" title="Xuất Excel"><i class="fas fa-file-excel"></i> Xuất
                 Excel</a>
             </div>
 
@@ -67,39 +67,38 @@
             id="sampleTable">
             <thead>
               <tr>
-                <th colspan="11" style="text-align: center; background-color: #eee">Đăng ký học - Học kỳ 1 năm học
-                  2022-2023</th>
+                <th colspan="11" style="text-align: center; background-color: #eee">{{ma_dot}}</th>
               </tr>
               <tr>
                 <th>Môn học</th>
                 <th>TC</th>
-                <th>Điểm</th>
-                <th>Lớp môn học</th>
+                <th>Mã lớp</th>
                 <th>Tổng SV</th>
                 <th>Đã ĐK</th>
-                <th>Học phí</th>
                 <th>Lịch học</th>
-                <th>Ngày thi</th>
                 <th width="50">Tính năng</th>
               </tr>
             </thead>
             <tbody>
+              {% for data in cac_lop %}
               <tr>
-                <td>Cơ sở dữ liệu Web và hệ thống thông tin</td>
-                <td>3</td>
-                <td>3.5</td>
-                <td>PEC3027</td>
-                <td>50</td>
-                <td style="background-color: #eee;">50</td>
-                <td>500.000</td>
-                <td>T3-(1-3)-501T5</td>
-                <td></td>
+                <td>{{data[1]}}</td>
+                <td>{{data[2]}}</td>
+                <td>{{data[3]}}</td>
+                <td>{{data[4]}}</td>
+                {% if data[4] == data[5] %}
+                  <td style="background-color: #eee;">{{data[5]}}</td>
+                {% else %}
+                  <td>{{data[5]}}</td>
+                {% endif %}
+                <td>{{data[6]}}</td>
                 <td class="table-td-center">
                   <button class="btn btn-primary btn-sm edit" type="button" title="Xem" id="show-emp">
-                    <a href="/table_dang_ky_hoc/table_dkh_sv"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                    <a href="/table_dang_ky_hoc/table_dkh_sv/{{data[0]}}"><i class="fa fa-eye" aria-hidden="true"></i></a>
                   </button>
                 </td>
               </tr>
+              {% endfor %}
 
             </tbody>
           </table>
@@ -187,7 +186,7 @@
   //In dữ liệu
   var myApp = new function () {
     this.printTable = function () {
-      var win = window.open('/get_print_data_employees', '', 'height=700,width=1400');
+      var win = window.open('/get_print_dang_ky_hoc/{{ma_dot_dang_ky}}', '', 'height=700,width=1400');
       win.document.close();
       win.print();
     }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 29, 2022 at 03:59 PM
+-- Generation Time: Jan 01, 2023 at 04:05 PM
 -- Server version: 10.4.21-MariaDB
 -- PHP Version: 8.0.10
 
@@ -30,8 +30,41 @@ SET time_zone = "+00:00";
 CREATE TABLE `dang_ky_mon` (
   `id_dang_ky` int(11) NOT NULL,
   `ma_sinh_vien` int(11) NOT NULL,
-  `la_yeu_cau` tinyint(1) NOT NULL
+  `la_yeu_cau` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `dang_ky_mon`
+--
+
+INSERT INTO `dang_ky_mon` (`id_dang_ky`, `ma_sinh_vien`, `la_yeu_cau`) VALUES
+(756, 20002077, 0),
+(758, 20002077, 0),
+(760, 20002077, 0);
+
+--
+-- Triggers `dang_ky_mon`
+--
+DELIMITER $$
+CREATE TRIGGER `after_dang_ky_mon` AFTER INSERT ON `dang_ky_mon` FOR EACH ROW BEGIN
+
+UPDATE mon_hoc_dot_dang_ky mhdk
+SET mhdk.so_luong_da_dang_ky = mhdk.so_luong_da_dang_ky + 1
+WHERE mhdk.id_dang_ky = NEW.id_dang_ky;
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `after_delete_dangky` BEFORE DELETE ON `dang_ky_mon` FOR EACH ROW BEGIN
+
+UPDATE mon_hoc_dot_dang_ky mhdk
+SET mhdk.so_luong_da_dang_ky = mhdk.so_luong_da_dang_ky - 1
+WHERE mhdk.id_dang_ky = OLD.id_dang_ky;
+
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -49,11 +82,29 @@ CREATE TABLE `diem` (
   `he_so_3` float DEFAULT NULL,
   `diem_he_1` float DEFAULT NULL,
   `diem_he_2` float DEFAULT NULL,
-  `diem_he_3` float DEFAULT NULL,
+  `diem_he_3` float DEFAULT -1,
   `thang_10` float DEFAULT NULL,
   `thang_4` float DEFAULT NULL,
   `thang_chu` varchar(2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `diem`
+--
+
+INSERT INTO `diem` (`id_diem`, `ma_sinh_vien`, `ma_mon`, `ma_hoc_ky`, `he_so_1`, `he_so_2`, `he_so_3`, `diem_he_1`, `diem_he_2`, `diem_he_3`, `thang_10`, `thang_4`, `thang_chu`) VALUES
+(6, 20002077, 'MAT3500', 'HK200', 0.2, 0.2, 0.6, 8, 7, 9, 8.4, 3.5, 'B+'),
+(8, 20002077, 'HIS1001', 'HK201', 0.2, 0.2, 0.6, 9, 9, 8, 8.4, 3.5, 'B+'),
+(12, 20002077, 'MAT3382', 'HK201', 0.2, 0.2, 0.6, 9.8, 10, 10, 10, 4, 'A+'),
+(22, 20002077, 'MAT3507', 'HK200', 0.2, 0.2, 0.6, 9, 8, 9, 8.8, 3.7, 'A'),
+(23, 20002076, 'HIS1001', 'HK200', 0.2, 0.2, 0.6, 8, 7, 9, 8.4, 3.5, 'B+'),
+(24, 20002080, 'MAT3514', 'HK200', 0.2, 0.2, 0.6, 9, 9, 9, 9, 4, 'A+'),
+(25, 20002080, 'HIS1001', 'HK200', 0.2, 0.2, 0.6, 10, 9, 8.5, 8.9, 3.7, 'A'),
+(26, 20002076, 'MAT3514', 'HK200', 0.2, 0.2, 0.6, 8, 7, 9, 8.4, 3.5, 'B+'),
+(27, 20002076, 'MAT3382', 'HK201', 0.2, 0.2, 0.6, 9, 9, 9, 9, 4, 'A+'),
+(28, 20002080, 'MAT3379', 'HK201', 0.2, 0.2, 0.6, 10, 9, 8.5, 8.9, 3.7, 'A'),
+(29, 20002080, 'MAT3382', 'HK201', 0.2, 0.2, 0.6, 8, 7, 9, 8.4, 3.5, 'B+'),
+(30, 20002076, 'MAT3379', 'HK201', 0.2, 0.2, 0.6, 9, 9, 9, 9, 4, 'A+');
 
 --
 -- Triggers `diem`
@@ -64,7 +115,7 @@ DECLARE diem10 double;
 DECLARE diem4 double;
 DECLARE diem_chu varchar(2);
 
-IF NEW.diem_he_1 IS NOT NULL AND NEW.diem_he_2 IS NOT NULL AND NEW.diem_he_3 IS NOT NULL THEN
+IF NEW.diem_he_1 IS NOT NULL AND NEW.diem_he_2 IS NOT NULL AND NEW.diem_he_3 != -1 THEN
 	SET diem10 = ROUND(NEW.he_so_1 * NEW.diem_he_1 + NEW.he_so_2 * NEW.diem_he_2 + NEW.he_so_3 * NEW.diem_he_3, 1);
     
     IF diem10  < 4.0 THEN
@@ -109,7 +160,7 @@ DECLARE diem10 double;
 DECLARE diem4 double;
 DECLARE diem_chu varchar(2);
 
-IF NEW.diem_he_1 IS NOT NULL AND NEW.diem_he_2 IS NOT NULL AND NEW.diem_he_3 IS NOT NULL THEN
+IF NEW.diem_he_1 IS NOT NULL AND NEW.diem_he_2 IS NOT NULL AND NEW.diem_he_3 != -1 THEN
 	SET diem10 = ROUND(NEW.he_so_1 * NEW.diem_he_1 + NEW.he_so_2 * NEW.diem_he_2 + NEW.he_so_3 * NEW.diem_he_3, 1);
     
     IF diem10  < 4.0 THEN
@@ -160,8 +211,15 @@ CREATE TABLE `dot_dang_ky` (
   `ma_hoc_ky` varchar(15) DEFAULT NULL,
   `ngay_bat_dau` datetime DEFAULT NULL,
   `ngay_ket_thuc` datetime DEFAULT NULL,
-  `trang_thai` varchar(30) DEFAULT NULL
+  `trang_thai` varchar(30) DEFAULT 'Đang đóng'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `dot_dang_ky`
+--
+
+INSERT INTO `dot_dang_ky` (`ma_dot`, `ma_hoc_ky`, `ngay_bat_dau`, `ngay_ket_thuc`, `trang_thai`) VALUES
+(202001, 'HK202', '2023-01-01 10:00:00', '2023-01-15 10:00:00', 'Đang mở');
 
 -- --------------------------------------------------------
 
@@ -171,10 +229,11 @@ CREATE TABLE `dot_dang_ky` (
 
 CREATE TABLE `dot_yeu_cau_dang_ky` (
   `ma_dot_yeu_cau` int(11) NOT NULL,
+  `ma_dot_dang_ky` int(11) NOT NULL,
   `ma_hoc_ky` varchar(15) DEFAULT NULL,
   `ngay_bat_dau` datetime DEFAULT NULL,
   `ngay_ket_thuc` datetime DEFAULT NULL,
-  `trang_thai` varchar(30) DEFAULT NULL
+  `trang_thai` varchar(30) DEFAULT 'Đang đóng'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -372,6 +431,7 @@ INSERT INTO `mon_hoc` (`ma_mon`, `ten_mon`, `so_tin_chi`, `is_delete`) VALUES
 ('MAT2501', 'Giải tích 1', 4, 0),
 ('MAT2502', 'Giải tích 2', 4, 0),
 ('MAT2503', 'Giải tích 3', 2, 0),
+('MAT2505', 'Lập trình cơ bản', 3, 0),
 ('MAT2506', 'Kĩ năng mềm', 2, 0),
 ('MAT3148', 'Tính toán song song', 3, 0),
 ('MAT3300', 'Đại số đại cương', 4, 0),
@@ -424,6 +484,7 @@ INSERT INTO `mon_hoc` (`ma_mon`, `ten_mon`, `so_tin_chi`, `is_delete`) VALUES
 ('MAT3372', 'Các thành phần phần mềm', 3, 0),
 ('MAT3373E', 'Nhập môn an toàn máy tính', 3, 0),
 ('MAT3374', 'Thực tập thực tế phát triển phần mềm', 3, 0),
+('MAT3376', 'Lập trình nâng cao', 2, 0),
 ('MAT3377', 'Một số vấn đề chọn lọc về Trí tuệ nhân tạo', 3, 0),
 ('MAT3378', 'Quản trị dữ liệu lớn', 3, 0),
 ('MAT3379', 'Phân tích hồi quy và ứng dụng', 3, 0),
@@ -467,6 +528,7 @@ INSERT INTO `mon_hoc` (`ma_mon`, `ten_mon`, `so_tin_chi`, `is_delete`) VALUES
 ('MAT3453', 'Phương pháp chọn mẫu dữ liệu', 3, 0),
 ('MAT3456', 'Logic ứng dụng', 3, 0),
 ('MAT3500', 'Toán rời rạc', 4, 0),
+('MAT3501', 'Nguyên lý hệ điều hành', 3, 0),
 ('MAT3504', 'Thiết kế và đánh giá thuật toán', 3, 0),
 ('MAT3505', 'Kiến trúc máy tính', 3, 0),
 ('MAT3506', 'Mạng máy tính', 3, 0),
@@ -482,9 +544,11 @@ INSERT INTO `mon_hoc` (`ma_mon`, `ten_mon`, `so_tin_chi`, `is_delete`) VALUES
 ('MAT3533', 'Học máy', 3, 0),
 ('MAT3534', 'Khai phá dữ liệu', 3, 0),
 ('MAT3535', 'Tìm kiếm thông tin', 3, 0),
+('MAT3536', 'Ngôn ngữ học tính toán', 3, 0),
 ('MAT3538', 'Các hệ thống tri thức', 3, 0),
 ('MAT3539', 'Mật mã và an toàn dữ liệu', 3, 0),
 ('MAT3540', 'Cơ sở dữ liệu đa phương tiện', 3, 0),
+('MAT3541', 'Nguyên lý các ngôn ngữ lập trình', 3, 0),
 ('MAT3541E', 'Nguyên lí các ngôn ngữ lập trình', 3, 0),
 ('MAT3542', 'Phát triển ứng dụng web', 3, 0),
 ('MAT3543', 'Công nghệ phần mềm', 3, 0),
@@ -532,17 +596,209 @@ CREATE TABLE `mon_hoc_dot_dang_ky` (
   `id_dang_ky` int(11) NOT NULL,
   `ma_mon` varchar(15) DEFAULT NULL,
   `ma_so_lop` varchar(30) DEFAULT NULL,
-  `ma_dot_yeu_cau` int(11) DEFAULT NULL,
+  `ma_dot_yeu_cau` int(11) DEFAULT -1,
   `ma_dot` int(11) DEFAULT NULL,
-  `th_lt` varchar(30) DEFAULT NULL,
+  `th_lt` varchar(30) NOT NULL DEFAULT '',
   `thu` varchar(2) DEFAULT NULL,
   `phong_hoc` varchar(10) NOT NULL,
   `tiet_bat_dau` int(11) DEFAULT NULL,
   `tiet_ket_thuc` int(11) DEFAULT NULL,
   `so_luong` int(11) DEFAULT NULL,
-  `so_luong_da_dang_ky` int(11) DEFAULT NULL,
+  `so_luong_da_dang_ky` int(11) DEFAULT 0,
   `so_luong_con_lai` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `mon_hoc_dot_dang_ky`
+--
+
+INSERT INTO `mon_hoc_dot_dang_ky` (`id_dang_ky`, `ma_mon`, `ma_so_lop`, `ma_dot_yeu_cau`, `ma_dot`, `th_lt`, `thu`, `phong_hoc`, `tiet_bat_dau`, `tiet_ket_thuc`, `so_luong`, `so_luong_da_dang_ky`, `so_luong_con_lai`) VALUES
+(756, 'MAT2034', 'MAT2034 1', -1, 202001, 'LT', '2', '204T5', 9, 10, 70, 1, NULL),
+(756, 'MAT2034', 'MAT2034 1', -1, 202001, 'TH', '4', '204T5', 1, 2, 70, 1, NULL),
+(758, 'MAT3148', 'MAT3148', -1, 202001, 'LT', '3', '205T5', 1, 2, 70, 1, NULL),
+(758, 'MAT3148', 'MAT3148', -1, 202001, 'TH', '5', 'PM', 1, 5, 70, 1, NULL),
+(760, 'MAT3378', 'MAT3378', -1, 202001, 'LT', '3', '201T4', 6, 7, 70, 1, NULL),
+(760, 'MAT3378', 'MAT3378', -1, 202001, 'TH', '4', 'PM', 6, 8, 70, 1, NULL),
+(762, 'MAT3382', 'MAT3382', -1, 202001, 'LT', '4', '201T5', 4, 5, 70, 0, NULL),
+(762, 'MAT3382', 'MAT3382', -1, 202001, 'TH', '6', 'PM', 6, 10, 70, 0, NULL),
+(764, 'MAT3385', 'MAT3385', -1, 202001, 'LT', '3', '201T5', 4, 5, 70, 0, NULL),
+(764, 'MAT3385', 'MAT3385', -1, 202001, 'TH', '2', 'PM', 1, 5, 70, 0, NULL),
+(766, 'MAT3508', 'MAT3508 2', -1, 202001, 'LT', '2', '206T5', 6, 7, 70, 0, NULL),
+(766, 'MAT3508', 'MAT3508 2', -1, 202001, 'TH', '7', 'PM', 1, 5, 70, 0, NULL),
+(768, 'MAT2323', 'MAT2323 1', -1, 202001, 'LT', '3', '202T4', 3, 5, 70, 0, NULL),
+(768, 'MAT2323', 'MAT2323 1', -1, 202001, 'TH', '5', '202T4', 4, 5, 70, 0, NULL),
+(771, 'MAT3372', 'MAT3372 1', -1, 202001, 'LT', '3', '204T4', 1, 2, 70, 0, NULL),
+(771, 'MAT3372', 'MAT3372 1', -1, 202001, 'TH', '4', 'PM', 6, 10, 70, 0, NULL),
+(773, 'MAT3507', 'MAT3507 1', -1, 202001, 'LT', '5', '207T5', 6, 8, 70, 0, NULL),
+(773, 'MAT3507', 'MAT3507 1', -1, 202001, 'TH', '3', 'PM', 6, 8, 70, 0, NULL),
+(775, 'MAT2400', 'MAT2400 1', -1, 202001, 'LT', '6', '211T5', 6, 8, 70, 0, NULL),
+(775, 'MAT2400', 'MAT2400 1', -1, 202001, 'TH', '2', '302T5', 3, 5, 70, 0, NULL),
+(777, 'MAT2400', 'MAT2400 2', -1, 202001, 'LT', '2', '302T5', 3, 5, 70, 0, NULL),
+(777, 'MAT2400', 'MAT2400 2', -1, 202001, 'TH', '6', '210T5', 6, 8, 70, 0, NULL),
+(779, 'MAT2501', 'MAT2501 5', -1, 202001, 'LT', '4', '211T5', 3, 5, 70, 0, NULL),
+(779, 'MAT2501', 'MAT2501 5', -1, 202001, 'TH', '3', '202T4', 6, 8, 70, 0, NULL),
+(780, 'MAT2501', 'MAT2501 6', -1, 202001, 'LT', '3', '202T4', 6, 8, 70, 0, NULL),
+(780, 'MAT2501', 'MAT2501 6', -1, 202001, 'TH', '4', '210T5', 3, 5, 70, 0, NULL),
+(783, 'MAT2506', 'MAT2506 3', -1, 202001, 'LT', '2', 'GĐ75', 8, 10, 70, 0, NULL),
+(783, 'MAT2506', 'MAT2506 3', -1, 202001, 'TH', '6', 'PM', 8, 10, 70, 0, NULL),
+(785, 'INM1000', 'INM1000 1', -1, 202001, 'LT', '3', '203T4', 1, 2, 50, 0, NULL),
+(785, 'INM1000', 'INM1000 1', -1, 202001, 'TH', '3', 'PM', 3, 5, 50, 0, NULL),
+(787, 'MAT2501', 'MAT2501 1', -1, 202001, 'BT', '6', '202T4', 1, 3, 50, 0, NULL),
+(787, 'MAT2501', 'MAT2501 1', -1, 202001, 'LT', '5', '109T5', 1, 3, 50, 0, NULL),
+(789, 'MAT2501', 'MAT2501 2', -1, 202001, 'BT', '5', '111T5', 1, 3, 50, 0, NULL),
+(789, 'MAT2501', 'MAT2501 2', -1, 202001, 'LT', '6', '202T4', 1, 3, 50, 0, NULL),
+(791, 'MAT2501', 'MAT2501 3', -1, 202001, 'BT', '2', '202T4', 3, 5, 50, 0, NULL),
+(791, 'MAT2501', 'MAT2501 3', -1, 202001, 'LT', '5', '211T5', 3, 5, 50, 0, NULL),
+(792, 'MAT2501', 'MAT2501 4', -1, 202001, 'BT', '5', '210T5', 3, 5, 50, 0, NULL),
+(792, 'MAT2501', 'MAT2501 4', -1, 202001, 'LT', '2', '202T4', 3, 5, 50, 0, NULL),
+(795, 'MAT2505', 'MAT2505 1', -1, 202001, 'LT', '4', '202T4', 3, 5, 50, 0, NULL),
+(795, 'MAT2505', 'MAT2505 1', -1, 202001, 'TH', '2', 'PM', 1, 3, 50, 0, NULL),
+(797, 'MAT2505', 'MAT2505 2', -1, 202001, 'LT', '4', '204T4', 3, 5, 50, 0, NULL),
+(797, 'MAT2505', 'MAT2505 2', -1, 202001, 'TH', '3', 'PM', 3, 5, 50, 0, NULL),
+(799, 'MAT2506', 'MAT2506 1', -1, 202001, 'LT', '6', 'PM', 8, 10, 50, 0, NULL),
+(799, 'MAT2506', 'MAT2506 1', -1, 202001, 'TH', '2', 'GĐ75', 8, 10, 50, 0, NULL),
+(801, 'MAT3557', 'MAT3557 1', -1, 202001, 'LT', '2', '102T4', 4, 5, 50, 0, NULL),
+(801, 'MAT3557', 'MAT3557 1', -1, 202001, 'TH', '3', 'PM', 9, 10, 50, 0, NULL),
+(803, 'MAT3557', 'MAT3557 2', -1, 202001, 'LT', '3', '102T4', 6, 7, 50, 0, NULL),
+(803, 'MAT3557', 'MAT3557 2', -1, 202001, 'TH', '5', 'PM', 9, 10, 50, 0, NULL),
+(805, 'MAT3533', 'MAT3533 1', -1, 202001, 'LT', '4', '102T4', 1, 2, 50, 0, NULL),
+(805, 'MAT3533', 'MAT3533 1', -1, 202001, 'TH', '2', 'PM', 2, 5, 50, 0, NULL),
+(807, 'MAT3542', 'MAT3542 1', -1, 202001, 'LT', '6', '202T5', 1, 2, 50, 0, NULL),
+(807, 'MAT3542', 'MAT3542 1', -1, 202001, 'TH', '3', 'PM', 6, 10, 50, 0, NULL),
+(809, 'MAT2407', 'MAT2407 1', -1, 202001, 'BT', '6', '202T4', 6, 7, 70, 0, NULL),
+(809, 'MAT2407', 'MAT2407 1', -1, 202001, 'LT', '4', '202T4', 1, 2, 70, 0, NULL),
+(811, 'MAT2407', 'MAT2407 2', -1, 202001, 'BT', '6', '201T4', 9, 10, 70, 0, NULL),
+(811, 'MAT2407', 'MAT2407 2', -1, 202001, 'LT', '4', '201T4', 4, 5, 70, 0, NULL),
+(813, 'MAT3376', 'MAT3376 1', -1, 202001, 'LT', '2', '201T4', 9, 10, 70, 0, NULL),
+(813, 'MAT3376', 'MAT3376 1', -1, 202001, 'TH', '5', 'PM', 1, 5, 70, 0, NULL),
+(815, 'MAT3501', 'MAT3501 1', -1, 202001, 'LT', '4', '209T5', 4, 5, 70, 0, NULL),
+(815, 'MAT3501', 'MAT3501 1', -1, 202001, 'TH', '3', 'PM', 6, 10, 70, 0, NULL),
+(817, 'MAT3501', 'MAT3501 2', -1, 202001, 'LT', '4', '301T4', 1, 2, 70, 0, NULL),
+(817, 'MAT3501', 'MAT3501 2', -1, 202001, 'TH', '3', 'PM', 6, 10, 70, 0, NULL),
+(819, 'MAT3506', 'MAT3506', -1, 202001, ' ', '2', '207T5', 6, 8, 70, 0, NULL),
+(820, 'MAT3508', 'MAT3508 1', -1, 202001, 'LT', '2', '205T5', 1, 2, 70, 0, NULL),
+(820, 'MAT3508', 'MAT3508 1', -1, 202001, 'TH', '7', 'PM', 6, 10, 70, 0, NULL),
+(822, 'MAT3508', 'MAT3508 3', -1, 202001, 'LT', '2', '201T4', 4, 5, 70, 0, NULL),
+(822, 'MAT3508', 'MAT3508 3', -1, 202001, 'TH', '7', 'PM', 6, 10, 70, 0, NULL),
+(824, 'MAT3541', 'MAT3541 1', -1, 202001, 'LT', '3', '303T5', 4, 5, 70, 0, NULL),
+(824, 'MAT3541', 'MAT3541 1', -1, 202001, 'TH', '5', 'PM', 6, 10, 70, 0, NULL),
+(826, 'MAT3541', 'MAT3541 2', -1, 202001, 'LT', '4', '205T5', 6, 7, 70, 0, NULL),
+(826, 'MAT3541', 'MAT3541 2', -1, 202001, 'TH', '5', 'PM', 6, 10, 70, 0, NULL),
+(828, 'MAT3543', 'MAT3543 1', -1, 202001, 'LT', '3', '208T5', 1, 2, 70, 0, NULL),
+(828, 'MAT3543', 'MAT3543 1', -1, 202001, 'TH', '7', 'PM', 6, 10, 70, 0, NULL),
+(830, 'MAT3539', 'MAT3539 1', -1, 202001, 'BT', '4', '302T4', 4, 5, 70, 0, NULL),
+(830, 'MAT3539', 'MAT3539 1', -1, 202001, 'LT', '3', '209T5', 4, 5, 70, 0, NULL),
+(832, 'MAT3562', 'MAT3562 1', -1, 202001, 'LT', '4', '202T4', 7, 8, 70, 0, NULL),
+(832, 'MAT3562', 'MAT3562 1', -1, 202001, 'TH', '4', 'PM', 9, 10, 70, 0, NULL),
+(834, 'MAT2315', 'MAT2315 2', -1, 202001, 'LT', '5', '205T5', 6, 7, 70, 0, NULL),
+(834, 'MAT2315', 'MAT2315 2', -1, 202001, 'TH', '7', 'PM', 1, 5, 70, 0, NULL),
+(836, 'MAT2404', 'MAT2404', -1, 202001, 'LT', '5', '205T5', 8, 10, 70, 0, NULL),
+(836, 'MAT2404', 'MAT2404', -1, 202001, 'TH', '2', '202T4', 6, 7, 70, 0, NULL),
+(838, 'MAT3366', 'MAT3366', -1, 202001, 'LT', '6', '201T5', 8, 10, 70, 0, NULL),
+(838, 'MAT3366', 'MAT3366', -1, 202001, 'TH', '6', 'PM', 8, 10, 70, 0, NULL),
+(840, 'MAT3409', 'MAT3409', -1, 202001, 'BT', '6', '201T5', 6, 7, 70, 0, NULL),
+(840, 'MAT3409', 'MAT3409', -1, 202001, 'LT', '4', '206T5', 6, 7, 70, 0, NULL),
+(842, 'MAT3311', 'MAT3311', -1, 202001, ' ', '6', '205T5', 3, 5, 70, 0, NULL),
+(843, 'MAT3318', 'MAT3318', -1, 202001, ' ', '2', '206T5', 3, 5, 70, 0, NULL),
+(844, 'MAT3345', 'MAT3345', -1, 202001, ' ', '5', '205T5', 3, 5, 70, 0, NULL),
+(845, 'MAT3361', 'MAT3361', -1, 202001, 'BT', '6', '202T4', 4, 5, 70, 0, NULL),
+(845, 'MAT3361', 'MAT3361', -1, 202001, 'LT', '2', '206T5', 1, 2, 70, 0, NULL),
+(847, 'MAT3406', 'MAT3406', -1, 202001, 'BT', '5', '203T5', 1, 2, 70, 0, NULL),
+(847, 'MAT3406', 'MAT3406', -1, 202001, 'LT', '3', '203T5', 1, 2, 70, 0, NULL),
+(849, 'MAT3407', 'MAT3407', -1, 202001, 'BT', '4', '203T5', 1, 2, 70, 0, NULL),
+(849, 'MAT3407', 'MAT3407', -1, 202001, 'LT', '5', '201T4', 4, 5, 70, 0, NULL),
+(851, 'MAT3418', 'MAT3418', -1, 202001, 'BT', '6', '205T5', 1, 2, 70, 0, NULL),
+(851, 'MAT3418', 'MAT3418', -1, 202001, 'LT', '3', '207T5', 4, 5, 70, 0, NULL),
+(853, 'MAT3423', 'MAT3423', -1, 202001, 'BT', '4', '205T5', 4, 5, 70, 0, NULL),
+(853, 'MAT3423', 'MAT3423', -1, 202001, 'LT', '2', '203T5', 4, 5, 70, 0, NULL),
+(855, 'MAT3321', 'MAT3321', -1, 202001, ' ', '5', '206T5', 6, 8, 70, 0, NULL),
+(856, 'MAT3323', 'MAT3323', -1, 202001, ' ', '4', '201T4', 1, 3, 70, 0, NULL),
+(857, 'MAT3327', 'MAT3327', -1, 202001, ' ', '3', '204T4', 3, 5, 70, 0, NULL),
+(858, 'MAT2300', 'MAT2300 1', -1, 202001, 'BT', '6', '204T5', 3, 5, 70, 0, NULL),
+(858, 'MAT2300', 'MAT2300 1', -1, 202001, 'LT', '4', '211T5', 1, 2, 70, 0, NULL),
+(860, 'MAT2300', 'MAT2300 2', -1, 202001, 'BT', '4', '210T5', 1, 2, 70, 0, NULL),
+(860, 'MAT2300', 'MAT2300 2', -1, 202001, 'LT', '6', '204T5', 3, 5, 70, 0, NULL),
+(862, 'MAT2302', 'MAT2302 1', -1, 202001, 'BT', '6', '111T5', 1, 2, 70, 0, NULL),
+(862, 'MAT2302', 'MAT2302 1', -1, 202001, 'LT', '4', '109T5', 4, 5, 70, 0, NULL),
+(864, 'MAT2302', 'MAT2302 2', -1, 202001, 'BT', '6', '112T5', 1, 2, 70, 0, NULL),
+(864, 'MAT2302', 'MAT2302 2', -1, 202001, 'LT', '4', '301T5', 4, 5, 70, 0, NULL),
+(866, 'PEC1008', 'PEC1008 1', -1, 202001, ' ', '2', '105T5', 1, 2, 100, 0, NULL),
+(867, 'PEC1008', 'PEC1008 10', -1, 202001, ' ', '6', '406T5', 6, 7, 100, 0, NULL),
+(868, 'PEC1008', 'PEC1008 2', -1, 202001, ' ', '2', '108T5', 1, 2, 100, 0, NULL),
+(869, 'PEC1008', 'PEC1008 3', -1, 202001, ' ', '2', '407T5', 6, 7, 100, 0, NULL),
+(870, 'PEC1008', 'PEC1008 4', -1, 202001, ' ', '2', '406T5', 6, 7, 100, 0, NULL),
+(871, 'PEC1008', 'PEC1008 5', -1, 202001, ' ', '5', '201T5', 1, 2, 100, 0, NULL),
+(872, 'PEC1008', 'PEC1008 6', -1, 202001, ' ', '5', '204T4', 1, 2, 100, 0, NULL),
+(873, 'PEC1008', 'PEC1008 7', -1, 202001, ' ', '6', '103T5', 1, 2, 100, 0, NULL),
+(874, 'PEC1008', 'PEC1008 8', -1, 202001, ' ', '6', '104T5', 1, 2, 100, 0, NULL),
+(875, 'PEC1008', 'PEC1008 9', -1, 202001, ' ', '6', '407T5', 6, 7, 100, 0, NULL),
+(876, 'PHI1002', 'PHI1002 1', -1, 202001, ' ', '3', '302T5', 4, 5, 100, 0, NULL),
+(877, 'PHI1002', 'PHI1002 10', -1, 202001, ' ', '2', '407T5', 4, 5, 100, 0, NULL),
+(878, 'PHI1002', 'PHI1002 11', -1, 202001, ' ', '2', '406T5', 4, 5, 100, 0, NULL),
+(879, 'PHI1002', 'PHI1002 12', -1, 202001, ' ', '3', '102T5', 1, 2, 100, 0, NULL),
+(880, 'PHI1002', 'PHI1002 13', -1, 202001, ' ', '4', '209T5', 1, 2, 100, 0, NULL),
+(881, 'PHI1002', 'PHI1002 14', -1, 202001, ' ', '6', '104T4', 9, 10, 100, 0, NULL),
+(882, 'PHI1002', 'PHI1002 2', -1, 202001, ' ', '6', '304T4', 6, 7, 100, 0, NULL),
+(883, 'PHI1002', 'PHI1002 3', -1, 202001, ' ', '5', '304T4', 1, 2, 100, 0, NULL),
+(884, 'PHI1002', 'PHI1002 4', -1, 202001, ' ', '6', '107T5', 4, 5, 100, 0, NULL),
+(885, 'PHI1002', 'PHI1002 5', -1, 202001, ' ', '5', '102T5', 6, 7, 100, 0, NULL),
+(886, 'PHI1002', 'PHI1002 6', -1, 202001, ' ', '4', '207T5', 4, 5, 100, 0, NULL),
+(887, 'PHI1002', 'PHI1002 7', -1, 202001, ' ', '2', '202T5', 1, 2, 100, 0, NULL),
+(888, 'PHI1002', 'PHI1002 8', -1, 202001, ' ', '2', '202T4', 1, 2, 100, 0, NULL),
+(889, 'PHI1002', 'PHI1002 9', -1, 202001, ' ', '5', '102T5', 1, 2, 100, 0, NULL),
+(890, 'PHI1006', 'PHI1006 10', -1, 202001, ' ', '5', '102T5', 3, 5, 100, 0, NULL),
+(891, 'PHI1006', 'PHI1006 11', -1, 202001, ' ', '4', '102T5', 1, 3, 100, 0, NULL),
+(892, 'PHI1006', 'PHI1006 12', -1, 202001, ' ', '4', '102T5', 8, 10, 100, 0, NULL),
+(893, 'PHI1006', 'PHI1006 13', -1, 202001, ' ', '6', '208T5', 3, 5, 100, 0, NULL),
+(894, 'PHI1006', 'PHI1006 14', -1, 202001, ' ', '6', '102T5', 6, 8, 100, 0, NULL),
+(895, 'PHI1006', 'PHI1006 15', -1, 202001, ' ', '6', '303T4', 6, 8, 100, 0, NULL),
+(896, 'PHI1006', 'PHI1006 16', -1, 202001, ' ', '4', '302T4', 6, 8, 100, 0, NULL),
+(897, 'PHI1006', 'PHI1006 17', -1, 202001, ' ', '5', '403T4', 1, 3, 100, 0, NULL),
+(898, 'PHI1006', 'PHI1006 18', -1, 202001, ' ', '3', '406T5', 8, 10, 100, 0, NULL),
+(899, 'PHI1006', 'PHI1006 19', -1, 202001, ' ', '4', '208T5', 3, 5, 100, 0, NULL),
+(900, 'PHI1006', 'PHI1006 20', -1, 202001, ' ', '6', '508T3', 1, 3, 100, 0, NULL),
+(901, 'PHI1006', 'PHI1006 21', -1, 202001, ' ', '2', '204T4', 3, 5, 100, 0, NULL),
+(902, 'PHI1006', 'PHI1006 22', -1, 202001, ' ', '2', '203T4', 3, 5, 100, 0, NULL),
+(903, 'PHI1006', 'PHI1006 23', -1, 202001, ' ', '5', '203T4', 3, 5, 100, 0, NULL),
+(904, 'PHI1006', 'PHI1006 24', -1, 202001, ' ', '3', '102T5', 8, 10, 100, 0, NULL),
+(905, 'PHI1006', 'PHI1006 25', -1, 202001, ' ', '5', '102T5', 8, 10, 100, 0, NULL),
+(906, 'PHI1006', 'PHI1006 26', -1, 202001, ' ', '4', '108T5', 1, 3, 100, 0, NULL),
+(907, 'PHI1006', 'PHI1006 7', -1, 202001, ' ', '2', '102T5', 8, 10, 100, 0, NULL),
+(908, 'PHI1006', 'PHI1006 8', -1, 202001, ' ', '3', '102T5', 3, 5, 100, 0, NULL),
+(909, 'PHI1006', 'PHI1006 9', -1, 202001, ' ', '2', '408T5', 1, 3, 100, 0, NULL),
+(910, 'POL1001', 'POL1001 1', -1, 202001, ' ', '2', '403T4', 1, 2, 100, 0, NULL),
+(911, 'POL1001', 'POL1001 10', -1, 202001, ' ', '5', '204T4', 6, 7, 100, 0, NULL),
+(912, 'POL1001', 'POL1001 11', -1, 202001, ' ', '6', '207T5', 9, 10, 100, 0, NULL),
+(913, 'POL1001', 'POL1001 12', -1, 202001, ' ', '6', '206T5', 9, 10, 100, 0, NULL),
+(914, 'POL1001', 'POL1001 2', -1, 202001, ' ', '2', '403T4', 4, 5, 100, 0, NULL),
+(915, 'POL1001', 'POL1001 3', -1, 202001, ' ', '2', '205T5', 9, 10, 100, 0, NULL),
+(916, 'POL1001', 'POL1001 4', -1, 202001, ' ', '3', '402T4', 1, 2, 100, 0, NULL),
+(917, 'POL1001', 'POL1001 5', -1, 202001, ' ', '3', '402T4', 4, 5, 100, 0, NULL),
+(918, 'POL1001', 'POL1001 6', -1, 202001, ' ', '3', '207T5', 9, 10, 100, 0, NULL),
+(919, 'POL1001', 'POL1001 7', -1, 202001, ' ', '5', '511T4', 1, 2, 100, 0, NULL),
+(920, 'POL1001', 'POL1001 8', -1, 202001, ' ', '5', '512T4', 1, 2, 100, 0, NULL),
+(921, 'POL1001', 'POL1001 9', -1, 202001, ' ', '5', '201T5', 6, 7, 100, 0, NULL),
+(922, 'PHY1100', 'PHY1100 10', -1, 202001, ' ', '6', '207T5', 3, 5, 100, 0, NULL),
+(923, 'PHY1100', 'PHY1100 11', -1, 202001, ' ', '2', '208T5', 3, 5, 100, 0, NULL),
+(924, 'PHY1100', 'PHY1100 12', -1, 202001, ' ', '5', '106T5', 1, 3, 100, 0, NULL),
+(925, 'PHY1100', 'PHY1100 13', -1, 202001, ' ', '3', '403T4', 3, 5, 100, 0, NULL),
+(926, 'PHY1100', 'PHY1100 14', -1, 202001, ' ', '3', '403T4', 6, 8, 100, 0, NULL),
+(927, 'PHY1100', 'PHY1100 15', -1, 202001, ' ', '6', '209T5', 6, 8, 100, 0, NULL),
+(928, 'PHY1100', 'PHY1100 16', -1, 202001, ' ', '2', '304T4', 3, 5, 100, 0, NULL),
+(929, 'PHY1100', 'PHY1100 17', -1, 202001, ' ', '2', '403T4', 6, 8, 100, 0, NULL),
+(930, 'PHY1100', 'PHY1100 18', -1, 202001, ' ', '4', '509T3', 3, 5, 100, 0, NULL),
+(931, 'PHY1100', 'PHY1100 19', -1, 202001, ' ', '4', '407T5', 6, 8, 100, 0, NULL),
+(932, 'PHY1103', 'PHY1103 10', -1, 202001, ' ', '3', '509T3', 3, 5, 100, 0, NULL),
+(933, 'PHY1103', 'PHY1103 11', -1, 202001, ' ', '4', '203T5', 3, 5, 100, 0, NULL),
+(934, 'PHY1103', 'PHY1103 12', -1, 202001, ' ', '6', '403T4', 3, 5, 100, 0, NULL),
+(935, 'PHY1103', 'PHY1103 13', -1, 202001, ' ', '6', '403T4', 6, 8, 100, 0, NULL),
+(936, 'PHY1103', 'PHY1103 4', -1, 202001, ' ', '2', '402T4', 3, 5, 100, 0, NULL),
+(937, 'PHY1103', 'PHY1103 5', -1, 202001, ' ', '2', '402T4', 6, 8, 100, 0, NULL),
+(938, 'PHY1103', 'PHY1103 6', -1, 202001, ' ', '3', '512T4', 6, 8, 100, 0, NULL),
+(939, 'PHY1103', 'PHY1103 7', -1, 202001, ' ', '4', '304T4', 6, 8, 100, 0, NULL),
+(940, 'PHY1103', 'PHY1103 8', -1, 202001, ' ', '5', '407T5', 1, 3, 100, 0, NULL),
+(941, 'PHY1103', 'PHY1103 9', -1, 202001, ' ', '5', '504T3', 6, 8, 100, 0, NULL),
+(943, 'MAT2503', 'MAT2503 1', -1, 202001, 'LT', '6', '206T5', 3, 5, 70, 0, 70);
 
 -- --------------------------------------------------------
 
@@ -622,6 +878,8 @@ INSERT INTO `mon_hoc_nganh` (`ma_mon`, `ma_nganh`) VALUES
 ('MAT2501', 'KHDL'),
 ('MAT2502', 'KHDL'),
 ('MAT2503', 'KHDL'),
+('MAT2505', 'KHMTTT'),
+('MAT2505', 'TT'),
 ('MAT2506', 'KHDL'),
 ('MAT3148', 'KHDL'),
 ('MAT3148', 'KHMTTT'),
@@ -682,6 +940,8 @@ INSERT INTO `mon_hoc_nganh` (`ma_mon`, `ma_nganh`) VALUES
 ('MAT3372', 'TT'),
 ('MAT3373E', 'KHMTTT'),
 ('MAT3374', 'KHMTTT'),
+('MAT3376', 'KHMTTT'),
+('MAT3376', 'TT'),
 ('MAT3377', 'KHMTTT'),
 ('MAT3378', 'KHDL'),
 ('MAT3379', 'KHDL'),
@@ -728,6 +988,7 @@ INSERT INTO `mon_hoc_nganh` (`ma_mon`, `ma_nganh`) VALUES
 ('MAT3500', 'KHDL'),
 ('MAT3500', 'KHMTTT'),
 ('MAT3500', 'TT'),
+('MAT3501', 'KHMTTT'),
 ('MAT3504', 'KHDL'),
 ('MAT3504', 'TT'),
 ('MAT3505', 'KHMTTT'),
@@ -753,10 +1014,13 @@ INSERT INTO `mon_hoc_nganh` (`ma_mon`, `ma_nganh`) VALUES
 ('MAT3534', 'KHMTTT'),
 ('MAT3535', 'KHDL'),
 ('MAT3535', 'KHMTTT'),
+('MAT3536', 'TH'),
+('MAT3536', 'TT'),
 ('MAT3538', 'KHMTTT'),
 ('MAT3539', 'KHMTTT'),
 ('MAT3539', 'TT'),
 ('MAT3540', 'KHMTTT'),
+('MAT3541', 'KHMTTT'),
 ('MAT3541E', 'KHMTTT'),
 ('MAT3542', 'KHMTTT'),
 ('MAT3543', 'KHMTTT'),
@@ -1093,7 +1357,7 @@ ALTER TABLE `mon_hoc`
 -- Indexes for table `mon_hoc_dot_dang_ky`
 --
 ALTER TABLE `mon_hoc_dot_dang_ky`
-  ADD PRIMARY KEY (`id_dang_ky`);
+  ADD PRIMARY KEY (`id_dang_ky`,`th_lt`);
 
 --
 -- Indexes for table `mon_hoc_nganh`
@@ -1157,13 +1421,29 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `diem`
 --
 ALTER TABLE `diem`
-  MODIFY `id_diem` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_diem` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+
+--
+-- AUTO_INCREMENT for table `mon_hoc_dot_dang_ky`
+--
+ALTER TABLE `mon_hoc_dot_dang_ky`
+  MODIFY `id_dang_ky` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=944;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
   MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+DELIMITER $$
+--
+-- Events
+--
+CREATE DEFINER=`root`@`localhost` EVENT `dk_hoc_end_202001` ON SCHEDULE AT '2023-01-15 10:00:00' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE dot_dang_ky
+            SET trang_thai = "Đã đóng"
+            WHERE ma_dot = '202001'$$
+
+DELIMITER ;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

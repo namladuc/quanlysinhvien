@@ -2659,7 +2659,7 @@ def delete_hoc_ky(ma_hoc_ky):
 # -------------------------- Ket Qua Hoc Tap -------------------------
 
 # -------------------------- Dang Ky Hoc -------------------------
-
+@login_required
 @app.route("/table_dang_ky_hoc", methods=['GET','POST'])
 def table_dang_ky_hoc():
     cur = mysql.connection.cursor()
@@ -2682,14 +2682,137 @@ def table_dang_ky_hoc():
         details = request.form
         ma_dot = details['ma_dot_dang_ky'].strip()
         ma_dot_dang_ky = details['ma_dot_dang_ky'].split("_")[0].strip()
-        
+    
+    cur.execute("""
+                SELECT mhdk.id_dang_ky, mh.ten_mon, mh.so_tin_chi, mhdk.ma_so_lop, mhdk.so_luong, mhdk.so_luong_da_dang_ky, 
+                CONCAT("T",mhdk.thu,"(",mhdk.tiet_bat_dau,"-",mhdk.tiet_ket_thuc,")",mhdk.phong_hoc)
+                FROM mon_hoc_dot_dang_ky mhdk
+                JOIN mon_hoc mh ON mh.ma_mon = mhdk.ma_mon
+                WHERE mhdk.ma_dot = %s
+                """, (ma_dot, ))
+    cac_lop = cur.fetchall()
+    column_name = ['id_dang_ky', 'ten_mon','so_tin_chi', 'ma_so_lop',
+                    'so_luong', 'so_luong_da_dang_ky', 'lich_hoc']
+    data = pd.DataFrame.from_records(cac_lop, columns=column_name)
+    
+    data = data.fillna(' ')
+    
+    def f(x):
+        return pd.Series(dict(lich_hoc = "%s" % ','.join(x['lich_hoc'])))
+    
+    if data.shape[0] == 0:
+        data = ()
+    else:
+        data = data.groupby(by=['id_dang_ky', 'ten_mon','so_tin_chi', 'ma_so_lop',
+                    'so_luong', 'so_luong_da_dang_ky'], group_keys=False).apply(f).reset_index()
+        data = data.values.tolist()
+    
     return render_template(session['role'] + 'dangkyhoc/table_dang_ky_hoc.html',
                            ma_dot_dang_ky = ma_dot_dang_ky,
                            ma_dot = ma_dot,
+                           cac_lop = data,
                            cac_ddk = cac_ddk,
                            my_user = session['username'],
                            truong = session['truong'])
 
+@login_required
+@app.route("/get_print_dang_ky_hoc/<string:ma_dot>")
+def get_print_dang_ky_hoc(ma_dot):
+    cur = mysql.connection.cursor()
+    cur.execute("""
+                SELECT ddk.ma_dot, ddk.ma_hoc_ky, hk.ten_hoc_ky
+                FROM dot_dang_ky ddk
+                JOIN hoc_ky hk ON ddk.ma_hoc_ky = hk.ma_hoc_ky
+                WHERE ddk.ma_dot = %s
+                """, (ma_dot, ))
+    cac_ddk = cur.fetchall()
+    
+    if (len(cac_ddk) != 0):
+        ma_dot_dang_ky = str(cac_ddk[0][0]) + " _ " + str(cac_ddk[0][1]) + " _ " + str(cac_ddk[0][2])
+    else:
+        return "Error"
+    
+    cur.execute("""
+                SELECT mhdk.id_dang_ky, mh.ten_mon, mh.so_tin_chi, mhdk.ma_so_lop, mhdk.so_luong, mhdk.so_luong_da_dang_ky, 
+                CONCAT("T",mhdk.thu,"(",mhdk.tiet_bat_dau,"-",mhdk.tiet_ket_thuc,")",mhdk.phong_hoc)
+                FROM mon_hoc_dot_dang_ky mhdk
+                JOIN mon_hoc mh ON mh.ma_mon = mhdk.ma_mon
+                WHERE mhdk.ma_dot = %s
+                """, (ma_dot, ))
+    cac_lop = cur.fetchall()
+    column_name = ['id_dang_ky', 'ten_mon','so_tin_chi', 'ma_so_lop',
+                    'so_luong', 'so_luong_da_dang_ky', 'lich_hoc']
+    data = pd.DataFrame.from_records(cac_lop, columns=column_name)
+    
+    data = data.fillna(' ')
+    
+    def f(x):
+        return pd.Series(dict(lich_hoc = "%s" % ','.join(x['lich_hoc'])))
+    
+    if data.shape[0] == 0:
+        data = ()
+    else:
+        data = data.groupby(by=['id_dang_ky', 'ten_mon','so_tin_chi', 'ma_so_lop',
+                    'so_luong', 'so_luong_da_dang_ky'], group_keys=False).apply(f).reset_index()
+        data = data.values.tolist()
+    
+    return render_template('dangkyhoc/table_print_dang_ky_hoc.html',
+                           ma_dot_dang_ky = ma_dot_dang_ky,
+                           ma_dot = ma_dot,
+                           cac_lop = data)
+
+@login_required
+@app.route("/get_table_dang_ky_hoc_pdf/<string:ma_dot>")
+def get_table_dang_ky_hoc_pdf(ma_dot):
+    pathFile = app.config['SAVE_FOLDER_PDF']  + '/Table_Lop_Dot_' + ma_dot + '.pdf'
+    pdfkit.from_url("/".join(request.url.split("/")[:-2:]) + '/get_print_dang_ky_hoc/' + str(ma_dot),pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
+@app.route("/get_table_dang_ky_hoc_excel/<string:ma_dot>")
+def get_table_dang_ky_hoc_excel(ma_dot):
+    cur = mysql.connection.cursor()
+    cur.execute("""
+                SELECT ddk.ma_dot, ddk.ma_hoc_ky, hk.ten_hoc_ky
+                FROM dot_dang_ky ddk
+                JOIN hoc_ky hk ON ddk.ma_hoc_ky = hk.ma_hoc_ky
+                WHERE ddk.ma_dot = %s
+                """, (ma_dot, ))
+    cac_ddk = cur.fetchall()
+    
+    if (len(cac_ddk) != 0):
+        ma_dot_dang_ky = str(cac_ddk[0][0]) + " _ " + str(cac_ddk[0][1]) + " _ " + str(cac_ddk[0][2])
+    else:
+        return "Error"
+    
+    cur.execute("""
+                SELECT mh.ten_mon, mh.so_tin_chi, mhdk.ma_so_lop, mhdk.so_luong, mhdk.so_luong_da_dang_ky, 
+                CONCAT("T",mhdk.thu,"(",mhdk.tiet_bat_dau,"-",mhdk.tiet_ket_thuc,")",mhdk.phong_hoc)
+                FROM mon_hoc_dot_dang_ky mhdk
+                JOIN mon_hoc mh ON mh.ma_mon = mhdk.ma_mon
+                WHERE mhdk.ma_dot = %s
+                """, (ma_dot, ))
+    cac_lop = cur.fetchall()
+    column_name = ['ten_mon','so_tin_chi', 'ma_so_lop',
+                    'so_luong', 'so_luong_da_dang_ky', 'lich_hoc']
+    data = pd.DataFrame.from_records(cac_lop, columns=column_name)
+    
+    data = data.fillna(' ')
+    
+    def f(x):
+        return pd.Series(dict(lich_hoc = "%s" % ','.join(x['lich_hoc'])))
+    
+    if data.shape[0] == 0:
+        data = ()
+    else:
+        data = data.groupby(by=['ten_mon','so_tin_chi', 'ma_so_lop',
+                    'so_luong', 'so_luong_da_dang_ky'], group_keys=False).apply(f).reset_index()
+        data = data.set_index('ma_so_lop')
+    pathFile = app.config['SAVE_FOLDER_EXCEL'] + "/" + "Danh_Sach_lop_Dot_" + ma_dot + ".xlsx"
+    data.to_excel(pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
 @app.route("/table_dang_ky_hoc/form_add_dot_dk", methods = ['GET','POST'])
 def form_add_dot_dk():
     cur = mysql.connection.cursor()
@@ -2931,12 +3054,134 @@ def form_add_dot_dk():
                            my_user = session['username'],
                            truong = session['truong'])
 
-@app.route("/table_dang_ky_hoc/table_dkh_sv")
-def table_dkh_sv():
+@login_required
+@app.route("/table_dang_ky_hoc/table_dkh_sv/<string:id_dang_ky>")
+def table_dkh_sv(id_dang_ky):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT mhdk.ma_dot, hk.ten_hoc_ky, mh.ten_mon, mhdk.ma_so_lop
+                FROM mon_hoc_dot_dang_ky mhdk
+                JOIN mon_hoc mh ON mhdk.ma_mon = mh.ma_mon
+                JOIN dot_dang_ky ddk ON ddk.ma_dot = mhdk.ma_dot
+                JOIN hoc_ky hk ON hk.ma_hoc_ky = ddk.ma_hoc_ky
+                WHERE mhdk.id_dang_ky = %s
+                GROUP BY mhdk.id_dang_ky
+                """, (id_dang_ky, ))
+    thong_tin = cur.fetchall()
+    if (len(thong_tin) == 0):
+        return "Error"
+    thong_tin = thong_tin[0]
+
+    cur.execute("""
+                SELECT dkm.ma_sinh_vien, sv.ho_ten, l.ten_lop, n.ten_nganh
+                FROM dang_ky_mon dkm
+                JOIN sinh_vien sv ON sv.ma_sinh_vien = dkm.ma_sinh_vien
+                JOIN sinh_vien_lop svl ON dkm.ma_sinh_vien = svl.ma_sinh_vien
+                JOIN lop l ON svl.ma_lop = l.ma_lop
+                JOIN nganh n ON l.ma_nganh = n.ma_nganh
+                WHERE dkm.id_dang_ky = %s
+                """, (id_dang_ky, ))
+    cac_sv = cur.fetchall()
+    
     return render_template(session['role'] + 'dangkyhoc/table_dkh_sv.html',
+                           id_dang_ky = id_dang_ky,
+                           thong_tin = thong_tin,
+                           cac_sv = cac_sv,
                            my_user = session['username'],
                            truong = session['truong'])
 
+@login_required
+@app.route("/get_print_table_dkh_sv/<string:id_dang_ky>")
+def get_print_table_dk_sv(id_dang_ky):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT mhdk.ma_dot, hk.ten_hoc_ky, mh.ten_mon, mhdk.ma_so_lop
+                FROM mon_hoc_dot_dang_ky mhdk
+                JOIN mon_hoc mh ON mhdk.ma_mon = mh.ma_mon
+                JOIN dot_dang_ky ddk ON ddk.ma_dot = mhdk.ma_dot
+                JOIN hoc_ky hk ON hk.ma_hoc_ky = ddk.ma_hoc_ky
+                WHERE mhdk.id_dang_ky = %s
+                """, (id_dang_ky, ))
+    thong_tin = cur.fetchall()
+    if (len(thong_tin) == 0):
+        return "Error"
+    thong_tin = thong_tin[0]
+
+    cur.execute("""
+                SELECT dkm.ma_sinh_vien, sv.ho_ten, l.ten_lop, n.ten_nganh
+                FROM dang_ky_mon dkm
+                JOIN sinh_vien sv ON sv.ma_sinh_vien = dkm.ma_sinh_vien
+                JOIN sinh_vien_lop svl ON dkm.ma_sinh_vien = svl.ma_sinh_vien
+                JOIN lop l ON svl.ma_lop = l.ma_lop
+                JOIN nganh n ON l.ma_nganh = n.ma_nganh
+                WHERE dkm.id_dang_ky = %s
+                """, (id_dang_ky, ))
+    cac_sv = cur.fetchall()
+    
+    return render_template('dangkyhoc/table_print_dkh_sv.html',
+                           id_dang_ky = id_dang_ky,
+                           thong_tin = thong_tin,
+                           cac_sv = cac_sv)
+
+@login_required
+@app.route("/get_table_dkh_sv_pdf/<string:id_dang_ky>_<string:ma_lop>")
+def get_table_dkh_sv_pdf(id_dang_ky, ma_lop):
+    pathFile = app.config['SAVE_FOLDER_PDF']  + '/Table_Lop_' + ma_lop + '.pdf'
+    pdfkit.from_url("/".join(request.url.split("/")[:-2:]) + '/get_print_table_dkh_sv/' + str(id_dang_ky),pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
+@app.route("/get_table_dkh_sv_excel/<string:id_dang_ky>_<string:ma_lop>")
+def get_table_dkh_sv_excel(id_dang_ky, ma_lop):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT mhdk.ma_dot, hk.ten_hoc_ky, mh.ten_mon, mhdk.ma_so_lop
+                FROM mon_hoc_dot_dang_ky mhdk
+                JOIN mon_hoc mh ON mhdk.ma_mon = mh.ma_mon
+                JOIN dot_dang_ky ddk ON ddk.ma_dot = mhdk.ma_dot
+                JOIN hoc_ky hk ON hk.ma_hoc_ky = ddk.ma_hoc_ky
+                WHERE mhdk.id_dang_ky = %s
+                """, (id_dang_ky, ))
+    thong_tin = cur.fetchall()
+    if (len(thong_tin) == 0):
+        return "Error"
+    thong_tin = thong_tin[0]
+    del ma_lop
+    cur.execute("""
+                SELECT dkm.ma_sinh_vien, sv.ho_ten, l.ten_lop, n.ten_nganh
+                FROM dang_ky_mon dkm
+                JOIN sinh_vien sv ON sv.ma_sinh_vien = dkm.ma_sinh_vien
+                JOIN sinh_vien_lop svl ON dkm.ma_sinh_vien = svl.ma_sinh_vien
+                JOIN lop l ON svl.ma_lop = l.ma_lop
+                JOIN nganh n ON l.ma_nganh = n.ma_nganh
+                WHERE dkm.id_dang_ky = %s
+                """, (id_dang_ky, ))
+    cac_sv = cur.fetchall()
+    columnName = ['ma_sinh_vien','ho_ten','ten_lop','ten_nganh']
+    data = pd.DataFrame.from_records(cac_sv, columns=columnName)
+    data = data.set_index('ma_sinh_vien')
+    pathFile = app.config['SAVE_FOLDER_EXCEL'] + "/" + "Danh_Sach_lop_" + thong_tin[3] + ".xlsx"
+    data.to_excel(pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
+@app.route("/huy_dang_ky_sv/<string:id_dang_ky>_<string:ma_sinh_vien>")
+def huy_dang_ky_sv(id_dang_ky, ma_sinh_vien):
+    if (session['role_id'] != 1):
+        return "Error"
+    
+    cur = mysql.connection.cursor()
+    cur.execute("""
+                DELETE FROM dang_ky_mon
+                WHERE id_dang_ky = %s AND ma_sinh_vien = %s
+                """, (id_dang_ky, ma_sinh_vien))
+    mysql.connection.commit()
+    return redirect(url_for('table_dkh_sv', id_dang_ky = id_dang_ky))
+
+@login_required
 @app.route("/table_dang_ky_hoc/table_dkh_lop_hoc/<string:ma_dot>")
 def table_dkh_lop_hoc(ma_dot):
     cur = mysql.connection.cursor()
@@ -2966,9 +3211,12 @@ def table_dkh_lop_hoc(ma_dot):
     def f(x):
         return pd.Series(dict(lich_hoc = "%s" % ','.join(x['lich_hoc'])))
     
-    data = data.groupby(by=['id_dang_ky', 'ten_mon','so_tin_chi',
-                            'ma_so_lop', 'so_luong', 'so_luong_da_dang_ky']).apply(f).reset_index()
-    data = data.values.tolist()
+    if data.shape[0] == 0:
+        data = ()
+    else:
+        data = data.groupby(by=['id_dang_ky', 'ten_mon','so_tin_chi',
+                                'ma_so_lop', 'so_luong', 'so_luong_da_dang_ky'], group_keys=False).apply(f).reset_index()
+        data = data.values.tolist()
     return render_template(session['role'] + 'dangkyhoc/table_dkh_lop_hoc.html',
                            tt_dot = thong_tin_dot,
                            cac_mon_dk = data,
@@ -2976,12 +3224,184 @@ def table_dkh_lop_hoc(ma_dot):
                            my_user = session['username'],
                            truong = session['truong'])
 
-@app.route("/table_dang_ky_hoc/form_add_dkh_lop_hoc_upload_file/<string:ma_dot>")
+@login_required
+@app.route("/table_dang_ky_hoc/form_add_dkh_lop_hoc_upload_file/<string:ma_dot>", methods = ['GET','POST'])
 def form_add_dkh_lop_hoc_upload_file(ma_dot):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT *
+                FROM dot_dang_ky
+                WHERE ma_dot = %s
+                """, (ma_dot, ))
+    if (len(cur.fetchall()) == 0):
+        return "Error"
+    
+    if request.method == 'POST':
+        data_file = request.files['FileDataUpload']
+        if data_file.filename != '':
+            if data_file.filename.split(".")[-1] not in ['xlsx', 'csv', 'xls', 'xlsm']:
+                return redirect(url_for("form_add_dkh_lop_hoc_upload_file", ma_dot = ma_dot))
+            filename = "TMP_" + data_file.filename 
+            pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
+            data_file.save(pathToFile)
+            return redirect(url_for("form_add_dkh_lop_hoc_upload_process", filename=filename, ma_dot = ma_dot))
+        return redirect(url_for("form_add_dkh_lop_hoc_upload_file", ma_dot = ma_dot))
     return render_template(session['role'] + 'dangkyhoc/form_add_dkh_lop_hoc_upload_file.html',
+                           ma_dot = ma_dot,
                            my_user = session['username'],
                            truong = session['truong'])
+    
+@login_required
+@app.route("/table_dang_ky_hoc/form_add_dkh_lop_hoc_upload_process/<string:filename>_<string:ma_dot>", methods = ['GET','POST'])
+def form_add_dkh_lop_hoc_upload_process(filename, ma_dot):
+    pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
+    
+    default_tag_column = ['ma_mon', 'ma_so_lop', 'thu', 'phong_hoc', 'th_lt',
+                          'tiet_bat_dau', 'tiet_ket_thuc', 'so_luong']
+    
+    default_name_column = ['Mã môn học', 'Mã số lớp', 'Ngày học (thứ mấy)', 'Phòng học', 'Hình thức học (LT hay TH)',
+                           'Tiết bắt đầu', 'Tiết kết thúc', 'Số lượng sinh viên']
+    
+    data_lop_dk = pd.read_excel(pathToFile)
+    data_column = list(data_lop_dk.columns)
+    
+    if (len(data_column) > len(default_tag_column)) or len(data_column)  < 8:
+        return "Error"
+    
+    if request.method == 'POST':
+        cur = mysql.connection.cursor()
+        details = request.form
+        column_link = [details[col] for col in data_column]
+        column_match = [default_name_column.index(elm) for elm in column_link]
+        
+        if (len(set(column_match)) != len(column_link)):
+            return "Error"
+        
+        if (len(column_match) != 8):
+            return "Error"
+        
+        cur.execute("""
+                    SELECT ma_dot_yeu_cau
+                    FROM dot_yeu_cau_dang_ky
+                    WHERE ma_dot_dang_ky = %s
+                    """, (ma_dot, ))
+        ma_dot_ks = cur.fetchall()
+        if (len(ma_dot_ks) != 0):
+            ma_dot_ks = ma_dot_ks[0][0]
+        else:
+            ma_dot_ks = -1
+        
+        # Kiểm tra xem mã môn có tồn tại không
+        tmp = tuple(set(data_lop_dk[data_column[column_match.index(0)]]))
+        if len(tmp) == 1:
+            cur.execute("SELECT ma_mon FROM mon_hoc WHERE ma_mon = %s", tmp)
+        else:
+            new_tmp = ["\"" + text +"\"" for text in tmp]
+            cur.execute("SELECT ma_mon FROM mon_hoc WHERE ma_mon IN (" + ", ".join(new_tmp) + ")")
+        data_tuple = cur.fetchall()
+        data_tmp_take = []
+        for elm in data_tuple:
+            data_tmp_take.append(elm[0])
+        
+        for elm in tmp:
+            if elm not in data_tmp_take:
+                print(elm)
+        
+        if (len(data_tmp_take) != len(tmp)):
+            return "Error"
+        
+        data_lop_dk = data_lop_dk.fillna(' ')
+        
+        # Kiểm tra xem có mã số lớp đó chưa
+        # Nếu có đủ rồi thì drop
+        # nếu là loại khác thì sẽ thêm vào 
+        for index_row in range(data_lop_dk.shape[0]):
+            sql = "SELECT id_dang_ky FROM mon_hoc_dot_dang_ky WHERE ma_so_lop = %s AND th_lt = %s"
+            val = (data_lop_dk[data_column[column_match.index(1)]][index_row],
+                   data_lop_dk[data_column[column_match.index(4)]][index_row])
+            cur.execute(sql,val)
+            ktra_lop = cur.fetchall()
+            if (len(ktra_lop) != 0):
+                data_lop_dk = data_lop_dk.drop(index_row)
+            else:
+                sql = "SELECT id_dang_ky FROM mon_hoc_dot_dang_ky WHERE ma_so_lop = %s"
+                val = (data_lop_dk[data_column[column_match.index(1)]][index_row], )
+                cur.execute(sql,val)
+                id_dk = cur.fetchall()
+                if (len(id_dk) != 0):
+                    sql = """
+                        INSERT INTO mon_hoc_dot_dang_ky(`id_dang_ky`, `ma_mon`,
+                        `ma_so_lop`, `ma_dot_yeu_cau`, `ma_dot`, `th_lt`, `thu`,
+                        `phong_hoc`, `tiet_bat_dau`, `tiet_ket_thuc`, `so_luong`,
+                        `so_luong_con_lai`)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """
+                    val = (
+                        id_dk[0][0],
+                        data_lop_dk[data_column[column_match.index(0)]][index_row],
+                        data_lop_dk[data_column[column_match.index(1)]][index_row],
+                        ma_dot_ks,
+                        ma_dot,
+                        data_lop_dk[data_column[column_match.index(2)]][index_row],
+                        data_lop_dk[data_column[column_match.index(3)]][index_row],
+                        data_lop_dk[data_column[column_match.index(4)]][index_row],
+                        data_lop_dk[data_column[column_match.index(5)]][index_row],
+                        data_lop_dk[data_column[column_match.index(6)]][index_row],
+                        data_lop_dk[data_column[column_match.index(7)]][index_row],
+                        data_lop_dk[data_column[column_match.index(7)]][index_row]
+                    )
+                    cur.execute(sql,val)
+                    mysql.connection.commit()
+                    data_lop_dk = data_lop_dk.drop(index_row)
+        
+        data_lop_dk = data_lop_dk.reset_index()
+    
+        data_lop_dk = data_lop_dk.drop('index', axis=1)
+    
+        sql = "INSERT INTO `mon_hoc_dot_dang_ky` ("
+        for index in column_match:
+            sql += default_tag_column[index] + ","
+        sql += "ma_dot_yeu_cau,ma_dot"
+        sql += ") VALUES "
+        for index_row in range(data_lop_dk.shape[0]):
+            sql += "("
+            for col in data_column:
+                sql +=  "\"" + str(data_lop_dk[col][index_row]) + "\"" + ","
+            sql += "\"" + str(ma_dot_ks) + "\",\"" + str(ma_dot) + "\""
+            sql += "),"
+        sql = sql[:-1:]  
+        cur.execute(sql)
+        mysql.connection.commit()
+        
+        ma_so_lst = list(set(data_lop_dk[data_column[column_match.index(1)]].values.tolist()))
+        
+        for elm in ma_so_lst:
+            cur.execute("""
+                        SELECT id_dang_ky
+                        FROM mon_hoc_dot_dang_ky 
+                        WHERE ma_so_lop = %s
+                        LIMIT 1
+                        """, (elm, ))
+            id_dk = cur.fetchall()[0][0]
+            
+            cur.execute("""
+                        UPDATE mon_hoc_dot_dang_ky
+                        SET id_dang_ky = %s
+                        WHERE ma_so_lop = %s AND ma_dot = %s;
+                        """, (id_dk, elm, ma_dot))
+            mysql.connection.commit()
+        os.remove(pathToFile)
+        return redirect(url_for('table_dkh_lop_hoc', ma_dot = ma_dot))         
+    return render_template(session['role'] + 'dangkyhoc/form_add_dkh_lop_hoc_upload_process.html',
+                           my_user = session['username'],
+                           truong = session['truong'],
+                           filename = filename,
+                           ma_dot = ma_dot,
+                           name_column = default_name_column,
+                           index_column = data_column)
 
+@login_required
 @app.route("/table_dang_ky_hoc/form_add_dkh_lop_hoc/<string:ma_dot>", methods=['GET','POST'])
 def form_add_dkh_lop_hoc(ma_dot):
     if request.method == 'POST':
@@ -3085,6 +3505,186 @@ def form_add_dkh_lop_hoc(ma_dot):
                            ma_dot = ma_dot,
                            my_user = session['username'],
                            truong = session['truong'])
+
+@login_required
+@app.route("/delete_lop_hoc/<ma_dot>_<id_dang_ky>")
+def delete_lop_hoc(ma_dot,id_dang_ky):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                DELETE FROM dang_ky_mon
+                WHERE id_dang_ky = %s
+                """, (id_dang_ky, ))
+    mysql.connection.commit()
+    
+    cur.execute("""
+                DELETE FROM mon_hoc_dot_dang_ky
+                WHERE id_dang_ky = %s
+                """, (id_dang_ky, ))
+    mysql.connection.commit()
+    return redirect(url_for('table_dkh_lop_hoc', ma_dot = ma_dot))
+
+# student
+@login_required
+@app.route("/view_dang_ky_hoc", methods = ['GET','POST'])
+def view_dang_ky_hoc():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT ma_dot
+                FROM dot_dang_ky dk
+                WHERE CURRENT_TIMESTAMP() BETWEEN dk.ngay_bat_dau AND dk.ngay_ket_thuc
+                """)
+    ma_dot = cur.fetchall()
+    ma_dot = (('202001',),)
+    ma_sinh_vien = '20002077'
+    if (len(ma_dot) == 0):
+        return render_template('student/dangkyhoc/view_dang_ky_hoc.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+    ma_dot = ma_dot[0][0]
+    cur.execute("""
+                SELECT mhn.ma_mon
+                FROM mon_hoc_nganh mhn
+                WHERE mhn.ma_nganh IN (SELECT DISTINCT n.ma_nganh
+                                    FROM sinh_vien_lop svl
+                                    JOIN lop l ON l.ma_lop = svl.ma_lop
+                                    JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                                    WHERE svl.ma_sinh_vien = %s);
+                """, (ma_sinh_vien, ))
+    ma_mon = cur.fetchall()
+    ma_mon_dh = "("
+    for elm in ma_mon:
+        ma_mon_dh += "'" + elm[0] + "',"
+    ma_mon_dh = ma_mon_dh[:-1:]
+    ma_mon_dh += ")"
+    
+    cur.execute("""
+            SELECT mhdk.id_dang_ky, mh.ten_mon, mh.so_tin_chi, d.thang_4, mhdk.ma_so_lop, mhdk.so_luong, mhdk.so_luong_da_dang_ky,
+            CONCAT("T",mhdk.thu,"(",mhdk.tiet_bat_dau,"-",mhdk.tiet_ket_thuc,")",mhdk.phong_hoc)
+            FROM mon_hoc_dot_dang_ky mhdk
+            LEFT JOIN mon_hoc mh ON mhdk.ma_mon = mh.ma_mon
+            LEFT JOIN (SELECT * FROM diem d WHERE d.ma_sinh_vien = '""" + ma_sinh_vien + """' ) d ON d.ma_mon = mh.ma_mon
+            WHERE mhdk.ma_dot = '""" + ma_dot + """' AND mhdk.ma_mon IN """ + ma_mon_dh + """
+            ORDER BY mhdk.ma_so_lop ASC;
+            """)
+    column_name = ['id_dang_ky', 'ten_mon','so_tin_chi', 'thang_4', 'ma_so_lop',
+                    'so_luong', 'so_luong_da_dang_ky', 'lich_hoc']
+    cac_mon_dk = cur.fetchall()
+    data = pd.DataFrame.from_records(cac_mon_dk, columns=column_name)
+    
+    data = data.fillna(' ')
+    
+    def f(x):
+        return pd.Series(dict(lich_hoc = "%s" % ','.join(x['lich_hoc'])))
+    
+    if data.shape[0] == 0:
+        data = ()
+    else:
+        data = data.groupby(by=['id_dang_ky', 'ten_mon','so_tin_chi', 'thang_4',
+                                'ma_so_lop', 'so_luong', 'so_luong_da_dang_ky'], group_keys=False).apply(f).reset_index()
+        data = data.values.tolist()
+        
+    
+    if request.method == 'POST':
+        details = request.form
+        cac_ma_dk = details['mon_hoc_dang_ky'].strip()
+        
+        cac_ma_dk = list(set(cac_ma_dk.split(",")))
+        
+        if (len(cac_ma_dk) == 0):
+            return "Error"
+        
+        cur.execute("SELECT id_dang_ky FROM dang_ky_mon WHERE ma_sinh_vien = %s", (ma_sinh_vien, ))
+        check_exits = cur.fetchall()
+        id_tmp = []
+        for elm in check_exits:
+            id_tmp.append(elm[0])
+            
+        for elm in cac_ma_dk:
+            if elm in id_tmp:
+                cac_ma_dk.remove(elm)
+        
+        sql = "INSERT INTO dang_ky_mon(id_dang_ky, ma_sinh_vien) VALUES "
+        for elm in cac_ma_dk:
+            sql += "('" + elm + "','" + ma_sinh_vien + "'),"
+        sql = sql[:-1:]
+        cur.execute(sql)
+        mysql.connection.commit()
+        return redirect(url_for('view_dang_ky_hoc'))
+        
+    # cac mon da dang ky duoc
+    cur.execute("""
+                SELECT dkm.id_dang_ky, mh.ten_mon, mh.so_tin_chi, mhdk.ma_so_lop,
+                CONCAT("T",mhdk.thu,"(",mhdk.tiet_bat_dau,"-",mhdk.tiet_ket_thuc,")",mhdk.phong_hoc)
+                FROM dang_ky_mon dkm
+                JOIN mon_hoc_dot_dang_ky mhdk ON dkm.id_dang_ky = mhdk.id_dang_ky
+                LEFT JOIN mon_hoc mh ON mhdk.ma_mon = mh.ma_mon
+                WHERE mhdk.ma_dot = '""" + ma_dot + """' 
+                AND dkm.ma_sinh_vien = '""" + ma_sinh_vien + """' 
+                AND mhdk.ma_mon IN """ + ma_mon_dh + """
+                ORDER BY mhdk.ma_so_lop ASC;
+                """)
+    column_name = ['id_dang_ky', 'ten_mon','so_tin_chi', 'ma_so_lop', 'lich_hoc']
+    cac_mon_da_dk = cur.fetchall()
+    sub_data = pd.DataFrame.from_records(cac_mon_da_dk, columns=column_name)
+    
+    sub_data = sub_data.fillna(' ')
+    
+    def f(x):
+        return pd.Series(dict(lich_hoc = "%s" % ','.join(x['lich_hoc'])))
+    
+    if sub_data.shape[0] == 0:
+        sub_data = ()
+    else:
+        sub_data = sub_data.groupby(by=['id_dang_ky', 'ten_mon','so_tin_chi','ma_so_lop'],
+                                    group_keys=False).apply(f).reset_index()
+        sub_data = sub_data.values.tolist()
+    
+    return render_template('student/dangkyhoc/view_dang_ky_hoc.html',
+                            cac_mon = data,
+                            cac_mon_da_dk = sub_data,
+                        ma_dot = ma_dot,
+                    my_user = session['username'],
+                    truong = session['truong'])
+
+@login_required
+@app.route("/huy_dang_ky_mon/<string:id_dang_ky>")
+def huy_dang_ky_mon(id_dang_ky):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT ma_dot
+                FROM dot_dang_ky dk
+                WHERE CURRENT_TIMESTAMP() BETWEEN dk.ngay_bat_dau AND dk.ngay_ket_thuc
+                """)
+    ma_dot = cur.fetchall()
+    ma_dot = (('202001',),)
+    ma_sinh_vien = '20002077'
+    if (len(ma_dot) == 0):
+        return render_template('student/dangkyhoc/view_dang_ky_hoc.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+    ma_dot = ma_dot[0][0]
+    
+    cur.execute("""
+                SELECT DISTINCT mhdk.id_dang_ky
+                FROM mon_hoc_dot_dang_ky mhdk
+                JOIN dang_ky_mon dkm ON dkm.id_dang_ky = mhdk.id_dang_ky
+                WHERE mhdk.ma_dot = %s AND mhdk.id_dang_ky = %s AND ma_sinh_vien = %s
+                """, (ma_dot, id_dang_ky, ma_sinh_vien))
+    id_tmp = cur.fetchall()
+    if (len(id_tmp) == 0):
+        return "Error"
+    
+    cur.execute("""
+                DELETE FROM dang_ky_mon
+                WHERE ma_sinh_vien = %s AND id_dang_ky = %s
+                """, (ma_sinh_vien, id_dang_ky))
+    mysql.connection.commit()
+    return redirect(url_for('view_dang_ky_hoc'))
 
 # -------------------------- Dang Ky Hoc -------------------------
 def take_image_to_save(id_image, path_to_img):

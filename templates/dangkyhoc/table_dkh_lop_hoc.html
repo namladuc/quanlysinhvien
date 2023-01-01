@@ -93,10 +93,7 @@
  <script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
  <script type="text/javascript">$('#sampleTable').DataTable();</script>
  <script>
-   function deleteRow(r) {
-     var i = r.parentNode.parentNode.rowIndex;
-     // document.getElementById("myTable").deleteRow(i); -->
-     var maNV = r.parentNode.parentNode.childNodes[3].textContent
+   function deleteRow(id) {
      swal({
        title: "Cảnh báo",
        text: "Bạn có chắc chắn là muốn xóa lớp này?", // index = 3
@@ -106,7 +103,7 @@
         
          if (willDelete) {
            $.ajax({
-             url:"/delete_sinh_vien/" + maNV,
+             url:"/delete_lop_hoc/{{ma_dot}}_" + id,
              context: document.body
            })
            swal("Đã xóa thành công.!", {
@@ -123,7 +120,7 @@
      $('#sampleTable tbody :checkbox').each(function () {
          let i = this.parentNode.parentNode.rowIndex;
          if (this.checked) {
-           id_nv.push(this.parentNode.parentNode.childNodes[3].textContent);
+           id_nv.push(this.name);
          }
      });
 
@@ -136,7 +133,7 @@
          if (willDelete) {
            for (let i = 0; i < id_nv.length; i++) {
              $.ajax({
-               url:"/delete_sinh_vien/" + id_nv[i],
+               url:"/delete_lop_hoc/{{ma_dot}}_" + id_nv[i],
                context: document.body
              })
            }
