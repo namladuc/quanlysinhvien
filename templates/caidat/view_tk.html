@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %} Tài khoản {% endblock title %}
+{% block content %}
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item"><a href="/cai_dat"><b>Cài đặt</b></a></li>
+            <li class="breadcrumb-item active"><a href="">Tài khoản</li></a>
+        </ul>
+        <div id="clock"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <h3 class="tile-title">Danh sách tài khoản</h3>
+                <div class="tile-body">
+                    <div class="row element-button">
+
+                        <div class="col-sm-2">
+                          <a class="btn btn-add btn-sm" href="/cai_dat/form_add_tk" title="Thêm"><i class="fas fa-plus"></i>
+                            Tạo tài khoản mới</a>
+                        </div>
+                        <div class="col-sm-2">
+                            <a class="btn btn-delete btn-sm nhap-tu-file" href="/cai_dat/form_add_tk_upload_file"
+                                type="button" title="Tải từ file"><i class="fas fa-file-upload"></i>Tải từ file</a>
+                        </div>
+                    </div>
+                    <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0"
+                        border="0" id="sampleTable">
+                        <thead>
+                            <tr>
+                                <th width="20">ID Tài khoản</th>
+                                <th>Tài khoản</th>
+                                <th>Tên người dùng</th>
+                                <th>Loại tài khoản</th>
+                                <th>Mã người dùng</th>
+                                <th>Lần đăng nhập cuối</th>
+                                <th>Đăng ký</th>
+                                <th width="100">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>duongnam</td>
+                                <td>Dương Nam</td>
+                                <td>Sinh viên</td>
+                                <td>20002076</td>
+                                <td>CN</td>
+                                <td>2/2/2020</td>
+                                <td class="table-td-center">
+                                    <button class="btn btn-primary btn-sm trash"
+                                        type="button" title="Xóa" onclick=""><i
+                                            class="fas fa-trash-alt"></i>
+                                    </button>
+                                    <button class="btn btn-primary btn-sm edit" type="button" title="Sửa"
+                                        id="show-emp">
+                                        <a href="/cai_dat/form_chinh_sua_mk"><i class="fas fa-pencil-square-o"
+                                                aria-hidden="true"></i></a>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Essential javascripts for application to work-->
+<script src="{{url_for('static', filename='doc/js/jquery-3.2.1.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/popper.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/bootstrap.min.js')}}"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="{{url_for('static', filename='doc/js/main.js')}}"></script>
+<!-- The javascript plugin to display page loading on top-->
+<script src="{{url_for('static', filename='doc/js/plugins/pace.min.js')}}"></script>
+<!-- Page specific javascripts-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+<!-- Data table plugin-->
+<!-- <script type="text/javascript" src="js/plugins/jquery.dataTables.min.js"></script> -->
+<script src="{{url_for('static', filename='doc/js/plugins/jquery.dataTables.min.js')}}"></script>
+<!-- <script type="text/javascript" src="js/plugins/dataTables.bootstrap.min.js"></script> -->
+<script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
+<script type="text/javascript">$('#sampleTable').DataTable();</script>
+<script>
+    function deleteTK(id) {
+        swal({
+            title: "Cảnh báo",
+            text: "Bạn có chắc chắn là muốn xóa tài khoản này?", // index = 3
+            buttons: ["Hủy bỏ", "Đồng ý"],
+        })
+            .then((willDelete) => {
+
+                if (willDelete) {
+                    $.ajax({
+                        url: "/delete_account/" + id,
+                        context: document.body
+                    })
+                    swal("Đã xóa thành công.!", {
+
+                    });
+                    location.reload();
+                }
+            });
+    }
+</script>
+{% endblock  %}

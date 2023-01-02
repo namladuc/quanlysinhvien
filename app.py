@@ -3524,6 +3524,163 @@ def delete_lop_hoc(ma_dot,id_dang_ky):
     mysql.connection.commit()
     return redirect(url_for('table_dkh_lop_hoc', ma_dot = ma_dot))
 
+@login_required
+@app.route("/delete_dot_dang_ky/<string:ma_dot>")
+def delete_dot_dang_ky(ma_dot):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT DISTINCT mhdk.id_dang_ky
+                FROM mon_hoc_dot_dang_ky mhdk
+                WHERE mhdk.ma_dot = %s
+                """, (ma_dot, ))
+    cac_id_dk = cur.fetchall()
+    
+    cac_id = "("
+    for elm in cac_id_dk:
+        cac_id += "\"" + elm[0] + "\","
+    cac_id = cac_id[:-1:]
+    cac_id += ")"
+
+    if (len(cac_id_dk) != 0):
+        cur.execute("""
+                    DELETE FROM dang_ky_mon
+                    WHERE id_dang_ky IN """ + cac_id)
+        mysql.connection.commit()
+        
+        cur.execute("""
+                    DELETE FROM mon_hoc_dot_dang_ky
+                    WHERE id_dang_ky IN """ + cac_id)
+        mysql.connection.commit()
+    
+    cur.execute("""
+                DROP EVENT IF EXISTS dk_hoc_start_""" + ma_dot + """
+                """)
+    mysql.connection.commit()
+    
+    cur.execute("""
+                DROP EVENT IF EXISTS dk_hoc_end_""" + ma_dot + """
+                """)
+    mysql.connection.commit()
+    
+    #ks_hoc_start_
+    cur.execute("""
+                DROP EVENT IF EXISTS ks_hoc_start_""" + ma_dot + """
+                """)
+    mysql.connection.commit()
+    
+    cur.execute("""
+                DROP EVENT IF EXISTS ks_hoc_end_""" + ma_dot + """
+                """)
+    mysql.connection.commit()
+    
+    cur.execute("""
+                DELETE FROM dot_yeu_cau_dang_ky
+                WHERE ma_dot_dang_ky = %s
+                """, (ma_dot, ))
+    mysql.connection.commit()
+    
+    cur.execute("""
+                DELETE FROM dot_dang_ky
+                WHERE ma_dot = %s
+                """, (ma_dot, ))
+    mysql.connection.commit()
+    return redirect(url_for('table_dang_ky_hoc'))
+    
+@login_required
+@app.route("/table_khao_sat", methods = ['GET','POST'])
+def table_khao_sat():
+    cur = mysql.connection.cursor()
+    cur.execute("""
+                SELECT dks.ma_dot_yeu_cau, ddk.ma_hoc_ky, hk.ten_hoc_ky, ddk.ma_dot
+                FROM dot_dang_ky ddk
+                JOIN hoc_ky hk ON ddk.ma_hoc_ky = hk.ma_hoc_ky
+                JOIN dot_yeu_cau_dang_ky dks ON dks.ma_dot_dang_ky = ddk.ma_dot
+                ORDER BY ddk.ngay_bat_dau DESC
+                """)
+    cac_ks = cur.fetchall()
+    
+    if (len(cac_ks) != 0):
+        ma_ks = str(cac_ks[0][0]) + " _ " + str(cac_ks[0][1]) + " _ " + str(cac_ks[0][2]) + " _ " + str(cac_ks[0][3])
+        ma_dot_dang_ky = str(cac_ks[0][3])
+    else:
+        ma_ks = ''
+        ma_dot_dang_ky = ''
+        
+    if request.method == 'POST':
+        details = request.form
+        ma_ks = details['ma_dot_khao_sat'].strip()
+        ma_dot_dang_ky = details['ma_dot_khao_sat'].split("_")[-1].strip()
+    
+    cur.execute("""
+                SELECT mhdk.id_dang_ky, mh.ten_mon, mh.so_tin_chi, mhdk.ma_so_lop, mhdk.so_luong, mhdk.so_luong_da_dang_ky, 
+                CONCAT("T",mhdk.thu,"(",mhdk.tiet_bat_dau,"-",mhdk.tiet_ket_thuc,")",mhdk.phong_hoc)
+                FROM mon_hoc_dot_dang_ky mhdk
+                JOIN mon_hoc mh ON mh.ma_mon = mhdk.ma_mon
+                WHERE mhdk.ma_dot = %s
+                """, (ma_dot_dang_ky, ))
+    cac_lop = cur.fetchall()
+    column_name = ['id_dang_ky', 'ten_mon','so_tin_chi', 'ma_so_lop',
+                    'so_luong', 'so_luong_da_dang_ky', 'lich_hoc']
+    data = pd.DataFrame.from_records(cac_lop, columns=column_name)
+    
+    data = data.fillna(' ')
+    
+    def f(x):
+        return pd.Series(dict(lich_hoc = "%s" % ','.join(x['lich_hoc'])))
+    
+    if data.shape[0] == 0:
+        data = ()
+    else:
+        data = data.groupby(by=['id_dang_ky', 'ten_mon','so_tin_chi', 'ma_so_lop',
+                    'so_luong', 'so_luong_da_dang_ky'], group_keys=False).apply(f).reset_index()
+        data = data.values.tolist()
+    
+    return render_template(session['role'] + 'khaosat/table_khao_sat.html',
+                           ma_dot_dang_ky = ma_dot_dang_ky,
+                           ma_dot = ma_ks,
+                           cac_lop = data,
+                           cac_ks = cac_ks,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/table_khao_sat/table_khao_sat_sv/<string:id_dang_ky>")
+def table_khao_sat_sv(id_dang_ky):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT mhdk.ma_dot, hk.ten_hoc_ky, mh.ten_mon, mhdk.ma_so_lop
+                FROM mon_hoc_dot_dang_ky mhdk
+                JOIN mon_hoc mh ON mhdk.ma_mon = mh.ma_mon
+                JOIN dot_dang_ky ddk ON ddk.ma_dot = mhdk.ma_dot
+                JOIN hoc_ky hk ON hk.ma_hoc_ky = ddk.ma_hoc_ky
+                WHERE mhdk.id_dang_ky = %s
+                GROUP BY mhdk.id_dang_ky
+                """, (id_dang_ky, ))
+    thong_tin = cur.fetchall()
+    if (len(thong_tin) == 0):
+        return "Error"
+    thong_tin = thong_tin[0]
+
+    cur.execute("""
+                SELECT dkm.ma_sinh_vien, sv.ho_ten, l.ten_lop, n.ten_nganh
+                FROM dang_ky_mon dkm
+                JOIN sinh_vien sv ON sv.ma_sinh_vien = dkm.ma_sinh_vien
+                JOIN sinh_vien_lop svl ON dkm.ma_sinh_vien = svl.ma_sinh_vien
+                JOIN lop l ON svl.ma_lop = l.ma_lop
+                JOIN nganh n ON l.ma_nganh = n.ma_nganh
+                WHERE dkm.id_dang_ky = %s
+                """, (id_dang_ky, ))
+    cac_sv = cur.fetchall()
+    
+    return render_template(session['role'] + 'khaosat/table_khao_sat_sv.html',
+                           id_dang_ky = id_dang_ky,
+                           thong_tin = thong_tin,
+                           cac_sv = cac_sv,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
 # student
 @login_required
 @app.route("/view_dang_ky_hoc", methods = ['GET','POST'])
@@ -3685,6 +3842,18 @@ def huy_dang_ky_mon(id_dang_ky):
                 """, (ma_sinh_vien, id_dang_ky))
     mysql.connection.commit()
     return redirect(url_for('view_dang_ky_hoc'))
+
+# -------------------------- Dang Ky Hoc -------------------------
+
+
+# -------------------------- Dang Ky Hoc -------------------------
+
+@login_required
+@app.route("/cai_dat")
+def cai_dat():
+    return render_template(session['role'] + "caidat/cai_dat.html",
+                           my_user = session['username'],
+                           truong = session['truong'])
 
 # -------------------------- Dang Ky Hoc -------------------------
 def take_image_to_save(id_image, path_to_img):

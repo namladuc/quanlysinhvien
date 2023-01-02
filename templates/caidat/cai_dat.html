@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %} Cài đặt {% endblock title %}
+{% block content %}
+ <!-- Cài đặt -->
+ <link rel="stylesheet" href="{{ url_for('static', filename='doc/css/khoa.css') }}">
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb">
+            <li class="breadcrumb-item active"><b>Cài đặt</b></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+
+            <div class="tile">
+
+                <h3 class="tile-title">Cài đặt</h3>
+                <div class="tile-body">
+                    <div class="dash-cards">
+                        <a href="/cai_dat/form_chinh_sua_mk_one">
+                            <div class="card-single" style="background-color: #808000;">
+                                <div class="card-body">
+                                    <!-- <span> <a class="bx bxs-user-account" href="form_view_tk"></a></span> -->
+                                    <span class="bx bxs-user-rectangle"></span>
+                                    <div>
+                                        <h5>Tài khoản của tôi</h5>
+                                        <h6>Đổi mật khẩu</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="/cai_dat/view_tk">
+                            <div class="card-single" style="background-color: #228B22;">
+                                <div class="card-body">
+                                    <!-- <span> <a class="bx bxs-user-account" href="form_view_tk"></a></span> -->
+                                    <span class="bx bxs-user-account"></span>
+                                    <div>
+                                        <h5>Tổng số tài khoản</h5>
+                                        <h6>8</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="/cai_dat/form_view_truong">
+                            <div class="card-single">
+                                <div class="card-body">
+                                    <span class='bx bxs-buildings'></span>
+                                    <div>
+                                        <h5>Thông tin trường học</h5>
+                                        <h6>Ấn để xem chi tiết</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock  %}

@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %} Đăng ký học {% endblock title %}
+{% block title %} Các đợt khảo sát {% endblock title %}
 {% block content %}
 <main class="app-content">
   <div class="app-title">
     <ul class="app-breadcrumb breadcrumb side">
-      <li class="breadcrumb-item active"><a href="#"><b>Đăng ký học</b></a></li>
+      <li class="breadcrumb-item active"><a href="#"><b>Các đợt khảo sát</b></a></li>
     </ul>
     <div id="clock"></div>
   </div>
@@ -13,45 +13,12 @@
     <div class="col-md-12">
       <div class="tile">
         <div class="tile-body">
-
-          <div class="row element-button">
-
-            <div class="col-sm-2">
-              <a class="btn btn-add btn-sm" href="/table_dang_ky_hoc/form_add_dot_dk" title="Thêm đợt đăng ký mới"><i
-                  class="fas fa-plus"></i>
-                Thêm</a>
-            </div>
-
-            <div class="col-sm-2">
-              <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printTable()"><i
-                  class="fas fa-print"></i> In thông tin</a>
-            </div>
-            <div class="col-sm-2">
-              <a class="btn btn-excel btn-sm" href="/get_table_dang_ky_hoc_excel/{{ma_dot_dang_ky}}" title="Xuất Excel"><i class="fas fa-file-excel"></i> Xuất
-                Excel</a>
-            </div>
-
-            <div class="col-sm-2">
-              <a class="btn btn-delete btn-sm pdf-file" type="button" title="Xuất PDF" href="/get_table_dang_ky_hoc_pdf/{{ma_dot_dang_ky}}"><i
-                  class="fas fa-file-pdf"></i>Xuất PDF</a>
-            </div>
-
-            <div class="col-sm-2">
-            </div>
-            <div class="col-sm-2">
-              <a class="btn btn-add btn-sm" href="/table_dang_ky_hoc/table_dkh_lop_hoc/{{ma_dot_dang_ky}}" title="Tùy chỉnh"><i
-                  class="fas fa-pen"></i>
-                Tùy chỉnh</a>
-            </div>
-
-          </div>
-          <form class="row" method="post" action="/table_dang_ky_hoc" enctype="multipart/form-data">
+          <form class="row" method="post" action="/table_khao_sat" enctype="multipart/form-data">
             <div class="col-md-5">
               <div class="form-group">
-                <select class="form-control" id="department" name="ma_dot_dang_ky">
-                  <option style="text-align: center; color: green; font-style: italic;"> {{ma_dot}} </option>
-                  {% for elm in cac_ddk %}
-                  <option style="text-align: center;"> {{elm[0]}} _ {{elm[1]}} _ {{elm[2]}} </option>
+                <select class="form-control" id="department" name="ma_dot_khao_sat">
+                  {% for elm in cac_ks%}
+                  <option style="text-align: center;"> {{elm[0]}} _ {{elm[1]}} _ {{elm[2]}} _ {{elm[3]}} </option>
                   {% endfor %}
                 </select>
               </div>
@@ -94,7 +61,7 @@
                 <td>{{data[6]}}</td>
                 <td class="table-td-center">
                   <button class="btn btn-primary btn-sm edit" type="button" title="Xem" id="show-emp">
-                    <a href="/table_dang_ky_hoc/table_dkh_sv/{{data[0]}}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                    <a href="/table_khao_sat/table_khao_sat_sv/{{data[0]}}"><i class="fa fa-eye" aria-hidden="true"></i></a>
                   </button>
                 </td>
               </tr>
@@ -183,13 +150,5 @@
     e.stopImmediatePropagation();
   });
 
-  //In dữ liệu
-  var myApp = new function () {
-    this.printTable = function () {
-      var win = window.open('/get_print_dang_ky_hoc/{{ma_dot_dang_ky}}', '', 'height=700,width=1400');
-      win.document.close();
-      win.print();
-    }
-  }
 </script>
 {% endblock content %}

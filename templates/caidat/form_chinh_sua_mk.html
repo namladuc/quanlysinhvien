@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %} Đổi mật khẩu {% endblock title %}
+{% block content %}
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb">
+            <li class="breadcrumb-item"><a href="/cai_dat"><b>Cài đặt</b></a></li>
+            <li class="breadcrumb-item"><a href="/cai_dat/view_tk">Tài khoản</a></li>
+            <li class="breadcrumb-item active"><a href="">Đổi mật khẩu cho tài khoản</a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+
+            <div class="tile">
+                <div class="tile-body">
+                    <form class="row" method="post" action="/form_chinh_sua_mk/{{id}}" enctype="multipart/form-data">
+
+                        {% if my_err %}
+                        <div class="form-group col-md-12">
+                            <div class="alert alert-danger" style="text-align: left; font-size: 12px; background-color: red;">
+                            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                            <strong>{{my_err}}</strong> 
+                            </div>
+                        </div>
+                      {% endif %}
+
+                        <div class="form-group col-md-12">
+                            <label class="control-label">Mật khẩu mới</label>
+                            <input class="form-control" type="password" name="password" required>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="control-label">Nhập lại mật khẩu</label>
+                            <input class="form-control" type="password" name="password_repeat" required>
+                        </div>
+                        <div id="toast">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <input class="btn btn-save" type="submit" onclick="showSuccessToast();"
+                                value="Lưu lại" />
+                            <a class="btn btn-cancel" href="/cai_dat/view_tk">Hủy bỏ</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock  %}

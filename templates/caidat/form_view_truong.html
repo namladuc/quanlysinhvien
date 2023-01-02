@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block title %} Cài đặt {% endblock title %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='doc/css/addupdate.css') }}">
+<main class="app-content">
+    <div class="app-title">
+      <ul class="app-breadcrumb breadcrumb side">
+        <li class="breadcrumb-item"><a href="/cai_dat"><b>Cài đặt</b></a></li>
+        <li class="breadcrumb-item active"><a href="">Thông tin trường học</li> </a>
+      </ul>
+      <div id="clock"></div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="tile">
+          <div class="tile-body">
+            <form class="row" action="" method="post" enctype="multipart/form-data">
+              <!-- btn -->
+              <div class="col-md-12">
+                {% if mode != "" %}
+                <a class="btn btn-info" href="/form_view_truong/E" style="width: 100px; border-radius: 10px;">Sửa</a>
+                {% endif %}
+
+                {% if mode == "" %}
+                <input type="submit" name="submit" id="reset" value="Lưu" class="btn btn-save"
+                  style="width: 100px; border-radius: 10px;">
+
+                <a class="btn btn-danger" href="/cai_dat" style="width: 100px; border-radius: 10px;">Hủy</a>
+                {% endif %}
+
+                <a href="/cai_dat" class="btn btn-secondary"
+                  style="width: 100px; border-radius: 10px;">Quay lại</a>
+              </div>
+
+              <div class="col-md-8">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label class="control-label">Tên trường học</label>
+                      <input type="text" class="form-control" value="" name="TenTH" required {{mode}}>
+                      <span id="available"></span>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="control-label">Ngày thành lập</label>
+                      <input type="date" class="form-control" value="" name="NgayThanhLap" required {{mode}}>
+                      <span id="available"></span>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="control-label">Số điện thoại</label>
+                      <input type="text" class="form-control" value="" name="SDT" required {{mode}}>
+                      <span id="available"></span>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label class="control-label">Địa chỉ</label>
+                      <textarea class="form-control" id="address" name="DIACHI" rows="2" {{mode}}></textarea>
+                      <span id="available"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- image -->
+              <div class="col-md-4">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div style="text-align: center;">
+                      <img id="img-upload">
+                      <div id="tem_img">
+                        <img id="id_img_profile_1" 
+                        src="" 
+                        alt="Ảnh" width="170px" height="170px">
+                        <a class="removeimg" href="javascript:"></a>
+                      </div><br>
+                      <div class="col-md-8"></div>
+                      <div class="col-md-4">
+                        <div class="input-group">
+                          <span class="input-group-btn" style="margin-left: 130px;">
+                            <span id="Choicefile" class="btn btn-info btn-file">
+                              Logo trường <input type="file" id="imginp" name="ImageProfileUpload" onchange="readCTURL(this)"
+                                {{mode}}>
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Essential javascripts for application to work-->
+  <script src="{{url_for('static', filename='doc/js/jquery-3.2.1.min.js')}}"></script>
+  <script src="{{url_for('static', filename='doc/js/popper.min.js')}}"></script>
+  <script src="{{url_for('static', filename='doc/js/bootstrap.min.js')}}"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="{{url_for('static', filename='doc/js/main.js')}}"></script>
+  <!-- The javascript plugin to display page loading on top-->
+  <script src="{{url_for('static', filename='doc/js/plugins/pace.min.js')}}"></script>
+  <!-- Page specific javascripts-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+  <!-- Data table plugin-->
+  <!-- <script type="text/javascript" src="js/plugins/jquery.dataTables.min.js"></script> -->
+  <script src="{{url_for('static', filename='doc/js/plugins/jquery.dataTables.min.js')}}"></script>
+  <!-- <script type="text/javascript" src="js/plugins/dataTables.bootstrap.min.js"></script> -->
+  <script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
+  <script type="text/javascript">$('#sampleTable').DataTable();</script>
+  <script>
+    var img_default = "}";
+    function readCTURL(input, thumbimage) {
+       
+      if (input.files && input.files[0]) { //Sử dụng  cho Firefox - chrome
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          $("#id_img_profile_1").attr('src', e.target.result);
+        }
+        reader.readAsDataURL(input.files[0]);
+      }
+      else { // Sử dụng cho IE
+        $("#id_img_profile_1").attr('src', input.value);
+
+      }
+      $("#id_img_profile_1").show();
+      $('.filename').text($("#imginp").val());
+      $('.Choicefile').css('background', '#14142B');
+      $('.Choicefile').css('cursor', 'default');
+      $(".removeimg").show();
+      $(".Choicefile").unbind('click');
+
+    }
+    $(document).ready(function () {
+        
+      $(".Choicefile").bind('click', function () {
+        $("#imginp").click();
+
+      });
+      $(".removeimg").click(function () {
+        $("#id_img_profile_1").attr('src', img_default);
+        $(".removeimg").hide();
+        $(".Choicefile").bind('click', function () {
+          $("#imginp").click();
+        });
+        $('.Choicefile').css('background', '#14142B');
+        $('.Choicefile').css('cursor', 'pointer');
+        $(".filename").text("");
+      });
+    })
+  </script>
+{% endblock  %}

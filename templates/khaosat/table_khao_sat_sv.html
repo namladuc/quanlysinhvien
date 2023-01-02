@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %} Danh sách môn học đợt : {{tt_dot[0]}}_{{tt_dot[1]}}_{{tt_dot[2]}}{% endblock title %}
+{% block title %} Danh sách sinh viên yêu cầu môn học {% endblock title %}
 {% block content %}
 <main class="app-content">
     <div class="app-title">
         <ul class="app-breadcrumb breadcrumb side">
             <li class="breadcrumb-item active"><a href="/table_dang_ky_hoc"><b>Đăng ký học</b></a></li>
-            <li class="breadcrumb-item active"><a href=""><b>Danh sách lớp học đợt : {{tt_dot[0]}}_{{tt_dot[1]}}_{{tt_dot[2]}}</b></a></li>
+            <li class="breadcrumb-item active"><a href="#"><b>Danh sách sinh viên yêu cầu môn học</b></a></li>
         </ul>
         <div id="clock"></div>
     </div>
@@ -16,53 +16,32 @@
                 <div class="tile-body">
 
                     <div class="row element-button">
-
-                        <div class="col-sm-2">
-                            <a class="btn btn-add btn-sm" href="/table_dang_ky_hoc/form_add_dkh_lop_hoc/{{ma_dot}}" title="Thêm lớp học mới"><i
-                                    class="fas fa-plus"></i>
-                                Thêm lớp học</a>
-                        </div>
-
-                        <div class="col-sm-2">
-                            <a class="btn btn-delete btn-sm nhap-tu-file" href="/table_dang_ky_hoc/form_add_dkh_lop_hoc_upload_file/{{ma_dot}}"
-                                type="button" title="Tải từ file"><i class="fas fa-file-upload"></i>Tải từ file</a>
-                        </div>
-
                         <div class="col-sm-2">
                             <a class="btn btn-delete btn-sm" type="button" title="Xóa tất cả các phần tử đã chọn"
-                                onclick="deleteMoreRow(this)"><i class="fas fa-trash-alt"></i> Xóa phần tử đã chọn </a>
-                        </div>
-
-                        <div class="col-sm-2">
-                          <a class="btn btn-delete btn-sm" type="button" title="Xóa"
-                              onclick="deleteDot()"><i class="fas fa-trash-alt"></i> Xóa đợt đăng ký này </a>
-                      </div>
-
+                              onclick="deleteMoreRow(this)"><i class="fas fa-trash-alt"></i> Xóa phần tử đã chọn </a>
+                          </div>
                     </div>
+                    <p> {{thong_tin[0]}} | {{thong_tin[1]}} | {{thong_tin[2]}} | {{thong_tin[3]}}</p>
                     <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0"
                         border="0" id="sampleTable">
                         <thead>
                             <tr>
                                 <th width="10"><input type="checkbox" id="all"></th>
-                                <th width="300">Môn học</th>
-                                <th width="50">Số TC</th>
-                                <th width="150">Mã lớp</th>
-                                <th width="100">Tổng sinh viên</th>
-                                <th width="100"> Đã đăng ký</th>
-                                <th width="200">Lịch học</th>
+                                <th>Mã sinh viên</th>
+                                <th >Họ và tên</th>
+                                <th>Lớp</th>
+                                <th>Ngành</th>
                                 <th width="50">Tính năng</th>
                             </tr>
                         </thead>
                         <tbody>
-                          {% for data in cac_mon_dk %}
+                          {% for data in cac_sv %}
                             <tr>
-                                <td width="10"><input type="checkbox" id="myChecker" name="{{data[0]}}" value="{{data[0]}}"></td>
-                               <td>{{data[1]}}</td>
-                               <td>{{data[2]}}</td>
-                               <td>{{data[3]}}</td>
-                               <td>{{data[4]}}</td>
-                               <td>{{data[5]}}</td>
-                               <td>{{data[6]}}</td>
+                                <td width="10"><input type="checkbox" id="myChecker" name="check1" value="1"></td>
+                                <td>{{data[0]}}</td>
+                                <td>{{data[1]}}</td>
+                                <td>{{data[2]}}</td>
+                                <td>{{data[3]}}</td>
                                 <td class="table-td-center"><button class="btn btn-primary btn-sm trash" type="button"
                                         title="Xóa" onclick="deleteRow('{{data[0]}}')"><i class="fas fa-trash-alt"></i>
                                     </button>
@@ -96,14 +75,14 @@
    function deleteRow(id) {
      swal({
        title: "Cảnh báo",
-       text: "Bạn có chắc chắn là muốn xóa lớp này?", // index = 3
+       text: "Bạn có chắc chắn là muốn xóa sinh viên này?", // index = 3
        buttons: ["Hủy bỏ", "Đồng ý"],
      })
        .then((willDelete) => {
         
          if (willDelete) {
            $.ajax({
-             url:"/delete_lop_hoc/{{ma_dot}}_" + id,
+             url:"/huy_dang_ky_sv/{{id_dang_ky}}_" + id,
              context: document.body
            })
            swal("Đã xóa thành công.!", {
@@ -114,47 +93,26 @@
        });
    }
 
-   function deleteDot() {
-    swal({
-      title: "Cảnh báo",
-      text: "Bạn có chắc chắn là muốn xóa đợt đăng ký này?", // index = 3
-      buttons: ["Hủy bỏ", "Đồng ý"],
-    })
-      .then((willDelete) => {
-       
-        if (willDelete) {
-          $.ajax({
-            url:"/delete_dot_dang_ky/{{ma_dot}}",
-            context: document.body
-          })
-          swal("Đã xóa thành công.!", {
-            
-          });
-          window.location.href = "/table_dang_ky_hoc";
-        }
-      });
-  }
-
    function deleteMoreRow(r) {
      var numRow = document.getElementById("sampleTable").rows.length;
      var id_nv = [];
      $('#sampleTable tbody :checkbox').each(function () {
          let i = this.parentNode.parentNode.rowIndex;
          if (this.checked) {
-           id_nv.push(this.name);
+           id_nv.push(this.parentNode.parentNode.childNodes[3].textContent);
          }
      });
 
      swal({
        title: "Cảnh báo",
-       text: "Bạn có chắc chắn là muốn xóa những lớp này?", // index = 3
+       text: "Bạn có chắc chắn là muốn xóa các sinh viên này?", // index = 3
        buttons: ["Hủy bỏ", "Đồng ý"],
      })
        .then((willDelete) => {
          if (willDelete) {
            for (let i = 0; i < id_nv.length; i++) {
              $.ajax({
-               url:"/delete_lop_hoc/{{ma_dot}}_" + id_nv[i],
+               url:"/huy_dang_ky_sv/{{id_dang_ky}}_" + id_nv[i],
                context: document.body
              })
            }
@@ -173,7 +131,7 @@
    //In dữ liệu
    var myApp = new function () {
      this.printTable = function () {
-       var win = window.open('/get_print_data_employees', '', 'height=700,width=1400');
+       var win = window.open('/get_print_table_dkh_sv/{{id_dang_ky}}', '', 'height=700,width=1400');
        win.document.close();
        win.print();
      }
