@@ -132,6 +132,19 @@ def login():
             mysql.connection.cursor().execute("SET GLOBAL event_scheduler = ON;")
             mysql.connection.commit()
         
+        if (session['role_id'] == 2):
+            lst = list(my_user)
+            cur.execute("""
+                        SELECT ma_lop 
+                        FROM lop
+                        WHERE ma_nguoi_quan_ly = %s AND is_delete = 0
+                        LIMIT 1
+                        """, (my_user[1], ))
+            ma_lop = cur.fetchall()
+            if (len(ma_lop) != 0):
+                lst.append(ma_lop[0][0])
+                session['username'] = lst
+        
         cur.close()
         return redirect(url_for("home"))
     return render_template('general/login.html',
@@ -160,6 +173,9 @@ def forgot():
 @login_required
 @app.route("/view_all_khoa")
 def view_all_khoa():
+    if session['role_id'] != 1:
+        return "Error"
+    
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -179,6 +195,9 @@ def view_all_khoa():
 @login_required
 @app.route("/view_all_khoa/view_khoa/<string:ma_khoa>")
 def view_khoa(ma_khoa):
+    if session['role_id'] != 1:
+        return "Error"
+    
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -212,6 +231,9 @@ def view_khoa(ma_khoa):
 @login_required
 @app.route("/view_all_khoa/form_add_khoa", methods=['GET','POST'])
 def form_add_khoa():
+    if session['role_id'] != 1:
+        return "Error"
+    
     if request.method == 'POST':
         details = request.form
         ma_khoa= details['ma_khoa']
@@ -242,6 +264,9 @@ def form_add_khoa():
 @login_required
 @app.route("/view_all_khoa/form_update_khoa/<string:ma_khoa>", methods=['GET','POST'])
 def form_update_khoa(ma_khoa):
+    if session['role_id'] != 1:
+        return "Error"
+    
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -276,6 +301,9 @@ def form_update_khoa(ma_khoa):
 @login_required
 @app.route("/delete_khoa/<string:ma_khoa>")
 def delete_khoa(ma_khoa):
+    if session['role_id'] != 1:
+        return "Error"
+    
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -304,6 +332,8 @@ def delete_khoa(ma_khoa):
 
 @app.route("/table_nganh")
 def table_nganh():
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -375,6 +405,8 @@ def get_table_nganh_pdf():
 @login_required
 @app.route("/table_nganh/form_add_nganh_upload_file", methods=['GET','POST'])
 def form_add_nganh_upload_file():
+    if session['role_id'] != 1:
+        return "Error"
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
         if data_file.filename != '':
@@ -392,6 +424,8 @@ def form_add_nganh_upload_file():
 @login_required
 @app.route("/table_nganh/form_add_nganh_upload_process/<string:filename>", methods=['GET','POST'])
 def form_add_nganh_upload_process(filename):
+    if session['role_id'] != 1:
+        return "Error"
     pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
     
     default_tag_column = ['ma_nganh','ten_nganh','hinh_thuc_dao_tao','ma_khoa','ma_he']
@@ -486,6 +520,8 @@ def form_add_nganh_upload_process(filename):
 @login_required
 @app.route("/table_nganh/view_nganh_lop/<string:ma_nganh>")
 def view_nganh_lop(ma_nganh):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("SELECT ma_nganh, ten_nganh FROM nganh WHERE ma_nganh = %s", (ma_nganh, ))
@@ -513,6 +549,8 @@ def view_nganh_lop(ma_nganh):
 @login_required
 @app.route("/table_nganh/form_add_nganh", methods=['GET','POST'])
 def form_add_nganh():
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("SELECT * FROM khoa")
@@ -558,6 +596,8 @@ def form_add_nganh():
 @login_required
 @app.route("/table_nganh/form_update_nganh/<string:ma_nganh>", methods = ['GET','POST'])
 def form_update_nganh(ma_nganh):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -600,6 +640,8 @@ def form_update_nganh(ma_nganh):
 @login_required
 @app.route("/table_nganh/view_nganh_he")
 def view_nganh_he():
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("SELECT * FROM loai_he")
@@ -612,6 +654,8 @@ def view_nganh_he():
 
 @app.route("/table_nganh/form_add_he", methods=['GET','POST'])
 def form_add_he():
+    if session['role_id'] != 1:
+        return "Error"
     if request.method == 'POST':
         details = request.form
         ma_he = details['ma_he'].strip()
@@ -639,6 +683,8 @@ def form_add_he():
 
 @app.route("/table_nganh/form_update_he/<string:ma_he>", methods=['GET','POST'])
 def form_update_he(ma_he):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("SELECT * FROM loai_he WHERE ma_he = %s", (ma_he, ))
@@ -670,6 +716,8 @@ def form_update_he(ma_he):
 @login_required
 @app.route("/delete_he/<string:ma_he>")
 def delete_he(ma_he):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("SELECT COUNT(*) FROM nganh WHERE ma_he = %s", (ma_he, ))
@@ -683,6 +731,8 @@ def delete_he(ma_he):
 @login_required
 @app.route("/delete_nganh/<string:ma_nganh>")
 def delete_nganh(ma_nganh):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -701,6 +751,8 @@ def delete_nganh(ma_nganh):
 @login_required
 @app.route("/table_lop")
 def table_lop():
+    if session['role_id'] == 3:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -721,6 +773,8 @@ def table_lop():
 @login_required
 @app.route("/table_lop/form_add_lop", methods=['GET','POST'])
 def form_add_lop():
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("SELECT * FROM nganh WHERE is_delete = 0")
@@ -770,6 +824,8 @@ def form_add_lop():
 @login_required
 @app.route("/table_lop/form_update_lop/<string:ma_lop>", methods=['GET','POST'])
 def form_update_lop(ma_lop):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("SELECT * FROM lop WHERE ma_lop = %s", (ma_lop, ))
@@ -810,6 +866,8 @@ def form_update_lop(ma_lop):
 @login_required
 @app.route("/table_lop/form_add_lop_upload_file", methods=['GET','POST'])
 def form_add_lop_upload_file():
+    if session['role_id'] != 1:
+        return "Error"
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
         if data_file.filename != '':
@@ -827,6 +885,8 @@ def form_add_lop_upload_file():
 @login_required
 @app.route("/table_lop/form_add_lop_upload_process/<string:filename>", methods=['GET','POST'])
 def form_add_lop_upload_process(filename):
+    if session['role_id'] != 1:
+        return "Error"
     pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
     
     default_tag_column = ['ma_lop','ma_nganh','nam','ten_lop','ma_nguoi_quan_ly']
@@ -957,6 +1017,8 @@ def get_table_lop_excel():
 @login_required
 @app.route("/table_lop/view_lop_sinh_vien/<string:ma_lop>")
 def view_lop_sinh_vien(ma_lop):
+    if session['role_id'] == 3:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -1052,6 +1114,8 @@ def get_table_lop_sinh_vien_excel(ma_lop):
 @login_required
 @app.route("/delete_lop/<string:ma_lop>")
 def delete_lop(ma_lop):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -1070,6 +1134,8 @@ def delete_lop(ma_lop):
 @login_required
 @app.route("/bang_sinh_vien")
 def bang_sinh_vien():
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -1091,6 +1157,8 @@ def bang_sinh_vien():
 @login_required
 @app.route("/delete_sinh_vien/<string:ma_sinh_vien>")
 def delete_sinh_vien(ma_sinh_vien):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -1232,7 +1300,7 @@ def form_view_update_sinh_vien(ma_sinh_vien, can_edit):
                 cur.execute("""SELECT us.*, sv.ho_ten, img.path_to_image
                     FROM user us
                     JOIN sinh_vien sv ON sv.ma_sinh_vien = us.ma_nguoi_dung 
-                    JOIN image_data img ON img.id_image = nql.id_image
+                    JOIN image_data img ON img.id_image = sv.id_image
                     WHERE username=%s""",(ma_sinh_vien,))
                 user_data = cur.fetchall()
                 
@@ -1241,6 +1309,8 @@ def form_view_update_sinh_vien(ma_sinh_vien, can_edit):
                 session['username'] = my_user
         
         mysql.connection.commit()
+        if session["role_id"] != 1:
+            return redirect(url_for('form_view_update_sinh_vien', ma_sinh_vien = ma_sinh_vien, can_edit = 'N'))
         return redirect(url_for("bang_sinh_vien"))
     
     return render_template(session['role'] +'sinhvien/form_view_update_sinh_vien.html',
@@ -1254,6 +1324,8 @@ def form_view_update_sinh_vien(ma_sinh_vien, can_edit):
 @login_required
 @app.route("/bang_sinh_vien/form_add_sinh_vien_upload_file", methods=['GET','POST'])
 def form_add_sinh_vien_upload_file():
+    if session['role_id'] != 1:
+        return "Error"
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
         if data_file.filename != '':
@@ -1271,7 +1343,8 @@ def form_add_sinh_vien_upload_file():
 @login_required
 @app.route("/bang_sinh_vien/form_add_sinh_vien_upload_process/<string:filename>", methods=['GET','POST'])
 def form_add_sinh_vien_upload_process(filename):
-    
+    if session['role_id'] != 1:
+        return "Error"
     pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
     
     default_tag_column = ['ma_sinh_vien', 'ho_ten', 'gioi_tinh', 'ngay_sinh', 'noi_sinh',
@@ -1386,7 +1459,8 @@ def get_table_sinh_vien_pdf():
 @login_required
 @app.route("/bang_sinh_vien/form_add_sinh_vien", methods=['GET','POST'])
 def form_add_sinh_vien():
-    
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -1535,6 +1609,8 @@ def table_print_sinh_vien():
 
 @app.route("/table_mon_hoc")
 def table_mon_hoc():
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -1551,7 +1627,8 @@ def table_mon_hoc():
 
 @app.route("/table_mon_hoc/form_add_mon_hoc", methods = ['GET','POST'])
 def form_add_mon_hoc():
-    
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""SELECT n.*, lh.ten_he
@@ -1601,6 +1678,8 @@ def form_add_mon_hoc():
 
 @app.route("/table_mon_hoc/form_update_mon_hoc/<string:ma_mon>", methods = ['GET','POST'])
 def form_update_mon_hoc(ma_mon):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""SELECT n.*, lh.ten_he
@@ -1670,6 +1749,8 @@ def form_update_mon_hoc(ma_mon):
 
 @app.route("/table_mon_hoc/form_add_mon_hoc_upload_file", methods=['GET','POST'])
 def form_add_mon_hoc_upload_file():
+    if session['role_id'] != 1:
+        return "Error"
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
         if data_file.filename != '':
@@ -1686,6 +1767,8 @@ def form_add_mon_hoc_upload_file():
 
 @app.route("/table_mon_hoc/form_add_mon_hoc_upload_process/<string:filename>", methods=['GET','POST'])
 def form_add_mon_hoc_upload_process(filename):
+    if session['role_id'] != 1:
+        return "Error"
     pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
     
     default_tag_column = ['ma_mon', 'ten_mon', 'so_tin_chi', 'ma_nganh']
@@ -1828,6 +1911,8 @@ def get_table_mon_hoc_excel():
 @login_required
 @app.route("/delete_mon_hoc/<string:ma_mon>")
 def delete_mon_hoc(ma_mon):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -1844,6 +1929,8 @@ def delete_mon_hoc(ma_mon):
 @login_required
 @app.route("/table_kqht_sv")
 def table_kqht_sv():
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
 
     cur.execute("""
@@ -2131,7 +2218,7 @@ def table_print_kqht(ma_sinh_vien):
     if (len(tk_diem_sinh_vien) != 1):
         return "Error"
     
-    tk_diem_sinh_vien = tk_diem_sinh_vien[0]
+    tk_diem_sinh_vien = (tk_diem_sinh_vien[0][0],round(tk_diem_sinh_vien[0][1],2),tk_diem_sinh_vien[0][2])
     
     hk = []
     for elm in tmp_hoc_ky:
@@ -2176,6 +2263,8 @@ def get_table_kqht_excel(ma_sinh_vien):
 @login_required
 @app.route("/delete_diem/<string:id_diem>")
 def delete_diem(id_diem):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""DELETE FROM diem
@@ -2186,6 +2275,8 @@ def delete_diem(id_diem):
 @login_required
 @app.route("/table_kqht_sv/form_add_kqht", methods = ['GET','POST'])
 def form_add_kqht():
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -2273,6 +2364,8 @@ def form_add_kqht():
 @login_required
 @app.route("/table_kqht_sv/form_add_kqht_upload_file", methods = ['GET','POST'])
 def form_add_kqht_upload_file():
+    if session['role_id'] != 1:
+        return "Error"
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
         if data_file.filename != '':
@@ -2290,6 +2383,8 @@ def form_add_kqht_upload_file():
 @login_required
 @app.route("/table_kqht_sv/form_add_kqht_upload_process/<string:filename>", methods=['GET','POST'])
 def form_add_kqht_upload_process(filename):
+    if session['role_id'] != 1:
+        return "Error"
     pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
     
     default_tag_column = ['ma_sinh_vien', 'ma_mon', 'ma_hoc_ky', 'he_so_1', 'he_so_2',
@@ -2446,6 +2541,8 @@ def form_add_kqht_upload_process(filename):
 
 @app.route("/table_kqht_sv/form_update_kqht/<string:id_diem>", methods = ['GET','POST'])
 def form_update_kqht(id_diem):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -2514,6 +2611,8 @@ def form_update_kqht(id_diem):
 @login_required
 @app.route("/table_kqht_sv/table_hoc_ky")
 def table_hoc_ky():
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""SELECT * 
@@ -2571,6 +2670,8 @@ def get_table_hoc_ky_pdf():
 @login_required
 @app.route("/table_kqht_sv/form_add_hoc_ky", methods = ['GET','POST'])
 def form_add_hoc_ky():
+    if session['role_id'] != 1:
+        return "Error"
     if request.method == 'POST':
         details = request.form
         ma_hoc_ky = details['ma_hoc_ky'].strip()
@@ -2598,6 +2699,8 @@ def form_add_hoc_ky():
 @login_required
 @app.route("/table_kqht_sv/form_update_hoc_ky/<string:ma_hoc_ky>", methods = ['GET','POST'])
 def form_update_hoc_ky(ma_hoc_ky):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -2632,6 +2735,8 @@ def form_update_hoc_ky(ma_hoc_ky):
 @login_required
 @app.route("/delete_hoc_ky/<string:ma_hoc_ky>")
 def delete_hoc_ky(ma_hoc_ky):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -2663,6 +2768,8 @@ def delete_hoc_ky(ma_hoc_ky):
 @login_required
 @app.route("/table_dang_ky_hoc", methods=['GET','POST'])
 def table_dang_ky_hoc():
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     cur.execute("""
                 SELECT ddk.ma_dot, ddk.ma_hoc_ky, hk.ten_hoc_ky
@@ -2816,6 +2923,8 @@ def get_table_dang_ky_hoc_excel(ma_dot):
 @login_required
 @app.route("/table_dang_ky_hoc/form_add_dot_dk", methods = ['GET','POST'])
 def form_add_dot_dk():
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     # DROP EVENT IF EXISTS `dk_hoc_end_202001`
     cur.execute("""
@@ -3058,6 +3167,8 @@ def form_add_dot_dk():
 @login_required
 @app.route("/table_dang_ky_hoc/table_dkh_sv/<string:id_dang_ky>")
 def table_dkh_sv(id_dang_ky):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -3185,6 +3296,8 @@ def huy_dang_ky_sv(id_dang_ky, ma_sinh_vien):
 @login_required
 @app.route("/table_dang_ky_hoc/table_dkh_lop_hoc/<string:ma_dot>")
 def table_dkh_lop_hoc(ma_dot):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     cur.execute("""
                 SELECT ddk.ma_dot, ddk.ma_hoc_ky, hk.ten_hoc_ky
@@ -3228,6 +3341,8 @@ def table_dkh_lop_hoc(ma_dot):
 @login_required
 @app.route("/table_dang_ky_hoc/form_add_dkh_lop_hoc_upload_file/<string:ma_dot>", methods = ['GET','POST'])
 def form_add_dkh_lop_hoc_upload_file(ma_dot):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -3256,6 +3371,8 @@ def form_add_dkh_lop_hoc_upload_file(ma_dot):
 @login_required
 @app.route("/table_dang_ky_hoc/form_add_dkh_lop_hoc_upload_process/<string:filename>_<string:ma_dot>", methods = ['GET','POST'])
 def form_add_dkh_lop_hoc_upload_process(filename, ma_dot):
+    if session['role_id'] != 1:
+        return "Error"
     pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
     
     default_tag_column = ['ma_mon', 'ma_so_lop', 'thu', 'phong_hoc', 'th_lt',
@@ -3401,6 +3518,8 @@ def form_add_dkh_lop_hoc_upload_process(filename, ma_dot):
 @login_required
 @app.route("/table_dang_ky_hoc/form_add_dkh_lop_hoc/<string:ma_dot>", methods=['GET','POST'])
 def form_add_dkh_lop_hoc(ma_dot):
+    if session['role_id'] != 1:
+        return "Error"
     if request.method == 'POST':
         cur = mysql.connection.cursor()
         details = request.form
@@ -3506,6 +3625,8 @@ def form_add_dkh_lop_hoc(ma_dot):
 @login_required
 @app.route("/delete_lop_hoc/<ma_dot>_<id_dang_ky>")
 def delete_lop_hoc(ma_dot,id_dang_ky):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -3524,6 +3645,8 @@ def delete_lop_hoc(ma_dot,id_dang_ky):
 @login_required
 @app.route("/delete_dot_dang_ky/<string:ma_dot>")
 def delete_dot_dang_ky(ma_dot):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -3587,6 +3710,8 @@ def delete_dot_dang_ky(ma_dot):
 @login_required
 @app.route("/table_khao_sat", methods = ['GET','POST'])
 def table_khao_sat():
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     cur.execute("""
                 SELECT dks.ma_dot_yeu_cau, ddk.ma_hoc_ky, hk.ten_hoc_ky, ddk.ma_dot
@@ -3644,6 +3769,8 @@ def table_khao_sat():
 @login_required
 @app.route("/table_khao_sat/table_khao_sat_sv/<string:id_dang_ky>")
 def table_khao_sat_sv(id_dang_ky):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -3682,6 +3809,8 @@ def table_khao_sat_sv(id_dang_ky):
 @login_required
 @app.route("/view_dang_ky_hoc", methods = ['GET','POST'])
 def view_dang_ky_hoc():
+    if session['role_id'] == 1 or session['role_id'] == 2:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -3690,14 +3819,13 @@ def view_dang_ky_hoc():
                 WHERE CURRENT_TIMESTAMP() BETWEEN dk.ngay_bat_dau AND dk.ngay_ket_thuc
                 """)
     ma_dot = cur.fetchall()
-    ma_dot = (('202001',),)
-    ma_sinh_vien = '20002077'
+    ma_sinh_vien = str(session['username'][1])
     if (len(ma_dot) == 0):
         return render_template('student/dangkyhoc/view_dang_ky_hoc.html',
                            my_user = session['username'],
                            truong = session['truong'])
 
-    ma_dot = ma_dot[0][0]
+    ma_dot = str(ma_dot[0][0])
     cur.execute("""
                 SELECT mhn.ma_mon
                 FROM mon_hoc_nganh mhn
@@ -3732,7 +3860,7 @@ def view_dang_ky_hoc():
             CONCAT("T",mhdk.thu,"(",mhdk.tiet_bat_dau,"-",mhdk.tiet_ket_thuc,")",mhdk.phong_hoc)
             FROM mon_hoc_dot_dang_ky mhdk
             LEFT JOIN mon_hoc mh ON mhdk.ma_mon = mh.ma_mon
-            LEFT JOIN (SELECT * FROM diem d WHERE d.ma_sinh_vien = '""" + ma_sinh_vien + """' ) d ON d.ma_mon = mh.ma_mon
+            LEFT JOIN (SELECT * FROM diem d WHERE d.ma_sinh_vien = '""" + str(ma_sinh_vien) + """' ) d ON d.ma_mon = mh.ma_mon
             WHERE mhdk.ma_dot = '""" + ma_dot + """' AND mhdk.ma_mon IN """ + ma_mon_dh + """
             ORDER BY mhdk.ma_so_lop ASC;
             """)
@@ -3809,7 +3937,7 @@ def view_dang_ky_hoc():
                                     group_keys=False).apply(f).reset_index()
         sub_data = sub_data.values.tolist()
     
-    return render_template('student/dangkyhoc/view_dang_ky_hoc.html',
+    return render_template(session['role'] + 'dangkyhoc/view_dang_ky_hoc.html',
                            thong_tin_hk = thong_tin_hk,
                            ma_sinh_vien = ma_sinh_vien,
                             cac_mon = data,
@@ -3831,7 +3959,7 @@ def form_print_dkh(ma_dot,ma_sinh_vien):
     if (len(cur.fetchall()) == 0):
         return "Error"
 
-    ma_sinh_vien = '20002077'
+    ma_sinh_vien = str(session['username'][1])
     
     cur.execute("""
                 SELECT mhn.ma_mon
@@ -4002,6 +4130,8 @@ def cai_dat():
 @login_required
 @app.route("/cai_dat/view_tk")
 def view_tk():
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -4029,6 +4159,8 @@ def view_tk():
 @login_required
 @app.route("/cai_dat/form_add_tk", methods = ['GET','POST'])
 def form_add_tk():
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -4082,6 +4214,8 @@ def form_add_tk():
 @login_required
 @app.route("/cai_dat/form_add_tk_qt", methods=['GET','POST'])
 def form_add_tk_qt():
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     cac_quyen = {
         'Admin':1,
@@ -4152,6 +4286,8 @@ def form_add_tk_qt():
 @login_required
 @app.route("/cai_dat/form_chinh_sua_mk/<string:id_user>", methods=['GET','POST'])
 def form_chinh_sua_mk(id_user):
+    if session['role_id'] != 1:
+        id_user = session['username'][0]
     if request.method == 'POST':
         details = request.form
         password = hashlib.md5(details['password'].encode()).hexdigest()
@@ -4181,6 +4317,8 @@ def form_chinh_sua_mk(id_user):
 @login_required
 @app.route("/cai_dat/form_add_tk_upload_file", methods=['GET','POST'])
 def form_add_tk_upload_file():
+    if session['role_id'] != 1:
+        return "Error"
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
         if data_file.filename != '':
@@ -4198,6 +4336,8 @@ def form_add_tk_upload_file():
 @login_required
 @app.route("/cai_dat/form_add_tk_upload_process/<string:filename>", methods=['GET','POST'])
 def form_add_tk_upload_process(filename):
+    if session['role_id'] != 1:
+        return "Error"
     pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
     
     default_tag_column = ['username', 'ten_nguoi_dung', 'password', 'role_id']
@@ -4273,7 +4413,7 @@ def form_add_tk_upload_process(filename):
                         VALUES (%s, %s, %s)
                         """, (
                             data_mng[data_column[column_match.index(0)]][index],
-                            data_mng[data_column[column_match.index(2)]][index],
+                            hashlib.md5(data_mng[data_column[column_match.index(2)]][index].encode()).hexdigest(),
                             data_mng[data_column[column_match.index(0)]][index]
                         ))
             mysql.connection.commit()
@@ -4318,7 +4458,7 @@ def form_add_tk_upload_process(filename):
                         VALUES (%s, %s, %s)
                         """, (
                             data_acc[data_column[column_match.index(0)]][index_row],
-                            data_acc[data_column[column_match.index(2)]][index_row],
+                            hashlib.md5(data_acc[data_column[column_match.index(2)]][index].encode()).hexdigest(),
                             data_acc[data_column[column_match.index(0)]][index_row]
                         ))
             mysql.connection.commit()
@@ -4352,6 +4492,8 @@ def form_add_tk_upload_process(filename):
 @login_required
 @app.route("/cai_dat/form_view_truong/<string:can_edit>", methods=['GET','POST'])
 def form_view_truong(can_edit):
+    if session['role_id'] != 1:
+        return "Error"
     cur = mysql.connection.cursor()
     
     cur.execute("""

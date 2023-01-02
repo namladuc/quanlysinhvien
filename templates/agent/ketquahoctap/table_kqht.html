@@ -1,0 +1,135 @@
+{% extends "base_agent.html" %}
+{% block title %} Kết quả học tập Sinh viên {{sinh_vien[1]}} {% endblock title %}
+{% block content %}
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item active"><a href="/table_lop/view_lop_sinh_vien/{{my_user[-1]}}">Lớp</a></li>
+            <li class="breadcrumb-item active"><a href="#"><b>Sinh viên {{sinh_vien[1]}}</b></a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <div class="tile-body">
+
+                    <div class="row element-button">
+
+                        <div class="col-sm-2">
+                          <a class="btn btn-delete btn-sm print-file" type="button" title="In" onclick="myApp.printTable()"><i
+                              class="fas fa-print"></i> In thông tin</a>
+                        </div>
+                        <div class="col-sm-2">
+                            <a class="btn btn-excel btn-sm" href="/get_table_kqht_excel/{{sinh_vien[0]}}" title="Xuất Excel"><i
+                                    class="fas fa-file-excel"></i> Xuất Excel</a>
+                        </div>
+
+                        <div class="col-sm-2">
+                            <a class="btn btn-delete btn-sm pdf-file" type="button" title="Xuất PDF"
+                                href="/get_table_kqht_pdf/{{sinh_vien[0]}}"><i class="fas fa-file-pdf"></i>Xuất PDF</a>
+                        </div>
+
+                    </div>
+                    <div class="form-group col-md-12">
+                      <label class="control-label">Mã sinh viên: {{sinh_vien[0]}}</label>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label class="control-label">Họ tên: {{sinh_vien[1]}}</label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="control-label"> Lớp: {{sinh_vien[2]}} </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="control-label"> Ngành: {{sinh_vien[3]}} </label>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label class="control-label">Khoa: {{sinh_vien[4]}}</label>
+                    </div>
+                    {% for index in index_hk %}
+                    <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0"
+                        border="0" id="sampleTable1">
+                        <thead>
+                            <tr>
+                                <th colspan="8" style="text-align: center; background-color: #eee">{{hk[index]}}</th>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; background-color: #eee" width="50">STT</th>
+                                <th style="text-align: left; background-color: #eee" width="100">Mã MH</th>
+                                <th style="text-align: left; background-color: #eee" width="500">Môn học</th>
+                                <th style="text-align: left; background-color: #eee" width="70">Số TC</th>
+                                <th style="text-align: left; background-color: #eee" width="100">Điểm hệ 10</th>
+                                <th style="text-align: left; background-color: #eee" width="100">Điểm chữ</th>
+                                <th style="text-align: left; background-color: #eee" width="100">Điểm hệ 4</th>
+                                <th style="text-align: left; background-color: #eee" width="50">Chi tiết</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for index_diem in index_diem_hk[index] %}
+                            <tr>
+                                <td>{{index_diem + 1}}</td>
+                                <td>{{data_diem_hk[index][index_diem][1]}}</td>
+                                <td>{{data_diem_hk[index][index_diem][2]}}</td>
+                                <td>{{data_diem_hk[index][index_diem][3]}}</td>
+                                {% if data_diem_hk[index][index_diem][4] == None %}
+                                  <td></td>
+                                  <td>{{data_diem_hk[index][index_diem][5]}}</td>  
+                                  <td></td>  
+                                {% else %}
+                                  <td>{{data_diem_hk[index][index_diem][4]}}</td>
+                                  <td>{{data_diem_hk[index][index_diem][5]}}</td>  
+                                  <td>{{data_diem_hk[index][index_diem][6]}}</td>   
+                                {% endif %}
+                                <td>
+                                    <button class="btn btn-primary btn-sm edit" type="button" title="Chi tiết" id="show-emp">
+                                        <a href="/table_kqht_sv/table_kqht_chi_tiet/{{sinh_vien[0]}}_{{data_diem_hk[index][index_diem][0]}}"><i class="fa fa-book"
+                                                aria-hidden="true"></i></a>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% endfor %}
+                </div>
+                <div class="form-group col-md-12">
+                    <label class="control-label">Tổng tín chỉ: {{tk_diem_sinh_vien[-1]}}</label>
+                </div>
+                <div class="form-group col-md-12">
+                    <label class="control-label">Tổng tín chỉ tích lũy: {{tk_diem_sinh_vien[-1]}}</label>
+                </div>
+                <div class="form-group col-md-12">
+                    <label class="control-label"> Điểm trung bình tích lũy hệ 4: {{tk_diem_sinh_vien[1]}}</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+ <!-- Essential javascripts for application to work-->
+ <script src="{{url_for('static', filename='doc/js/jquery-3.2.1.min.js')}}"></script>
+ <script src="{{url_for('static', filename='doc/js/popper.min.js')}}"></script>
+ <script src="{{url_for('static', filename='doc/js/bootstrap.min.js')}}"></script>
+ <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+ <script src="{{url_for('static', filename='doc/js/main.js')}}"></script>
+ <!-- The javascript plugin to display page loading on top-->
+ <script src="{{url_for('static', filename='doc/js/plugins/pace.min.js')}}"></script>
+ <!-- Page specific javascripts-->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+ <!-- Data table plugin-->
+ <!-- <script type="text/javascript" src="js/plugins/jquery.dataTables.min.js"></script> -->
+ <script src="{{url_for('static', filename='doc/js/plugins/jquery.dataTables.min.js')}}"></script>
+ <!-- <script type="text/javascript" src="js/plugins/dataTables.bootstrap.min.js"></script> -->
+ <script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
+ <!--<script type="text/javascript">$('#sampleTable').DataTable();</script>-->
+ <script>
+   //In dữ liệu
+   var myApp = new function () {
+     this.printTable = function () {
+       var win = window.open('/table_print_kqht/{{sinh_vien[0]}}', '', 'height=700,width=1400');
+       win.document.close();
+       win.print();
+     }
+   }
+ </script>
+{% endblock content %}

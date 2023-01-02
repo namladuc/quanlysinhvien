@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 01, 2023 at 04:05 PM
+-- Generation Time: Jan 02, 2023 at 02:41 PM
 -- Server version: 10.4.21-MariaDB
 -- PHP Version: 8.0.10
 
@@ -219,7 +219,8 @@ CREATE TABLE `dot_dang_ky` (
 --
 
 INSERT INTO `dot_dang_ky` (`ma_dot`, `ma_hoc_ky`, `ngay_bat_dau`, `ngay_ket_thuc`, `trang_thai`) VALUES
-(202001, 'HK202', '2023-01-01 10:00:00', '2023-01-15 10:00:00', 'Đang mở');
+(202001, 'HK202', '2023-01-01 10:00:00', '2023-01-15 10:00:00', 'Đang mở'),
+(202002, 'HK202', '2023-02-01 10:00:00', '2023-02-07 10:00:00', 'Đang đóng');
 
 -- --------------------------------------------------------
 
@@ -235,6 +236,13 @@ CREATE TABLE `dot_yeu_cau_dang_ky` (
   `ngay_ket_thuc` datetime DEFAULT NULL,
   `trang_thai` varchar(30) DEFAULT 'Đang đóng'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `dot_yeu_cau_dang_ky`
+--
+
+INSERT INTO `dot_yeu_cau_dang_ky` (`ma_dot_yeu_cau`, `ma_dot_dang_ky`, `ma_hoc_ky`, `ngay_bat_dau`, `ngay_ket_thuc`, `trang_thai`) VALUES
+(202002, 202002, 'HK202', '2023-01-20 10:10:00', '2023-01-30 10:10:00', 'Đang đóng');
 
 -- --------------------------------------------------------
 
@@ -798,7 +806,8 @@ INSERT INTO `mon_hoc_dot_dang_ky` (`id_dang_ky`, `ma_mon`, `ma_so_lop`, `ma_dot_
 (939, 'PHY1103', 'PHY1103 7', -1, 202001, ' ', '4', '304T4', 6, 8, 100, 0, NULL),
 (940, 'PHY1103', 'PHY1103 8', -1, 202001, ' ', '5', '407T5', 1, 3, 100, 0, NULL),
 (941, 'PHY1103', 'PHY1103 9', -1, 202001, ' ', '5', '504T3', 6, 8, 100, 0, NULL),
-(943, 'MAT2503', 'MAT2503 1', -1, 202001, 'LT', '6', '206T5', 3, 5, 70, 0, 70);
+(943, 'MAT2503', 'MAT2503 1', -1, 202001, 'LT', '6', '206T5', 3, 5, 70, 0, 70),
+(944, 'MAT3500', 'MAT3500', 202002, 202002, 'LT', '2', '204T4', 1, 5, 70, 0, 70);
 
 -- --------------------------------------------------------
 
@@ -1122,7 +1131,7 @@ INSERT INTO `nganh` (`ma_nganh`, `ma_khoa`, `ten_nganh`, `hinh_thuc_dao_tao`, `m
 CREATE TABLE `nguoi_quan_li` (
   `ma_nguoi_quan_li` int(11) NOT NULL,
   `ho_ten` varchar(70) DEFAULT NULL,
-  `id_image` varchar(50) DEFAULT NULL
+  `id_image` varchar(50) DEFAULT 'none_image_profile'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -1130,7 +1139,9 @@ CREATE TABLE `nguoi_quan_li` (
 --
 
 INSERT INTO `nguoi_quan_li` (`ma_nguoi_quan_li`, `ho_ten`, `id_image`) VALUES
-(1510560001, 'Administrator', 'none_image_profile');
+(1510560001, 'Administrator', 'none_image_profile'),
+(1510560002, 'Manager 01', 'none_image_profile'),
+(1510560003, 'Manager 03', 'none_image_profile');
 
 -- --------------------------------------------------------
 
@@ -1169,7 +1180,11 @@ CREATE TABLE `role_user` (
 --
 
 INSERT INTO `role_user` (`id_user`, `role_id`) VALUES
-(1, 1);
+(1, 1),
+(2, 3),
+(4, 2),
+(6, 1),
+(7, 3);
 
 -- --------------------------------------------------------
 
@@ -1273,7 +1288,7 @@ CREATE TABLE `user` (
   `password` varchar(32) DEFAULT NULL,
   `ma_nguoi_dung` int(11) DEFAULT NULL,
   `last_login` datetime DEFAULT NULL,
-  `register` datetime DEFAULT NULL
+  `register` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -1281,7 +1296,11 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id_user`, `username`, `password`, `ma_nguoi_dung`, `last_login`, `register`) VALUES
-(1, '1510560001', '21232f297a57a5a743894a0e4a801fc3', 1510560001, NULL, '2022-12-26 16:31:04');
+(1, '1510560001', '21232f297a57a5a743894a0e4a801fc3', 1510560001, '2023-01-02 20:26:09', '2022-12-26 16:31:04'),
+(2, '20002076', '827ccb0eea8a706c4c34a16891f84e7b', 20002076, NULL, '2023-01-02 15:22:39'),
+(4, '1510560002', '827ccb0eea8a706c4c34a16891f84e7b', 1510560002, NULL, '2023-01-02 15:45:58'),
+(6, '1510560003', '827ccb0eea8a706c4c34a16891f84e7b', 1510560003, NULL, '2023-01-02 20:03:10'),
+(7, '20002080', '827ccb0eea8a706c4c34a16891f84e7b', 20002080, NULL, '2023-01-02 20:03:10');
 
 --
 -- Indexes for dumped tables
@@ -1427,13 +1446,13 @@ ALTER TABLE `diem`
 -- AUTO_INCREMENT for table `mon_hoc_dot_dang_ky`
 --
 ALTER TABLE `mon_hoc_dot_dang_ky`
-  MODIFY `id_dang_ky` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=944;
+  MODIFY `id_dang_ky` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=945;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 DELIMITER $$
 --
@@ -1442,6 +1461,22 @@ DELIMITER $$
 CREATE DEFINER=`root`@`localhost` EVENT `dk_hoc_end_202001` ON SCHEDULE AT '2023-01-15 10:00:00' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE dot_dang_ky
             SET trang_thai = "Đã đóng"
             WHERE ma_dot = '202001'$$
+
+CREATE DEFINER=`root`@`localhost` EVENT `ks_hoc_start_202002` ON SCHEDULE AT '2023-01-20 10:10:00' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE dot_yeu_cau_dang_ky
+                SET trang_thai = "Đang mở"
+                WHERE ma_dot_dang_ky = '202002' AND ma_dot_yeu_cau = '202002'$$
+
+CREATE DEFINER=`root`@`localhost` EVENT `ks_hoc_end_202002` ON SCHEDULE AT '2023-01-30 10:10:00' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE dot_yeu_cau_dang_ky
+                SET trang_thai = "Đã đóng"
+                WHERE ma_dot_dang_ky = '202002' AND ma_dot_yeu_cau = '202002'$$
+
+CREATE DEFINER=`root`@`localhost` EVENT `dk_hoc_start_202002` ON SCHEDULE AT '2023-02-01 10:00:00' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE dot_dang_ky
+            SET trang_thai = "Đang mở"
+            WHERE ma_dot = '202002'$$
+
+CREATE DEFINER=`root`@`localhost` EVENT `dk_hoc_end_202002` ON SCHEDULE AT '2023-02-07 10:00:00' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE dot_dang_ky
+            SET trang_thai = "Đã đóng"
+            WHERE ma_dot = '202002'$$
 
 DELIMITER ;
 COMMIT;
