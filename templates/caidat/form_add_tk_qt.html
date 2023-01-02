@@ -6,7 +6,7 @@
         <ul class="app-breadcrumb breadcrumb">
             <li class="breadcrumb-item"><a href="/cai_dat"><b> Cài đặt </b></a></li>
             <li class="breadcrumb-item"><a href="/cai_dat/view_tk">Tài khoản</a></li>
-            <li class="breadcrumb-item active"><a href="#">Tạo tài khoản mới</a></li>
+            <li class="breadcrumb-item active"><a href="#">Tạo tài khoản quản lý mới</a></li>
         </ul>
         <div id="clock"></div>
     </div>
@@ -17,7 +17,7 @@
 
                 <h3 class="tile-title">Tạo tài khoản mới</h3>
                 <div class="tile-body">
-                    <form class="row" method="post" action="/cai_dat/form_add_tk" enctype="multipart/form-data">
+                    <form class="row" method="post" action="/cai_dat/form_add_tk_qt" enctype="multipart/form-data">
                         {% if my_err %}
                         <div class="form-group col-md-12">
                             <div class="alert alert-danger" style="text-align: left; font-size: 12px; background-color: red;">
@@ -28,13 +28,22 @@
                       {% endif %}
 
                         <div class="form-group col-md-12">
-                        <label class="control-label">Mã sinh viên</label>
-                        <select class="form-control" id="exampleSelect2" name="MND" required>
-                            {% for data in cac_ma %}
-                            <option>{{data[0]}}</option>
-                            {% endfor %}
-                          </select>
+                            <label class="control-label">Tài khoản</label>
+                            <input class="form-control" type="number" name="taikhoan" required>
                         </div>
+
+                        <div class="form-group col-md-12">
+                            <label class="control-label">Tên tài khoản</label>
+                            <input class="form-control" type="text" name="ten_tk" required>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <label class="control-label">Loại tài khoản</label>
+                            <select class="form-control" id="exampleSelect2" name="TYPE" required>
+                                <option>Admin</option>
+                                <option>Người quản lý</option>
+                              </select>
+                            </div>
 
                         <div class="form-group col-md-12">
                             <label class="control-label">Mật khẩu</label>

@@ -98,7 +98,7 @@ def login():
         cur.execute("""
                     UPDATE `user` 
                     SET `last_login` = CURRENT_TIMESTAMP()
-                    WHERE `user`.`ma_nguoi_dung` = %s
+                    WHERE `user`.`id_user` = %s
                     """, (my_user[0],))
         session['username'] = my_user
         mysql.connection.commit()
@@ -3305,10 +3305,6 @@ def form_add_dkh_lop_hoc_upload_process(filename, ma_dot):
         for elm in data_tuple:
             data_tmp_take.append(elm[0])
         
-        for elm in tmp:
-            if elm not in data_tmp_take:
-                print(elm)
-        
         if (len(data_tmp_take) != len(tmp)):
             return "Error"
         
@@ -4002,6 +3998,459 @@ def cai_dat():
                            so_acc = so_acc,
                            my_user = session['username'],
                            truong = session['truong'])
+
+@login_required
+@app.route("/cai_dat/view_tk")
+def view_tk():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+               SELECT us.id_user, us.ma_nguoi_dung, nql.ho_ten, r.role_name, us.last_login, us.register
+                FROM user us
+                JOIN role_user ru ON ru.id_user = us.id_user
+                JOIN role r ON ru.role_id = r.role_id
+                JOIN nguoi_quan_li nql ON nql.ma_nguoi_quan_li = us.ma_nguoi_dung
+                WHERE us.ma_nguoi_dung LIKE '151056%'
+                UNION
+                SELECT us.id_user, us.ma_nguoi_dung, sv.ho_ten, r.role_name, us.last_login, us.register
+                FROM user us
+                JOIN role_user ru ON ru.id_user = us.id_user
+                JOIN role r ON ru.role_id = r.role_id
+                JOIN sinh_vien sv ON sv.ma_sinh_vien = us.ma_nguoi_dung
+                WHERE us.ma_nguoi_dung NOT LIKE '151056%'
+                """)
+    cac_user = cur.fetchall()
+    
+    return render_template(session['role'] + 'caidat/view_tk.html',
+                           cac_user = cac_user,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/cai_dat/form_add_tk", methods = ['GET','POST'])
+def form_add_tk():
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT sv.ma_sinh_vien
+                FROM sinh_vien sv
+                WHERE sv.ma_sinh_vien NOT IN (
+                    SELECT us.ma_nguoi_dung
+                    FROM user us
+                )
+                """)
+    cac_ma = cur.fetchall()
+    
+    if request.method == 'POST':
+        details = request.form
+        username = details['MND']
+        password = hashlib.md5(details['password'].encode()).hexdigest()
+        password_repeat = hashlib.md5(details['password_repeat'].encode()).hexdigest()  
+        
+        if password != password_repeat:
+            return render_template(session['role'] + 'caidat/form_add_tk.html',
+                                   my_err = 'Nhập lại mật khẩu bị sai',
+                           cac_ma = cac_ma,
+                           my_user = session['username'],
+                           truong = session['truong'])
+            
+        cur.execute("""
+                    INSERT INTO user(username,password,ma_nguoi_dung)
+                    VALUES (%s, %s, %s)
+                    """, (username, password, username))
+        mysql.connection.commit()
+        
+        cur.execute("""
+                    SELECT id_user
+                    FROM user 
+                    WHERE ma_nguoi_dung = %s
+                    """, (username, ))
+        id_user = cur.fetchall()[0][0]
+        
+        cur.execute("""
+                    INSERT INTO role_user(id_user, role_id)
+                    VALUES (%s,%s)
+                    """, (id_user, 3))
+        mysql.connection.commit()
+        return redirect(url_for('view_tk'))
+    
+    return render_template(session['role'] + 'caidat/form_add_tk.html',
+                           cac_ma = cac_ma,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/cai_dat/form_add_tk_qt", methods=['GET','POST'])
+def form_add_tk_qt():
+    cur = mysql.connection.cursor()
+    cac_quyen = {
+        'Admin':1,
+        'Người quản lý':2
+    }
+    
+    if request.method == 'POST':
+        details = request.form
+        username = details['taikhoan']
+        ten_tk = details['ten_tk']
+        loai = cac_quyen[details['TYPE'].strip()]
+        password = hashlib.md5(details['password'].encode()).hexdigest()
+        password_repeat = hashlib.md5(details['password_repeat'].encode()).hexdigest()  
+        
+        if not username.startswith("151056"):
+            return render_template(session['role'] + "caidat/form_add_tk_qt.html",
+                                   my_err = "Mã người quản lý phải bắt đầu bằng 151056 !",
+                           my_user = session['username'],
+                           truong = session['truong'])
+        
+        cur.execute("""
+                    SELECT ma_nguoi_quan_li
+                    FROM nguoi_quan_li
+                    WHERE ma_nguoi_quan_li = %s
+                    """, (username, ))
+        if len(cur.fetchall()) != 0:
+            return render_template(session['role'] + "caidat/form_add_tk_qt.html",
+                                   my_err = "Mã người quản lý đã tồn tại !",
+                           my_user = session['username'],
+                           truong = session['truong'])
+            
+        if password != password_repeat:
+            return render_template(session['role'] + "caidat/form_add_tk_qt.html",
+                                   my_err = "Mật khẩu nhập lại không đúng",
+                           my_user = session['username'],
+                           truong = session['truong'])
+            
+        cur.execute("""
+                    INSERT INTO nguoi_quan_li(ma_nguoi_quan_li, ho_ten)
+                    VALUES (%s, %s)
+                    """, (username, ten_tk))
+        mysql.connection.commit()
+        
+        cur.execute("""
+                    INSERT INTO user(username,password,ma_nguoi_dung)
+                    VALUES (%s, %s, %s)
+                    """, (username, password, username))
+        mysql.connection.commit()
+        
+        cur.execute("""
+                    SELECT id_user
+                    FROM user 
+                    WHERE ma_nguoi_dung = %s
+                    """, (username, ))
+        id_user = cur.fetchall()[0][0]
+        
+        cur.execute("""
+                    INSERT INTO role_user(id_user, role_id)
+                    VALUES (%s,%s)
+                    """, (id_user, loai))
+        mysql.connection.commit()
+        return redirect(url_for('view_tk'))
+        
+    return render_template(session['role'] + "caidat/form_add_tk_qt.html",
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/cai_dat/form_chinh_sua_mk/<string:id_user>", methods=['GET','POST'])
+def form_chinh_sua_mk(id_user):
+    if request.method == 'POST':
+        details = request.form
+        password = hashlib.md5(details['password'].encode()).hexdigest()
+        password_repeat = hashlib.md5(details['password_repeat'].encode()).hexdigest()  
+        
+        if password != password_repeat:
+            return render_template(session['role'] + 'caidat/form_chinh_sua_mk.html',
+                                   id_user = id_user,
+                                   my_err = "Mật khẩu nhập lại không đúng",
+                           my_user = session['username'],
+                           truong = session['truong'])
+        
+        cur = mysql.connection.cursor()
+        cur.execute("""
+                    UPDATE user
+                    SET password = %s
+                    WHERE id_user = %s
+                    """, (password, id_user))
+        mysql.connection.commit()
+        return redirect(url_for('view_tk'))    
+        
+    return render_template(session['role'] + 'caidat/form_chinh_sua_mk.html',
+                           id_user = id_user,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/cai_dat/form_add_tk_upload_file", methods=['GET','POST'])
+def form_add_tk_upload_file():
+    if request.method == 'POST':
+        data_file = request.files['FileDataUpload']
+        if data_file.filename != '':
+            if data_file.filename.split(".")[-1] not in ['xlsx', 'csv', 'xls', 'xlsm']:
+                return redirect(url_for("form_add_tk_upload_file"))
+            filename = "TMP_" + data_file.filename 
+            pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
+            data_file.save(pathToFile)
+            return redirect(url_for("form_add_tk_upload_process", filename=filename))
+        return redirect(url_for("form_add_tk_upload_file"))
+    return render_template(session['role'] +'caidat/form_add_tk_upload_file.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/cai_dat/form_add_tk_upload_process/<string:filename>", methods=['GET','POST'])
+def form_add_tk_upload_process(filename):
+    pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
+    
+    default_tag_column = ['username', 'ten_nguoi_dung', 'password', 'role_id']
+    
+    default_name_column = ['Tài Khoản', 'Tên Người Dùng', 'Mật Khẩu', 'Loại quyền']
+    
+    data_acc = pd.read_excel(pathToFile)
+    data_column = list(data_acc.columns)
+    
+    if (len(data_column) > len(default_tag_column)) or len(data_column)  < 4:
+        return "Error"
+    
+    if request.method == 'POST':
+        cur = mysql.connection.cursor()
+        details = request.form
+        column_link = [details[col] for col in data_column]
+        column_match = [default_name_column.index(elm) for elm in column_link]
+        
+        if (len(set(column_match)) != len(column_link)):
+            return "Error"
+        
+        if (len(column_match) != 4):
+            return "Error"
+        
+        # lọc các mã quản lý để xử lý
+        data_acc = data_acc.fillna(" ")
+        data_mng = data_acc.copy(True)
+        data_mng[data_column[column_match.index(0)]] = data_mng[data_column[column_match.index(0)]].astype(str)
+        data_mng = data_mng.loc[data_mng[data_column[column_match.index(0)]].str.startswith('151056')]
+        # lấy index của những record là của người quản lý
+        index_drop = list(data_mng.index)
+        
+        for elm in index_drop:
+            data_acc = data_acc.drop(elm)
+        data_acc = data_acc.drop(data_column[column_match.index(1)], axis=1)
+        data_acc = data_acc.reset_index()
+        
+        # Kiểm tra xem mã nguoi quan ly có tồn tại không
+        # nếu tồn tại thì ko cho nhập
+        tmp = tuple(set(data_mng[data_column[column_match.index(0)]]))
+        if len(tmp) == 1:
+            cur.execute("SELECT ma_nguoi_quan_li FROM nguoi_quan_li WHERE ma_nguoi_quan_li = %s", tmp)
+        else:
+            new_tmp = ["\"" + text +"\"" for text in tmp]
+            cur.execute("SELECT ma_nguoi_quan_li FROM nguoi_quan_li WHERE ma_nguoi_quan_li IN (" + ", ".join(new_tmp) + ")")
+        data_tuple = cur.fetchall()
+        data_tmp_take = []
+        for elm in data_tuple:
+            data_tmp_take.append(elm[0])
+        if (len(data_tmp_take) != 0):
+            return "Error"
+        
+        # kiểm tra mã quyền có trong khoảng quy định ko 1 - 3
+        tmp = tuple(set(data_mng[data_column[column_match.index(3)]]))
+        tmp = [int(elm) for elm in tmp]
+        if max(tmp) > 3 or min(tmp) < 0:
+            return "Error 1"
+        
+        # xử lý dữ liệu người quản lý
+        # tách cột để cho vào bảng user
+        for index in list(data_mng.index):
+            cur.execute("""
+                        INSERT INTO nguoi_quan_li(ma_nguoi_quan_li, ho_ten)
+                        VALUES (%s, %s)
+                        """, (
+                            data_mng[data_column[column_match.index(0)]][index],
+                            data_mng[data_column[column_match.index(1)]][index]
+                        ))
+            mysql.connection.commit()
+            
+            cur.execute("""
+                        INSERT INTO user(username, password, ma_nguoi_dung)
+                        VALUES (%s, %s, %s)
+                        """, (
+                            data_mng[data_column[column_match.index(0)]][index],
+                            data_mng[data_column[column_match.index(2)]][index],
+                            data_mng[data_column[column_match.index(0)]][index]
+                        ))
+            mysql.connection.commit()
+            
+            cur.execute("""
+                        SELECT id_user
+                        FROM user
+                        WHERE username = %s
+                        """, (
+                            data_mng[data_column[column_match.index(0)]][index],
+                        ))
+            id_user = cur.fetchall()[0][0]
+            
+            cur.execute("""
+                        INSERT INTO role_user(id_user, role_id)
+                        VALUES (%s, %s)
+                        """, (id_user,
+                              data_mng[data_column[column_match.index(3)]][index]
+                              ))
+            mysql.connection.commit()
+        
+        
+        # Kiểm tra xem mã sinh viên có tồn tại không
+        # nếu tồn tại thì ko cho nhập
+        tmp = tuple(set(data_acc[data_column[column_match.index(0)]]))
+        if len(tmp) == 1:
+            cur.execute("SELECT ma_sinh_vien FROM sinh_vien WHERE ma_sinh_vien = %s", tmp)
+        else:
+            new_tmp = ["\"" + str(text) +"\"" for text in tmp]
+            cur.execute("SELECT ma_sinh_vien FROM sinh_vien WHERE ma_sinh_vien IN (" + ", ".join(new_tmp) + ")")
+        data_tuple = cur.fetchall()
+        data_tmp_take = []
+        for elm in data_tuple:
+            data_tmp_take.append(elm[0])
+        if (len(data_tmp_take) != len(tmp)):
+            return "Error 1"
+        
+        # Xử lý dữ liệu cho sinh viên
+        for index_row in range(data_acc.shape[0]):
+            cur.execute("""
+                        INSERT INTO user(username, password, ma_nguoi_dung)
+                        VALUES (%s, %s, %s)
+                        """, (
+                            data_acc[data_column[column_match.index(0)]][index_row],
+                            data_acc[data_column[column_match.index(2)]][index_row],
+                            data_acc[data_column[column_match.index(0)]][index_row]
+                        ))
+            mysql.connection.commit()
+            
+            cur.execute("""
+                        SELECT id_user
+                        FROM user
+                        WHERE username = %s
+                        """, (
+                            data_acc[data_column[column_match.index(0)]][index_row],
+                        ))
+            id_user = cur.fetchall()[0][0]
+            
+            cur.execute("""
+                        INSERT INTO role_user(id_user, role_id)
+                        VALUES (%s, %s)
+                        """, (id_user,
+                              3
+                              ))
+            mysql.connection.commit()        
+        os.remove(pathToFile)
+        return redirect(url_for('view_tk'))
+    
+    return render_template(session['role'] + 'caidat/form_add_tk_upload_process.html',
+                           my_user = session['username'],
+                           truong = session['truong'],
+                           filename = filename,
+                           name_column = default_name_column,
+                           index_column = data_column)
+
+@login_required
+@app.route("/cai_dat/form_view_truong/<string:can_edit>", methods=['GET','POST'])
+def form_view_truong(can_edit):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT *
+                FROM truong
+                LIMIT 1
+                """)
+    data_truong = cur.fetchall()[0]
+    
+    if request.method == 'POST':
+        details = request.form
+        TenTH = details['TenTH']
+        NgayThanhLap = details['NgayThanhLap']
+        DIACHI = details['DIACHI']
+        
+        image_profile = request.files['ImageProfileUpload']
+        pathToImage = data_truong[3]
+        if image_profile.filename != "":
+            ID_image = "logo_web"
+            filename = 'favicon' + "." + secure_filename(image_profile.filename).split(".")[1]
+            pathToImage = app.config['UPLOAD_FOLDER_IMG'] + "/" + filename
+            image_profile.save(pathToImage)
+            take_image_to_save(ID_image, pathToImage)
+            pathToImage = "/".join(pathToImage.split("/")[1::])
+        
+        cur.execute("""
+                    UPDATE truong
+                    SET ten_truong = %s, dia_chi = %s, logo_path = %s, ngay_thanh_lap = %s
+                    WHERE ID = %s
+                    """,(TenTH, DIACHI, pathToImage, NgayThanhLap, 1))
+        mysql.connection.commit()
+        
+        cur.execute("""
+                    SELECT * 
+                    FROM truong
+                    """)
+        session['truong'] = cur.fetchall()[0]
+        return redirect(url_for('cai_dat'))
+        
+    if can_edit == 'E':
+        return render_template(session['role'] +'caidat/form_view_truong.html', 
+                           mode = '',
+                           data_truong = data_truong,
+                           my_user = session['username'],
+                           truong = session['truong'])
+        
+    return render_template(session['role'] + 'caidat/form_view_truong.html',
+                           mode = 'disabled',
+                           data_truong = data_truong,
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/cai_dat/form_chinh_sua_mk_one", methods=['GET','POST'])
+def form_chinh_sua_mk_one():
+    if request.method == 'POST':
+        details = request.form
+        password = hashlib.md5(details['password'].encode()).hexdigest()
+        password_repeat = hashlib.md5(details['password_repeat'].encode()).hexdigest()  
+        
+        if password != password_repeat:
+            return render_template(session['role'] + 'caidat/form_chinh_sua_mk_one.html',
+                                   my_err = "Mật khẩu nhập lại không đúng",
+                           my_user = session['username'],
+                           truong = session['truong'])
+        
+        cur = mysql.connection.cursor()
+        cur.execute("""
+                    UPDATE user
+                    SET password = %s
+                    WHERE id_user = %s
+                    """, (password, session['username'][0]))
+        mysql.connection.commit()
+        return redirect(url_for('cai_dat'))  
+        
+    return render_template(session['role'] + 'caidat/form_chinh_sua_mk_one.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+@login_required
+@app.route("/delete_account/<string:id_user>")
+def delete_account(id_user):
+    if session['role_id'] != 1:
+        return "Error"
+    
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                DELETE FROM role_user
+                WHERE id_user = %s
+                """, (id_user, ))
+    mysql.connection.commit()
+    
+    cur.execute("""
+                DELETE FROM user
+                WHERE id_user = %s
+                """, (id_user, ))
+    mysql.connection.commit()
+    return redirect(url_for('view_tk'))
 
 # -------------------------- Cai dat -------------------------
 def take_image_to_save(id_image, path_to_img):

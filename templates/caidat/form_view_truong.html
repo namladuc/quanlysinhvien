@@ -19,7 +19,7 @@
               <!-- btn -->
               <div class="col-md-12">
                 {% if mode != "" %}
-                <a class="btn btn-info" href="/form_view_truong/E" style="width: 100px; border-radius: 10px;">Sửa</a>
+                <a class="btn btn-info" href="/cai_dat/form_view_truong/E" style="width: 100px; border-radius: 10px;">Sửa</a>
                 {% endif %}
 
                 {% if mode == "" %}
@@ -38,28 +38,23 @@
                   <div class="col-md-12">
                     <div class="form-group">
                       <label class="control-label">Tên trường học</label>
-                      <input type="text" class="form-control" value="" name="TenTH" required {{mode}}>
+                      <input type="text" class="form-control" value="{{data_truong[1]}}" name="TenTH" required {{mode}}>
                       <span id="available"></span>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label class="control-label">Ngày thành lập</label>
-                      <input type="date" class="form-control" value="" name="NgayThanhLap" required {{mode}}>
+                      <input type="date" class="form-control" value="{{data_truong[4]}}" name="NgayThanhLap" required {{mode}}>
                       <span id="available"></span>
                     </div>
                   </div>
                   <div class="col-md-6">
-                    <div class="form-group">
-                      <label class="control-label">Số điện thoại</label>
-                      <input type="text" class="form-control" value="" name="SDT" required {{mode}}>
-                      <span id="available"></span>
-                    </div>
                   </div>
                   <div class="col-md-12">
                     <div class="form-group">
                       <label class="control-label">Địa chỉ</label>
-                      <textarea class="form-control" id="address" name="DIACHI" rows="2" {{mode}}></textarea>
+                      <textarea class="form-control" id="address" name="DIACHI" rows="2" {{mode}}>{{data_truong[2]}}</textarea>
                       <span id="available"></span>
                     </div>
                   </div>
@@ -73,7 +68,7 @@
                       <img id="img-upload">
                       <div id="tem_img">
                         <img id="id_img_profile_1" 
-                        src="" 
+                        src="{{url_for('static', filename=data_truong[3])}}" 
                         alt="Ảnh" width="170px" height="170px">
                         <a class="removeimg" href="javascript:"></a>
                       </div><br>
@@ -116,7 +111,7 @@
   <script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
   <script type="text/javascript">$('#sampleTable').DataTable();</script>
   <script>
-    var img_default = "}";
+    var img_default = "{{url_for('static', filename=data_truong[3])}}";
     function readCTURL(input, thumbimage) {
        
       if (input.files && input.files[0]) { //Sử dụng  cho Firefox - chrome

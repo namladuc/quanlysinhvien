@@ -19,8 +19,12 @@
 
                         <div class="col-sm-2">
                           <a class="btn btn-add btn-sm" href="/cai_dat/form_add_tk" title="Thêm"><i class="fas fa-plus"></i>
-                            Tạo tài khoản mới</a>
+                            Tạo tài khoản sinh viên</a>
                         </div>
+                        <div class="col-sm-2">
+                            <a class="btn btn-add btn-sm" href="/cai_dat/form_add_tk_qt" title="Thêm"><i class="fas fa-plus"></i>
+                              Tạo tài khoản quản lý</a>
+                          </div>
                         <div class="col-sm-2">
                             <a class="btn btn-delete btn-sm nhap-tu-file" href="/cai_dat/form_add_tk_upload_file"
                                 type="button" title="Tải từ file"><i class="fas fa-file-upload"></i>Tải từ file</a>
@@ -34,33 +38,33 @@
                                 <th>Tài khoản</th>
                                 <th>Tên người dùng</th>
                                 <th>Loại tài khoản</th>
-                                <th>Mã người dùng</th>
                                 <th>Lần đăng nhập cuối</th>
                                 <th>Đăng ký</th>
                                 <th width="100">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
+                            {% for data in cac_user %}
                             <tr>
-                                <td>1</td>
-                                <td>duongnam</td>
-                                <td>Dương Nam</td>
-                                <td>Sinh viên</td>
-                                <td>20002076</td>
-                                <td>CN</td>
-                                <td>2/2/2020</td>
+                                <td>{{data[0]}}</td>
+                                <td>{{data[1]}}</td>
+                                <td>{{data[2]}}</td>
+                                <td>{{data[3]}}</td>
+                                <td>{{data[4]}}</td>
+                                <td>{{data[5]}}</td>
                                 <td class="table-td-center">
                                     <button class="btn btn-primary btn-sm trash"
-                                        type="button" title="Xóa" onclick=""><i
+                                        type="button" title="Xóa" onclick="deleteTK('{{data[0]}}')"><i
                                             class="fas fa-trash-alt"></i>
                                     </button>
                                     <button class="btn btn-primary btn-sm edit" type="button" title="Sửa"
                                         id="show-emp">
-                                        <a href="/cai_dat/form_chinh_sua_mk"><i class="fas fa-pencil-square-o"
+                                        <a href="/cai_dat/form_chinh_sua_mk/{{data[0]}}"><i class="fas fa-pencil-square-o"
                                                 aria-hidden="true"></i></a>
                                     </button>
                                 </td>
                             </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
