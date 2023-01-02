@@ -18,6 +18,7 @@ import numpy as np
 import functools
 import pdfkit
 import re
+import math
 
 app = Flask(__name__)
 app.secret_key = 'La Nam'
@@ -76,7 +77,7 @@ def login():
             cur.execute("""SELECT us.*, sv.ho_ten, img.path_to_image
                     FROM user us
                     JOIN sinh_vien sv ON sv.ma_sinh_vien = us.ma_nguoi_dung 
-                    JOIN image_data img ON img.id_image = nql.id_image
+                    JOIN image_data img ON img.id_image = sv.id_image
                     WHERE username=%s""",(user_name,))
             user_data = cur.fetchall()
         
@@ -3717,6 +3718,19 @@ def view_dang_ky_hoc():
     ma_mon_dh = ma_mon_dh[:-1:]
     ma_mon_dh += ")"
     
+     # lay thong tin hoc ky
+    cur.execute("""
+                SELECT * 
+                FROM hoc_ky hk
+                WHERE hk.ma_hoc_ky = (SELECT ddk.ma_hoc_ky
+                                    FROM dot_dang_ky ddk
+                                    WHERE ddk.ma_dot = %s)
+                """, (ma_dot, ))
+    thong_tin_hk = cur.fetchall()
+    if (len(thong_tin_hk) == 0):
+        return "Error"
+    thong_tin_hk = thong_tin_hk[0]
+    
     cur.execute("""
             SELECT mhdk.id_dang_ky, mh.ten_mon, mh.so_tin_chi, d.thang_4, mhdk.ma_so_lop, mhdk.so_luong, mhdk.so_luong_da_dang_ky,
             CONCAT("T",mhdk.thu,"(",mhdk.tiet_bat_dau,"-",mhdk.tiet_ket_thuc,")",mhdk.phong_hoc)
@@ -3800,11 +3814,136 @@ def view_dang_ky_hoc():
         sub_data = sub_data.values.tolist()
     
     return render_template('student/dangkyhoc/view_dang_ky_hoc.html',
+                           thong_tin_hk = thong_tin_hk,
+                           ma_sinh_vien = ma_sinh_vien,
                             cac_mon = data,
                             cac_mon_da_dk = sub_data,
                         ma_dot = ma_dot,
                     my_user = session['username'],
                     truong = session['truong'])
+
+@login_required
+@app.route("/form_print_dkh/<string:ma_dot>_<string:ma_sinh_vien>")
+def form_print_dkh(ma_dot,ma_sinh_vien):
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT ma_dot
+                FROM dot_dang_ky dk
+                WHERE ma_dot = %s
+                """, (ma_dot, ))
+    if (len(cur.fetchall()) == 0):
+        return "Error"
+
+    ma_sinh_vien = '20002077'
+    
+    cur.execute("""
+                SELECT mhn.ma_mon
+                FROM mon_hoc_nganh mhn
+                WHERE mhn.ma_nganh IN (SELECT DISTINCT n.ma_nganh
+                                    FROM sinh_vien_lop svl
+                                    JOIN lop l ON l.ma_lop = svl.ma_lop
+                                    JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                                    WHERE svl.ma_sinh_vien = %s);
+                """, (ma_sinh_vien, ))
+    ma_mon = cur.fetchall()
+    ma_mon_dh = "("
+    for elm in ma_mon:
+        ma_mon_dh += "'" + elm[0] + "',"
+    ma_mon_dh = ma_mon_dh[:-1:]
+    ma_mon_dh += ")"
+    
+    # lay thong tin hoc ky
+    cur.execute("""
+                SELECT * 
+                FROM hoc_ky hk
+                WHERE hk.ma_hoc_ky = (SELECT ddk.ma_hoc_ky
+                                    FROM dot_dang_ky ddk
+                                    WHERE ddk.ma_dot = %s)
+                """, (ma_dot, ))
+    thong_tin_hk = cur.fetchall()
+    if (len(thong_tin_hk) == 0):
+        return "Error"
+    thong_tin_hk = thong_tin_hk[0]
+    
+    # lay thong tin sinh vien
+    cur.execute("""
+                SELECT sv.ma_sinh_vien, sv.ho_ten, DATE_FORMAT(sv.ngay_sinh, "%d/%m/%Y"),
+                CONCAT(l.ten_lop, " ", n.ten_nganh), l.nam
+                FROM sinh_vien sv 
+                JOIN sinh_vien_lop svl ON sv.ma_sinh_vien = sv.ma_sinh_vien
+                JOIN lop l ON l.ma_lop = svl.ma_lop
+                JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                WHERE sv.ma_sinh_vien = """ + ma_sinh_vien + """
+                GROUP BY sv.ma_sinh_vien
+                LIMIT 1
+                """)
+    sinh_vien = cur.fetchall()
+    if (len(sinh_vien) == 0):
+        return "Error"
+    sinh_vien = sinh_vien[0]
+    
+    # ngay thang
+    cur.execute("""
+                SELECT DAY(CURRENT_DATE()), MONTH(CURRENT_DATE()), YEAR(CURRENT_DATE())
+                """)
+    date = cur.fetchall()[0]
+    
+    
+    # cac mon da dang ky duoc
+    cur.execute("""
+                SELECT dkm.id_dang_ky, mh.ma_mon, mh.ten_mon, mh.so_tin_chi, mh.so_tin_chi * lh.hoc_phi_tin_chi, 
+                mhdk.ma_so_lop,
+                CONCAT("T",mhdk.thu,"(",mhdk.tiet_bat_dau,"-",mhdk.tiet_ket_thuc,")",mhdk.phong_hoc)
+                FROM dang_ky_mon dkm
+                JOIN mon_hoc_dot_dang_ky mhdk ON dkm.id_dang_ky = mhdk.id_dang_ky
+                JOIN mon_hoc mh ON mhdk.ma_mon = mh.ma_mon
+                JOIN mon_hoc_nganh mhn ON mhn.ma_mon = mhdk.ma_mon
+                JOIN sinh_vien_lop svl ON svl.ma_sinh_vien = dkm.ma_sinh_vien
+                JOIN lop l ON l.ma_lop = svl.ma_lop
+                JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                JOIN loai_he lh ON lh.ma_he = n.ma_he
+                WHERE mhdk.ma_dot = '""" + ma_dot + """' 
+                AND dkm.ma_sinh_vien = '""" + ma_sinh_vien + """' 
+                AND mhdk.ma_mon IN """ + ma_mon_dh + """
+                GROUP BY mhdk.ma_so_lop, CONCAT("T",mhdk.thu,"(",mhdk.tiet_bat_dau,"-",mhdk.tiet_ket_thuc,")",mhdk.phong_hoc)
+                ORDER BY mhdk.ma_so_lop ASC;
+                """)
+    column_name = ['id_dang_ky', 'ma_mon', 'ten_mon','so_tin_chi','hoc_phi', 'ma_so_lop', 'lich_hoc']
+    cac_mon_da_dk = cur.fetchall()
+    sub_data = pd.DataFrame.from_records(cac_mon_da_dk, columns=column_name)
+    
+    sub_data = sub_data.fillna(' ')
+    
+    def f(x):
+        return pd.Series(dict(lich_hoc = "%s" % ','.join(x['lich_hoc'])))
+    
+    tong_tc = 0
+    tong_hp = 0
+    index_arr = []
+    if sub_data.shape[0] == 0:
+        sub_data = ()
+    else:
+        sub_data = sub_data.groupby(by=['id_dang_ky', 'ma_mon', 'ten_mon','so_tin_chi','hoc_phi', 'ma_so_lop'],
+                                    group_keys=False).apply(f).reset_index()
+        tong_tc = sub_data['so_tin_chi'].sum()
+        tong_hp = sub_data['hoc_phi'].sum()
+        tong_hp = round(tong_hp, -3)
+        index_arr = [i for i in range(sub_data.shape[0])]
+        sub_data = sub_data.values.tolist()
+        
+    
+    
+    return render_template('student/dangkyhoc/form_print_dkh.html',
+                           sinh_vien = sinh_vien,
+                           date = date,
+                           thong_tin_hk = thong_tin_hk,
+                           tong_tc = tong_tc,
+                           tong_hp = tong_hp,
+                           index_arr = index_arr,
+                        ma_sinh_vien = ma_sinh_vien,   
+                        cac_mon_da_dk = sub_data,
+                        ma_dot = ma_dot,)
 
 @login_required
 @app.route("/huy_dang_ky_mon/<string:id_dang_ky>")
@@ -3846,16 +3985,25 @@ def huy_dang_ky_mon(id_dang_ky):
 # -------------------------- Dang Ky Hoc -------------------------
 
 
-# -------------------------- Dang Ky Hoc -------------------------
+# -------------------------- Cai dat -------------------------
 
 @login_required
 @app.route("/cai_dat")
 def cai_dat():
+    cur  = mysql.connection.cursor()
+
+    cur.execute("""
+                SELECT COUNT(*)
+                FROM user
+                """)
+    so_acc = cur.fetchall()[0][0]
+    
     return render_template(session['role'] + "caidat/cai_dat.html",
+                           so_acc = so_acc,
                            my_user = session['username'],
                            truong = session['truong'])
 
-# -------------------------- Dang Ky Hoc -------------------------
+# -------------------------- Cai dat -------------------------
 def take_image_to_save(id_image, path_to_img):
     cur = mysql.connection.cursor()
     cur.execute("""SELECT * FROM image_data""")

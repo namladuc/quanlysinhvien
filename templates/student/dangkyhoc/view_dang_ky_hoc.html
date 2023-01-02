@@ -23,8 +23,7 @@
             id="myTable">
             <thead>
               <tr>
-                <th colspan="11" style="text-align: center; background-color: #33FF00">Đăng ký học - Học kỳ 1 năm học
-                  2022-2023</th>
+                <th colspan="11" style="text-align: center; background-color: #33FF00">Đăng ký học - {{thong_tin_hk[1]}}</th>
               </tr>
               <tr>
                 <th width="10"> Chọn</th>
@@ -122,7 +121,7 @@
 
               <div class="form-group col-md-4" style="margin-top: 30px;">
                 <input class="btn btn-add" type="submit" value="Ghi nhận" />
-                <a class="btn btn-info" href="/view_dkh_print">Xem và In</a>
+                <a class="btn btn-info" onclick="myApp.printTable()">Xem và In</a>
               </div>
             </form>
             <div class="col-md-4">
@@ -326,6 +325,14 @@
 
     $(r).parent().parent().remove();
     check_trung_lich();
+  }
+  
+  var myApp = new function () {
+    this.printTable = function () {
+      var win = window.open('/form_print_dkh/{{ma_dot}}_{{ma_sinh_vien}}', '', 'height=700,width=1400');
+      win.document.close();
+      win.print();
+    }
   }
 
   function copyRow(r) {

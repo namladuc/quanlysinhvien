@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>In kết quả đăng k&#253; m&#244;n học</title>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <meta content="text/html;charset=utf-8" http-equiv="content-type">
+    <meta content="Cổng thông tin Đào tạo - Đại học Quốc gia Hà Nội" name="description">
+    <meta name="google-site-verification" content="9KdWV5qOckc64BeUVl5ZP8bgTgJGs9zbDx83SNON6S0" />
+    <link rel="shortcut icon" href="/Images/fav.png" type="image/x-icon" />
+
+    <!--[if lt IE 9]>
+<script src="/bundles/fixjsie9?v=k83Tl1GyN6OCsI-0rR49snIhe6nxZUiWnYK4nCB_2HY1"></script>
+<![endif]-->
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-56954909-1', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+
+    <link href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.4.2/select2.css" rel="stylesheet" />
+    <link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet" />
+
+
+
+    <style type="text/css">
+        body * {
+            font-family: 'Times New Roman', Arial;
+        }
+    </style>
+
+</head>
+
+<body class="contrast-green">
+    <div id="wrapper">
+        <div id="main-nav-bg"></div>
+        <section id="content">
+            <div class="container">
+                <div class="row" id="content-wrapper">
+                    <div class="col-xs-12">
+                        <div class="print-area">
+                            <table style="width: 100%; border: none; border-collapse: collapse;">
+                                <tr>
+                                    <td style="width: 40%; text-align: center; vertical-align: top;">
+                                        <p
+                                            style="text-transform: uppercase; font-weight: normal; margin: 0; padding: 0; font-size: 12pt;">
+                                            ĐẠI HỌC QUỐC GIA HÀ NỘI</p>
+                                        <p
+                                            style="text-transform:uppercase; margin: 0; padding: 0; font-size:12pt; font-weight:bold;">
+                                            TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHI&#202;N</p>
+                                    </td>
+                                    <td style="width: 60%; text-align: center; vertical-align: top;">
+                                        <p
+                                            style="text-transform: uppercase; font-weight: bold; margin: 0; padding: 0; font-size: 12pt;">
+                                            CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+                                        <p style="margin: 0; padding: 0; font-weight: bold;">Độc lập - Tự do - Hạnh phúc
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            <h1
+                                style="text-align: center; text-transform: uppercase; font-weight: bold; font-size: 14pt; margin: 30px 0 0 0; padding: 0;">
+                                KẾT QUẢ ĐĂNG KÝ MÔN HỌC - {{thong_tin_hk[1]}}</h1>
+                            <p style="text-align: center; font-weight: bold; margin: 0; padding: 0; font-size: 14pt;">
+                                Ngày {{date[0]}} tháng {{date[1]}} năm {{date[2]}}
+                            </p>
+                            <table style="width: 100%; border: none; border-collapse: collapse; margin-top: 30px;">
+                                <tr>
+                                    <td>Họ và tên</td>
+                                    <td><b>{{sinh_vien[1]}}</b></td>
+                                    <td>Ngày sinh</td>
+                                    <td><b>{{sinh_vien[2]}}</b></td>
+                                    <td>Mã sinh viên</td>
+                                    <td><b>{{sinh_vien[0]}}</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Chương trình đào tạo</td>
+                                    <td><b>{{sinh_vien[3]}}</b></td>
+                                    <td>Khóa</td>
+                                    <td><b>{{sinh_vien[4]}}</b></td>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                            </table>
+                            <br />
+                            <table style="border:none; width: 100%; border-collapse:collapse;">
+
+                                <tr>
+                                    <th
+                                        style="border-top:1px solid #000; border-left:1px solid #000; text-align:center;">
+                                        STT</th>
+                                    <th
+                                        style="border-top: 1px solid #000; border-left: 1px solid #000; text-align: center;">
+                                        Mã môn học</th>
+                                    <th
+                                        style="border-top: 1px solid #000; border-left: 1px solid #000; text-align: center;">
+                                        Môn học</th>
+                                    <th
+                                        style="border-top: 1px solid #000; border-left: 1px solid #000; text-align: center;">
+                                        Số tín chỉ</th>
+                                    <th
+                                        style="border-top: 1px solid #000; border-left: 1px solid #000; text-align: center;">
+                                        Học phí</th>
+                                    <th
+                                        style="border-top: 1px solid #000; border-left: 1px solid #000; text-align: center;">
+                                        Lớp môn học</th>
+                                    <th
+                                        style="border-top: 1px solid #000; border-left: 1px solid #000; border-right:1px solid #000; text-align: center;">
+                                        Lịch học</th>
+                                </tr>
+                                {% for index in index_arr %}
+                                <tr>
+                                    <td
+                                        style="border-top: 1px solid #000; border-left: 1px solid #000; text-align: center;">
+                                        {{index + 1}}</td>
+                                    <td style="border-top:1px solid #000; border-left:1px solid #000;">&nbsp;{{cac_mon_da_dk[index][1]}}
+                                    </td>
+                                    <td style="border-top:1px solid #000; border-left:1px solid #000;">&nbsp;{{cac_mon_da_dk[index][2]}}</td>
+                                    <td style="border-top: 1px solid #000; border-left: 1px solid #000; text-align: center;">
+                                        {{cac_mon_da_dk[index][3]}}</td>
+                                    <td style="border-top:1px solid #000; border-left:1px solid #000;">&nbsp;{{cac_mon_da_dk[index][4]}}
+                                    </td>
+                                    <td style="border-top: 1px solid #000; border-left: 1px solid #000; border-right: 1px solid #000; text-align: center;">
+                                        {{cac_mon_da_dk[index][5]}}</td>
+                                    <td style="border-top: 1px solid #000; border-left: 1px solid #000; border-right: 1px solid #000; text-align: center;">
+                                            {{cac_mon_da_dk[index][6]}}</td>
+                                </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td
+                                        style="border-top: 1px solid #000; border-left: 1px solid #000; border-bottom:1px solid #000; text-align: center;">
+                                        &nbsp;</td>
+                                    <td
+                                        style="border-top: 1px solid #000; border-left: 1px solid #000; border-bottom: 1px solid #000; text-align: center; ">
+                                        &nbsp;Tổng</td>
+                                    <td
+                                        style="border-top: 1px solid #000; border-left: 1px solid #000; border-bottom: 1px solid #000;">
+                                        &nbsp;</td>
+                                    <td
+                                        style="border-top: 1px solid #000; border-left: 1px solid #000; border-bottom: 1px solid #000; text-align: center;">
+                                        {{tong_tc}}</td>
+                                    <td
+                                        style="border-top: 1px solid #000; border-left: 1px solid #000; border-bottom: 1px solid #000; text-align: left;">
+                                        &nbsp;{{tong_hp}}</td>
+                                    <td
+                                        style="border-top: 1px solid #000; border-left: 1px solid #000; border-bottom: 1px solid #000;">
+                                        &nbsp;</td>
+                                    <td
+                                        style="border-top: 1px solid #000; border-left: 1px solid #000; border-bottom: 1px solid #000; border-right: 1px solid #000; text-align: center; ">
+                                        &nbsp;</td>
+                                </tr>
+                            </table>
+
+                            <p style="font-size: 12pt; margin-top:15px;">Tổng số học phí đã làm tròn: {{tong_hp}} (đồng)</p>
+                            <table style="width: 100%; border: none; border-collapse: collapse; margin-top: 30px;">
+                                <tr>
+                                    <td style="width: 50%; vertical-align: top; text-align: center;">
+                                        <p
+                                            style="font-weight: bold; margin: 0; padding: 0; font-size: 12pt; text-transform:uppercase;">
+                                            SINH VIÊN</p>
+                                        <p style="margin: 0; padding: 0; font-size: 11pt; font-style: italic;">(Ký và
+                                            ghi rõ họ tên)</p>
+                                        <p style="margin-top:80px;"><b>{{sinh_vien[1]}}</b></p>
+                                    </td>
+                                    <td style="width: 50%; text-align: center; vertical-align: top; ">
+                                        <p style="font-size: 12pt; margin:0; padding:0;">Hà Nội, ngày ..... tháng .....
+                                            năm {{date[2]}}</p>
+                                        <p
+                                            style="font-weight: bold; margin: 0; padding: 0; text-transform: uppercase; font-size: 12pt;">
+                                            XÁC NHẬN CỦA PHÒNG ĐÀO TẠO</p>
+                                        <p style="font-weight: bold; margin-top: 80px;">&nbsp;</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
