@@ -3202,11 +3202,23 @@ def form_add_dot_dk():
             sql = "CREATE EVENT IF NOT EXISTS "
             sql += "ks_hoc_end_" + ma_dot + " "
             sql += "ON SCHEDULE AT \'" + ngay_ket_thuc_ks.strftime("%Y-%m-%d %H:%M:%S") + "\' "
-            sql += "DO "
+            sql += "DO BEGIN"
             sql += """
                 UPDATE dot_yeu_cau_dang_ky
                 SET trang_thai = "Đã đóng"
                 WHERE ma_dot_dang_ky = \'""" + ma_dot + "\' AND ma_dot_yeu_cau = '" + ma_dot_khao_sat + "' ;"
+                
+            sql += """
+                DELETE FROM dang_ky_mon 
+                WHERE id_dang_ky IN (
+                    SELECT DISTINCT mhdk.id_dang_ky
+                    FROM mon_hoc_dot_dang_ky mhdk
+                    WHERE mhdk.so_luong_da_dang_ky > mhdk.so_luong
+                    AND mhdk.ma_dot = '""" + ma_dot + """'
+                );
+                
+                END
+            """
             cur.execute(sql)
             mysql.connection.commit()
             
