@@ -1,0 +1,355 @@
+{% extends "basesv.html" %}
+{% block title %} Khảo sát đăng ký học {% endblock title %}
+{% block content %}
+<main class="app-content">
+  <div class="app-title">
+    <ul class="app-breadcrumb breadcrumb side">
+      <li class="breadcrumb-item active"><a href="#"><b> Khảo sát đăng ký học</b></a></li>
+    </ul>
+    <div id="clock"></div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="tile">
+
+
+        {% if ma_dot %}
+        <div class="tile-body" style=" height:300px;
+          width:100%;
+          overflow-y:scroll; 
+          display:block">
+          <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0" border="0"
+            id="myTable">
+            <thead>
+              <tr>
+                <th colspan="11" style="text-align: center; background-color: #33FF00">Đăng ký học - {{thong_tin_hk[1]}}</th>
+              </tr>
+              <tr>
+                <th width="10"> Chọn</th>
+                <th>Môn học</th>
+                <th>TC</th>
+                <th>Điểm</th>
+                <th>Lớp môn học</th>
+                <th>Tổng SV</th>
+                <th>Lịch học</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for data in cac_mon %}
+              <tr id="row_data_{{data[0]}}">
+                <td width="10">
+                  {% if data[6] < data[5] %} <input type="checkbox" id="check_mon_{{data[0]}}" onclick="copyRow(this)"
+                    name="{{data[0]}}" value="{{data[0]}}">
+                    {% endif %}
+                </td>
+                <td id="ten_data_{{data[0]}}">{{data[1]}}</td>
+                <td id="num_tc_{{data[0]}}">{{data[2]}}</td>
+                <td id="diem_data_{{data[0]}}">{{data[3]}}</td>
+                <td>{{data[4]}}</td>
+                <td>{{data[5]}}</td>
+                <td id="time_{{data[0]}}">{{data[7]}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="tile">
+        <div class="col-md-12"> </div>
+        <div class="tile-body" style=" height:300px;
+        width:100%;
+        overflow-y:scroll; 
+        display:block">
+          <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0" border="0"
+            id="tmpTable">
+            <thead>
+              <tr>
+                <th colspan="7" style="text-align: center; background-color: #0099FF">Danh sách môn học đã đăng ký hoặc
+                  đã chọn</th>
+              </tr>
+              <tr>
+                <th width="10">STT</th>
+                <th width="433">Môn học</th>
+                <th width="68">TC</th>
+                <th width="170">Lớp môn học</th>
+                <th width="315">Lịch học</th>
+                <th width="131">Hủy</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for data in cac_mon_da_dk %}
+              <tr id="row_data_{{data[0]}}_kk" style="background-color: #FEA1BF;">
+                <td width="10">
+                  <input type="checkbox" id="check_dk_mon_{{data[0]}}" 
+                    name="Nothing" value="" hidden>
+                </td>
+                <td id="ten_data_{{data[0]}}">{{data[1]}}</td>
+                <td id="num_tc_{{data[0]}}">{{data[2]}}</td>
+                <td>{{data[3]}}</td>
+                <td id="time_{{data[0]}}">{{data[4]}}</td>
+                <td><input class='btn btn-primary btn-sm trash' onclick="huy_dang_ky('{{data[0]}}')" type='button' value='Delete'/></td>
+              </tr>
+              
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="col-md-12">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="control-label" style="margin-top: 30px;">Tổng số tín chỉ đã đăng ký: [<span
+                    id="tong_so_tc"></span>]</label>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="control-label" style="margin-top: 30px;">Tổng số môn học đã đăng ký: [<span
+                    id="tong_so_mon_dk"></span>]</label>
+              </div>
+            </div>
+            <form method="post" action="/view_khao_sat" enctype="multipart/form-data">
+              <input id="mon_hoc_dang_ky" type="text" name="mon_hoc_dang_ky" hidden>
+
+              <div class="form-group col-md-4" style="margin-top: 30px;">
+                <input class="btn btn-add" type="submit" value="Ghi nhận" />
+                <a class="btn btn-info" onclick="myApp.printTable()">Xem và In</a>
+              </div>
+            </form>
+            <div class="col-md-4">
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="form-group col-md-12" style="margin-top: 30px;">
+          <div class="form-group">
+            <label class="control-label" style="margin-top: 30px;">Đang không trong đợt khảo sát</label>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<!-- Essential javascripts for application to work-->
+<script src="{{url_for('static', filename='doc/js/jquery-3.2.1.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/popper.min.js')}}"></script>
+<script src="{{url_for('static', filename='doc/js/bootstrap.min.js')}}"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="{{url_for('static', filename='doc/js/main.js')}}"></script>
+<!-- The javascript plugin to display page loading on top-->
+<script src="{{url_for('static', filename='doc/js/plugins/pace.min.js')}}"></script>
+<!-- Page specific javascripts-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+<!-- Data table plugin-->
+<!-- <script type="text/javascript" src="js/plugins/jquery.dataTables.min.js"></script> -->
+<script src="{{url_for('static', filename='doc/js/plugins/jquery.dataTables.min.js')}}"></script>
+<!-- <script type="text/javascript" src="js/plugins/dataTables.bootstrap.min.js"></script> -->
+<script src="{{url_for('static', filename='doc/js/plugins/dataTables.bootstrap.min.js')}}"></script>
+<script type="text/javascript">$('#sampleTable').DataTable();</script>
+{% for data in cac_mon %}
+{% if data[6] == data[5] %}
+<script>
+  $("#row_data_{{data[0]}}").css("background-color", "#F1F7B5");
+</script>
+{% endif %}
+{% endfor %}
+<script>
+  //In dữ liệu
+  var myApp = new function () {
+    this.printTable = function () {
+      var win = window.open('/get_print_data_employees', '', 'height=700,width=1400');
+      win.document.close();
+      win.print();
+    }
+  }
+
+  function huy_dang_ky(id) {
+    swal({
+        title: "Cảnh báo",
+        text: "Bạn có chắc chắn là muốn hủy đăng ký môn này?", // index = 3
+        buttons: ["Hủy bỏ", "Đồng ý"],
+    })
+        .then((willDelete) => {
+
+            if (willDelete) {
+                $.ajax({
+                    url: "/huy_dang_ky_mon/" + id,
+                    context: document.body
+                })
+                swal("Đã hủy đăng ký thành công.!", {
+
+                });
+                location.reload();
+            }
+        });
+  }
+
+  function take_data() {
+    var rowCount = $('#tmpTable > tbody > tr').length;
+    var value_hidden = "";
+    if (rowCount != 0) {
+      $('#tmpTable > tbody > tr').each(function () {
+        var self = $(this);
+        var id_dang_ky = $(this).attr('id');
+        var id_split = id_dang_ky.split("_");
+        id_dang_ky = id_dang_ky.substring(9, id_dang_ky.length - 3);
+        console.log(id_split[id_split.length-1]);
+        if (id_split[id_split.length-1] != 'kk') {
+          value_hidden +=  id_dang_ky + ",";
+        }
+      });
+      value_hidden = value_hidden.substring(0,value_hidden.length-1);
+    }
+    $('input[name=mon_hoc_dang_ky]').val(value_hidden);
+  }
+
+  function check_trung_lich() {
+    var index_arr = [];
+    var time_arr = [];
+    var ten_arr = [];
+    var bool_arr = [];
+    $('#myTable > tbody > tr').each(function () {
+      var id_tmp = $(this).attr('id');
+      id_tmp = id_tmp.substring(9, id_tmp.length);
+      var str_time_tmp = $(this).find('#time_' + id_tmp).html();
+      str_time_tmp = str_time_tmp.split(",");
+      var ten_tmp = $(this).find('#ten_data_' + id_tmp).html();
+      ten_arr.push(ten_tmp);
+      time_arr.push(str_time_tmp);
+      index_arr.push(id_tmp);
+
+      var diem_tmp = $(this).find('#diem_data_' + id_tmp).html();
+      if (parseFloat(diem_tmp) >= 2) {
+        bool_arr.push(false);
+        $("#check_mon_" + id_tmp).hide();
+        $("#row_data_" + id_tmp).css("background-color", "#F1F7B5");
+      } else {
+        bool_arr.push(true);
+      }
+    });
+
+    var rowCount = $('#tmpTable > tbody > tr').length;
+    var count_tin_chi = 0;
+    if (rowCount != 0) {
+      $('#tmpTable > tbody > tr').each(function () {
+        var self = $(this);
+        var id_dang_ky = $(this).attr('id');
+        id_dang_ky = id_dang_ky.substring(9, id_dang_ky.length - 3);
+
+        //count_tc
+        count_tin_chi += parseInt($('#num_tc_' + id_dang_ky).html());
+
+        // Time checker
+        var str_time = self.find('#time_' + id_dang_ky).html()
+        str_time = str_time.split(",");
+        for (let i = 0; i < str_time.length; i++) {
+
+          var part_text = str_time[i].split(")")[0];
+          part_text = part_text.split("(");
+          var time_s_e = part_text[1].split("-");
+
+          for (let j = 0; j < time_arr.length; j++) {
+            for (let z = 0; z < time_arr[j].length; z++) {
+              var time_tmp = time_arr[j][z].split(")")[0];
+              let position = time_tmp.search(part_text[0]);
+              if (position != -1) {
+                // format
+                var time_tmp = time_tmp.split("(")[1];
+                time_tmp = time_tmp.split("-");
+
+                if (time_s_e[1] < time_tmp[0] || time_tmp[1] < time_s_e[0]) {
+                } else {
+                  bool_arr[j] = false;
+                  $("#check_mon_" + index_arr[j]).hide();
+                  $("#row_data_" + index_arr[j]).css("background-color", "#F1F7B5");
+                  break;
+                }
+                //console.log(time_arr[j]);
+              }
+            }
+          }
+        }
+
+
+        // Name checker
+        var str_ten = self.find('#ten_data_' + id_dang_ky).html();
+        for (let k = 0; k < ten_arr.length; k++) {
+          if (ten_arr[k] == str_ten) {
+            bool_arr[k] = false;
+            $("#check_mon_" + index_arr[k]).hide();
+            $("#row_data_" + index_arr[k]).css("background-color", "#F1F7B5");
+          }
+        }
+      });
+    }
+
+    for (let j = 0; j < bool_arr.length; j++) {
+      if (bool_arr[j]) {
+        $("#check_mon_" + index_arr[j]).show();
+        $("#check_mon_" + index_arr[j]).prop('checked', false);
+        $("#row_data_" + index_arr[j]).css("background-color", "");
+      }
+    }
+
+    for (let j = 0; j < bool_arr.length; j++) {
+      var so_tc_tmp = parseInt($("#row_data_" + index_arr[j]).find("#num_tc_" + index_arr[j]).html())
+      if (count_tin_chi + so_tc_tmp > 40) {
+        $("#check_mon_" + index_arr[j]).hide();
+        $("#row_data_" + index_arr[j]).css("background-color", "#F1F7B5");
+      }
+    }
+
+    $('#tong_so_tc').html("").html(count_tin_chi);
+    $('#tong_so_mon_dk').html("").html(rowCount);
+    take_data()
+  }
+
+  
+
+  function removeRow(r) {
+    var p = r.parentNode.parentNode;
+    var id_elm = p.id.substring(9, p.id.length - 3);
+    $('#' + p.id.substring(0, p.id.length - 3)).css("background-color", "");
+
+    var this_count = $('#' + p.id.substring(0, p.id.length - 3)).find('#count_sub_data_' + id_elm).html();
+    $('#' + p.id.substring(0, p.id.length - 3)).find('#count_sub_data_' + id_elm).html("").html(parseInt(this_count) - 1);
+
+    $(r).parent().parent().remove();
+    check_trung_lich();
+  }
+  
+  var myApp = new function () {
+    this.printTable = function () {
+      var win = window.open('/form_print_dkh/{{ma_dot}}_{{ma_sinh_vien}}', '', 'height=700,width=1400');
+      win.document.close();
+      win.print();
+    }
+  }
+
+  function copyRow(r) {
+    var id = r.name
+    var elm = r.parentNode.parentNode;
+    var this_count = $(elm).find('#count_sub_data_' + id).html();
+    $(elm).find('#count_sub_data_' + id).html("").html(parseInt(this_count) + 1);
+    var clone = elm.cloneNode(true);
+    if (r.checked) {
+      clone.deleteCell(3);
+      clone.deleteCell(4);
+      $(clone).attr("id", clone.id + "_ss");
+      $(clone).find('#check_mon_' + id).hide();
+      var buttonDelete = "<td><input class='btn btn-primary btn-sm trash' onclick='removeRow(this)' type='button' value='Delete'/></td>";
+      $(clone).children("td:last").after(buttonDelete);
+      $(clone).css("background-color", "#91D8E4");
+      $('#tmpTable tbody').append(clone);
+    }
+    $('#check_mon_' + id).hide()
+    $('#row_data_' + id).css("background-color", "#F1F7B5");
+    check_trung_lich();
+  }
+  window.onload = check_trung_lich();
+
+</script>
+{% endblock content %}

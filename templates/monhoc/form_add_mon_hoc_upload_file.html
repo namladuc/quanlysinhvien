@@ -16,6 +16,16 @@
         <h3 class="tile-title">Thêm môn học - Upload file excel</h3>
         <div class="tile-body">
           <form class="row" method="post" action="/table_mon_hoc/form_add_mon_hoc_upload_file" enctype="multipart/form-data">
+            <div class="form-group col-md-12">
+              <label class="control-label">Thêm môn học từ file nhận các định dạng file excel ('xlsx', 'csv', 'xls', 'xlsm')</label> <br>
+              Yêu cầu nội dung trong file: <br>
+              - File luôn có số lượng cột là: 4 <br>
+              - Bao gồm các cột sau: <br>
+              + Mã môn là mã của môn học (Nếu tìm thấy mã đã có sẽ lỗi và không tiếp tục xử lý) <br>
+              + Tên môn là tên môn học <br>
+              + Số tín chỉ: số tín chỉ của môn học <br>
+              + Mã ngành: mã của các ngành (có dạng kiểu các mã cách nhau bằng dấu phẩy: KHDL,TT,MTKHTT,...) (Nếu mã ngành nhập trong file không tồn tại sẽ lỗi và không tiếp tục xử lý) <br>
+            </div>
             <div class="form-group col-md-4">
               <label class="control-label">Upload file</label>
               <input type="file" style="height:45px;" name="FileDataUpload" class="form-control" id="customFile" />

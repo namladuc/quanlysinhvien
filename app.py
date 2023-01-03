@@ -435,7 +435,7 @@ def form_add_nganh_upload_process(filename):
     data_mon_hoc = pd.read_excel(pathToFile)
     data_column = list(data_mon_hoc.columns)
     
-    if (len(data_column) > len(default_tag_column)) or len(data_column) < 3:
+    if (len(data_column) > len(default_tag_column)) or len(data_column) < 5:
         return "Error"
         
     if request.method == 'POST':
@@ -1358,7 +1358,7 @@ def form_add_sinh_vien_upload_process(filename):
     data_mon_hoc = pd.read_excel(pathToFile)
     data_column = list(data_mon_hoc.columns)
     
-    if (len(data_column) > len(default_tag_column)) or len(data_column) < 3:
+    if (len(data_column) > len(default_tag_column)) or len(data_column) < 6:
         return "Error"
         
     if request.method == 'POST':
@@ -1929,28 +1929,52 @@ def delete_mon_hoc(ma_mon):
 @login_required
 @app.route("/table_kqht_sv")
 def table_kqht_sv():
-    if session['role_id'] != 1:
+    if session['role_id'] == 3:
         return "Error"
     cur = mysql.connection.cursor()
-
-    cur.execute("""
-                SELECT d.ma_sinh_vien, sv.ho_ten, sv.ngay_sinh, l.ten_lop, n.ten_nganh,
-                k.ten_khoa, ROUND(SUM(d.thang_4 * mh.so_tin_chi)/SUM(mh.so_tin_chi),2)
-                FROM diem d
-                JOIN sinh_vien sv ON d.ma_sinh_vien = sv.ma_sinh_vien
-                JOIN sinh_vien_lop svl ON svl.ma_sinh_vien = sv.ma_sinh_vien
-                JOIN lop l ON l.ma_lop = svl.ma_lop
-                JOIN nganh n ON n.ma_nganh = l.ma_nganh
-                JOIN khoa k ON k.ma_khoa = n.ma_khoa
-                JOIN mon_hoc mh ON mh.ma_mon = d.ma_mon
-                WHERE d.diem_he_3 != -1 AND d.ma_mon IN (
-                    SELECT DISTINCT mhn.ma_mon 
-                    FROM mon_hoc_nganh mhn
-                    WHERE mhn.ma_nganh = n.ma_nganh
-                ) AND d.thang_10 >= 4
-                GROUP BY d.ma_sinh_vien
-                """)
-    diem_sinh_vien = cur.fetchall()
+    
+    diem_sinh_vien = ()
+    if session['role_id'] == 1:
+        cur.execute("""
+                    SELECT d.ma_sinh_vien, sv.ho_ten, sv.ngay_sinh, l.ten_lop, n.ten_nganh,
+                    k.ten_khoa, ROUND(SUM(d.thang_4 * mh.so_tin_chi)/SUM(mh.so_tin_chi),2)
+                    FROM diem d
+                    JOIN sinh_vien sv ON d.ma_sinh_vien = sv.ma_sinh_vien
+                    JOIN sinh_vien_lop svl ON svl.ma_sinh_vien = sv.ma_sinh_vien
+                    JOIN lop l ON l.ma_lop = svl.ma_lop
+                    JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                    JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                    JOIN mon_hoc mh ON mh.ma_mon = d.ma_mon
+                    WHERE d.diem_he_3 != -1 AND d.ma_mon IN (
+                        SELECT DISTINCT mhn.ma_mon 
+                        FROM mon_hoc_nganh mhn
+                        WHERE mhn.ma_nganh = n.ma_nganh
+                    ) AND d.thang_10 >= 4
+                    GROUP BY d.ma_sinh_vien
+                    """)
+        diem_sinh_vien = cur.fetchall()
+    else:
+        cur.execute("""
+                    SELECT d.ma_sinh_vien, sv.ho_ten, sv.ngay_sinh, l.ten_lop, n.ten_nganh,
+                    k.ten_khoa, ROUND(SUM(d.thang_4 * mh.so_tin_chi)/SUM(mh.so_tin_chi),2) as GPA
+                    FROM diem d
+                    JOIN sinh_vien sv ON d.ma_sinh_vien = sv.ma_sinh_vien
+                    JOIN sinh_vien_lop svl ON svl.ma_sinh_vien = sv.ma_sinh_vien
+                    JOIN lop l ON l.ma_lop = svl.ma_lop
+                    JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                    JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                    JOIN mon_hoc mh ON mh.ma_mon = d.ma_mon
+                    WHERE d.diem_he_3 != -1 AND d.ma_mon IN (
+                        SELECT DISTINCT mhn.ma_mon 
+                        FROM mon_hoc_nganh mhn
+                        WHERE mhn.ma_nganh = n.ma_nganh
+                    ) AND d.thang_10 >= 4 AND svl.ma_lop = %s
+                    GROUP BY d.ma_sinh_vien
+                    ORDER BY GPA DESC
+                    """, (session['username'][-1],))
+        diem_sinh_vien = cur.fetchall()
+    
+    print(diem_sinh_vien)
     
     return render_template(session['role'] + 'ketquahoctap/table_kqht_sv.html',
                            diem_sinh_vien = diem_sinh_vien,
@@ -1964,7 +1988,7 @@ def table_print_kqht_sv():
 
     cur.execute("""
                 SELECT d.ma_sinh_vien, sv.ho_ten, sv.ngay_sinh, l.ten_lop, n.ten_nganh,
-                k.ten_khoa, ROUND(SUM(d.thang_4 * mh.so_tin_chi)/SUM(mh.so_tin_chi),2)
+                k.ten_khoa, ROUND(SUM(d.thang_4 * mh.so_tin_chi)/SUM(mh.so_tin_chi),2) 
                 FROM diem d
                 JOIN sinh_vien sv ON d.ma_sinh_vien = sv.ma_sinh_vien
                 JOIN sinh_vien_lop svl ON svl.ma_sinh_vien = sv.ma_sinh_vien
@@ -1984,13 +2008,13 @@ def table_print_kqht_sv():
                            diem_sinh_vien = diem_sinh_vien)
 
 @login_required
-@app.route("/get_table_kqht_sv_excel")
-def get_table_kqht_sv_excel():
+@app.route("/table_print_kqht_sv_nql/<string:ma_lop>")
+def table_print_kqht_sv_nql(ma_lop):
     cur = mysql.connection.cursor()
 
     cur.execute("""
                 SELECT d.ma_sinh_vien, sv.ho_ten, sv.ngay_sinh, l.ten_lop, n.ten_nganh,
-                k.ten_khoa, ROUND(SUM(d.thang_4 * mh.so_tin_chi)/SUM(mh.so_tin_chi),2)
+                k.ten_khoa, ROUND(SUM(d.thang_4 * mh.so_tin_chi)/SUM(mh.so_tin_chi),2) as GPA
                 FROM diem d
                 JOIN sinh_vien sv ON d.ma_sinh_vien = sv.ma_sinh_vien
                 JOIN sinh_vien_lop svl ON svl.ma_sinh_vien = sv.ma_sinh_vien
@@ -2002,10 +2026,70 @@ def get_table_kqht_sv_excel():
                     SELECT DISTINCT mhn.ma_mon 
                     FROM mon_hoc_nganh mhn
                     WHERE mhn.ma_nganh = n.ma_nganh
-                ) AND d.thang_10 >= 4
+                ) AND d.thang_10 >= 4 AND svl.ma_lop = %s
                 GROUP BY d.ma_sinh_vien
-                """)
+                ORDER BY GPA DESC
+                """, (ma_lop, ))
     diem_sinh_vien = cur.fetchall()
+    return render_template('ketquahoctap/table_print_kqht_sv.html',
+                           diem_sinh_vien = diem_sinh_vien)
+
+@login_required
+@app.route("/get_table_kqht_nql_sv_pdf/<string:ma_lop>")
+def get_table_kqht_sv_nql_pdf(ma_lop):
+    pathFile = app.config['SAVE_FOLDER_PDF']  + '/Table Kqht SV.pdf'
+    pdfkit.from_url("/".join(request.url.split("/")[:-2:]) + '/table_print_kqht_sv_nql/' + str(ma_lop),pathFile)
+    return send_file(pathFile, as_attachment=True)
+
+@login_required
+@app.route("/get_table_kqht_sv_excel")
+def get_table_kqht_sv_excel():
+    cur = mysql.connection.cursor()
+
+    diem_sinh_vien = ()
+    if session['role_id'] == 1:
+        cur.execute("""
+                    SELECT d.ma_sinh_vien, sv.ho_ten, sv.ngay_sinh, l.ten_lop, n.ten_nganh,
+                    k.ten_khoa, ROUND(SUM(d.thang_4 * mh.so_tin_chi)/SUM(mh.so_tin_chi),2) as GPA
+                    FROM diem d
+                    JOIN sinh_vien sv ON d.ma_sinh_vien = sv.ma_sinh_vien
+                    JOIN sinh_vien_lop svl ON svl.ma_sinh_vien = sv.ma_sinh_vien
+                    JOIN lop l ON l.ma_lop = svl.ma_lop
+                    JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                    JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                    JOIN mon_hoc mh ON mh.ma_mon = d.ma_mon
+                    WHERE d.diem_he_3 != -1 AND d.ma_mon IN (
+                        SELECT DISTINCT mhn.ma_mon 
+                        FROM mon_hoc_nganh mhn
+                        WHERE mhn.ma_nganh = n.ma_nganh
+                    ) AND d.thang_10 >= 4
+                    GROUP BY d.ma_sinh_vien
+                    ORDER BY GPA DESC
+                    """)
+        diem_sinh_vien = cur.fetchall()
+    else:
+        cur.execute("""
+                    SELECT d.ma_sinh_vien, sv.ho_ten, sv.ngay_sinh, l.ten_lop, n.ten_nganh,
+                    k.ten_khoa, ROUND(SUM(d.thang_4 * mh.so_tin_chi)/SUM(mh.so_tin_chi),2) as GPA
+                    FROM diem d
+                    JOIN sinh_vien sv ON d.ma_sinh_vien = sv.ma_sinh_vien
+                    JOIN sinh_vien_lop svl ON svl.ma_sinh_vien = sv.ma_sinh_vien
+                    JOIN lop l ON l.ma_lop = svl.ma_lop
+                    JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                    JOIN khoa k ON k.ma_khoa = n.ma_khoa
+                    JOIN mon_hoc mh ON mh.ma_mon = d.ma_mon
+                    WHERE d.diem_he_3 != -1 AND d.ma_mon IN (
+                        SELECT DISTINCT mhn.ma_mon 
+                        FROM mon_hoc_nganh mhn
+                        WHERE mhn.ma_nganh = n.ma_nganh
+                    ) AND d.thang_10 >= 4 AND svl.ma_lop = %s
+                    GROUP BY d.ma_sinh_vien
+                    ORDER BY GPA DESC
+                    """, (session['username'][-1],))
+        diem_sinh_vien = cur.fetchall()
+        
+    if (len(diem_sinh_vien) == 0):
+        return "Error"
     columnName = ['MSV','HoTen','NgaySinh','TenLop','TenNganh','TenKhoa','GPA']
     data = pd.DataFrame.from_records(diem_sinh_vien, columns=columnName)
     data = data.set_index('MSV')
@@ -3807,6 +3891,146 @@ def table_khao_sat_sv(id_dang_ky):
 
 # student
 @login_required
+@app.route("/view_khao_sat", methods = ['GET','POST'])
+def view_khao_sat():
+    if session['role_id'] == 1 or session['role_id'] == 2:
+        return "Error"
+    cur = mysql.connection.cursor()
+    
+    cur.execute("""
+                SELECT ma_dot_dang_ky
+                FROM dot_yeu_cau_dang_ky dk
+                WHERE CURRENT_TIMESTAMP() BETWEEN dk.ngay_bat_dau AND dk.ngay_ket_thuc
+                """)
+    ma_dot = cur.fetchall()
+    ma_sinh_vien = str(session['username'][1])
+    if (len(ma_dot) == 0):
+        return render_template('student/dangkyhoc/view_dang_ky_hoc.html',
+                           my_user = session['username'],
+                           truong = session['truong'])
+
+    ma_dot = str(ma_dot[0][0])
+    cur.execute("""
+                SELECT mhn.ma_mon
+                FROM mon_hoc_nganh mhn
+                WHERE mhn.ma_nganh IN (SELECT DISTINCT n.ma_nganh
+                                    FROM sinh_vien_lop svl
+                                    JOIN lop l ON l.ma_lop = svl.ma_lop
+                                    JOIN nganh n ON n.ma_nganh = l.ma_nganh
+                                    WHERE svl.ma_sinh_vien = %s);
+                """, (ma_sinh_vien, ))
+    ma_mon = cur.fetchall()
+    ma_mon_dh = "("
+    for elm in ma_mon:
+        ma_mon_dh += "'" + elm[0] + "',"
+    ma_mon_dh = ma_mon_dh[:-1:]
+    ma_mon_dh += ")"
+    
+     # lay thong tin hoc ky
+    cur.execute("""
+                SELECT * 
+                FROM hoc_ky hk
+                WHERE hk.ma_hoc_ky = (SELECT ddk.ma_hoc_ky
+                                    FROM dot_dang_ky ddk
+                                    WHERE ddk.ma_dot = %s)
+                """, (ma_dot, ))
+    thong_tin_hk = cur.fetchall()
+    if (len(thong_tin_hk) == 0):
+        return "Error"
+    thong_tin_hk = thong_tin_hk[0]
+    
+    cur.execute("""
+            SELECT mhdk.id_dang_ky, mh.ten_mon, mh.so_tin_chi, d.thang_4, mhdk.ma_so_lop, mhdk.so_luong, mhdk.so_luong_da_dang_ky,
+            CONCAT("T",mhdk.thu,"(",mhdk.tiet_bat_dau,"-",mhdk.tiet_ket_thuc,")",mhdk.phong_hoc)
+            FROM mon_hoc_dot_dang_ky mhdk
+            LEFT JOIN mon_hoc mh ON mhdk.ma_mon = mh.ma_mon
+            LEFT JOIN (SELECT * FROM diem d WHERE d.ma_sinh_vien = '""" + str(ma_sinh_vien) + """' ) d ON d.ma_mon = mh.ma_mon
+            WHERE mhdk.ma_dot = '""" + ma_dot + """' AND mhdk.ma_mon IN """ + ma_mon_dh + """
+            ORDER BY mhdk.ma_so_lop ASC;
+            """)
+    column_name = ['id_dang_ky', 'ten_mon','so_tin_chi', 'thang_4', 'ma_so_lop',
+                    'so_luong', 'so_luong_da_dang_ky', 'lich_hoc']
+    cac_mon_dk = cur.fetchall()
+    data = pd.DataFrame.from_records(cac_mon_dk, columns=column_name)
+    
+    data = data.fillna(' ')
+    
+    def f(x):
+        return pd.Series(dict(lich_hoc = "%s" % ','.join(x['lich_hoc'])))
+    
+    if data.shape[0] == 0:
+        data = ()
+    else:
+        data = data.groupby(by=['id_dang_ky', 'ten_mon','so_tin_chi', 'thang_4',
+                                'ma_so_lop', 'so_luong', 'so_luong_da_dang_ky'], group_keys=False).apply(f).reset_index()
+        data = data.values.tolist()
+        
+    
+    if request.method == 'POST':
+        details = request.form
+        cac_ma_dk = details['mon_hoc_dang_ky'].strip()
+        
+        cac_ma_dk = list(set(cac_ma_dk.split(",")))
+        
+        if (len(cac_ma_dk) == 0):
+            return "Error"
+        
+        cur.execute("SELECT id_dang_ky FROM dang_ky_mon WHERE ma_sinh_vien = %s", (ma_sinh_vien, ))
+        check_exits = cur.fetchall()
+        id_tmp = []
+        for elm in check_exits:
+            id_tmp.append(elm[0])
+            
+        for elm in cac_ma_dk:
+            if elm in id_tmp:
+                cac_ma_dk.remove(elm)
+        
+        sql = "INSERT INTO dang_ky_mon(id_dang_ky, ma_sinh_vien) VALUES "
+        for elm in cac_ma_dk:
+            sql += "('" + elm + "','" + ma_sinh_vien + "'),"
+        sql = sql[:-1:]
+        cur.execute(sql)
+        mysql.connection.commit()
+        return redirect(url_for('view_dang_ky_hoc'))
+        
+    # cac mon da dang ky duoc
+    cur.execute("""
+                SELECT dkm.id_dang_ky, mh.ten_mon, mh.so_tin_chi, mhdk.ma_so_lop,
+                CONCAT("T",mhdk.thu,"(",mhdk.tiet_bat_dau,"-",mhdk.tiet_ket_thuc,")",mhdk.phong_hoc)
+                FROM dang_ky_mon dkm
+                JOIN mon_hoc_dot_dang_ky mhdk ON dkm.id_dang_ky = mhdk.id_dang_ky
+                LEFT JOIN mon_hoc mh ON mhdk.ma_mon = mh.ma_mon
+                WHERE mhdk.ma_dot = '""" + ma_dot + """' 
+                AND dkm.ma_sinh_vien = '""" + ma_sinh_vien + """' 
+                AND mhdk.ma_mon IN """ + ma_mon_dh + """
+                ORDER BY mhdk.ma_so_lop ASC;
+                """)
+    column_name = ['id_dang_ky', 'ten_mon','so_tin_chi', 'ma_so_lop', 'lich_hoc']
+    cac_mon_da_dk = cur.fetchall()
+    sub_data = pd.DataFrame.from_records(cac_mon_da_dk, columns=column_name)
+    
+    sub_data = sub_data.fillna(' ')
+    
+    def f(x):
+        return pd.Series(dict(lich_hoc = "%s" % ','.join(x['lich_hoc'])))
+    
+    if sub_data.shape[0] == 0:
+        sub_data = ()
+    else:
+        sub_data = sub_data.groupby(by=['id_dang_ky', 'ten_mon','so_tin_chi','ma_so_lop'],
+                                    group_keys=False).apply(f).reset_index()
+        sub_data = sub_data.values.tolist()
+    
+    return render_template(session['role'] + 'dangkyhoc/view_khao_sat.html',
+                           thong_tin_hk = thong_tin_hk,
+                           ma_sinh_vien = ma_sinh_vien,
+                            cac_mon = data,
+                            cac_mon_da_dk = sub_data,
+                        ma_dot = ma_dot,
+                    my_user = session['username'],
+                    truong = session['truong'])
+
+@login_required
 @app.route("/view_dang_ky_hoc", methods = ['GET','POST'])
 def view_dang_ky_hoc():
     if session['role_id'] == 1 or session['role_id'] == 2:
@@ -4080,14 +4304,13 @@ def huy_dang_ky_mon(id_dang_ky):
                 WHERE CURRENT_TIMESTAMP() BETWEEN dk.ngay_bat_dau AND dk.ngay_ket_thuc
                 """)
     ma_dot = cur.fetchall()
-    ma_dot = (('202001',),)
-    ma_sinh_vien = '20002077'
+    ma_sinh_vien = str(session['username'][1])
     if (len(ma_dot) == 0):
         return render_template('student/dangkyhoc/view_dang_ky_hoc.html',
                            my_user = session['username'],
                            truong = session['truong'])
 
-    ma_dot = ma_dot[0][0]
+    ma_dot = str(ma_dot[0][0])
     
     cur.execute("""
                 SELECT DISTINCT mhdk.id_dang_ky

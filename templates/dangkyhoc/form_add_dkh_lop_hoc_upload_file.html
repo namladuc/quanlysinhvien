@@ -17,6 +17,19 @@
         <h3 class="tile-title">Thêm lớp học - Upload file excel</h3>
         <div class="tile-body">
           <form class="row" method="post" action="/table_dang_ky_hoc/form_add_dkh_lop_hoc_upload_file/{{ma_dot}}" enctype="multipart/form-data">
+            <div class="form-group col-md-12">
+              <label class="control-label">Thêm dữ liệu môn học đăng ký từ file nhận các định dạng file excel ('xlsx', 'csv', 'xls', 'xlsm')</label> <br>
+              Yêu cầu nội dung trong file: <br>
+              - File luôn có số lượng cột là: 8 <br>
+              - Bao gồm các cột sau: <br>
+              + Mã môn: nếu mã môn học không được tìm thấy sẽ dừng xử lý và báo lỗi <br>
+              + Mã số lớp: (Ví dụ: MAT3500 1) là một mã số lớp học <br>
+              + Ngày học: Học thứ mấy (2-7)  <br>
+              + Phòng học <br>
+              + Tiết bắt đầu <br>
+              + Tiết kết thúc <br>
+              + Số lượng sinh viên <br>
+            </div>
             <div class="form-group col-md-4">
               <label class="control-label">Upload file</label>
               <input type="file" style="height:45px;" name="FileDataUpload" class="form-control" id="customFile" />

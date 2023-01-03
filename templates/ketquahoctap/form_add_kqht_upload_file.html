@@ -16,6 +16,21 @@
         <h3 class="tile-title">Thêm kết quả học tập - Upload file excel</h3>
         <div class="tile-body">
           <form class="row" method="post" action="/table_kqht_sv/form_add_kqht_upload_file" enctype="multipart/form-data">
+            <div class="form-group col-md-12">
+              <label class="control-label">Thêm kết quả học tập từ file nhận các định dạng file excel ('xlsx', 'csv', 'xls', 'xlsm')</label> <br>
+              Yêu cầu nội dung trong file: <br>
+              - File luôn có số lượng cột là: 9 <br>
+              - Bao gồm các cột sau: <br>
+              + Mã sinh viên: Mã của sinh viên (Nếu không thấy mã sinh viên tồn tại sẽ báo lỗi và dừng xử lý) <br>
+              + Mã môn: Nếu mã môn không được tìm thấy sẽ báo lỗi và dừng xử lý <br>
+              + Mã học kỳ: Nếu mã học kỳ không được tìm thấy sẽ báo lỗi và dừng xử lý <br>
+              + Hệ số điêm 1 <br>
+              + Hệ số điêm 2 <br>
+              + Hệ số điêm 3 <br>
+              + Điểm hệ số 1 <br>
+              + Điểm hệ số 2 <br>
+              + Điểm hệ số 3 <br>
+            </div>
             <div class="form-group col-md-4">
               <label class="control-label">Upload file</label>
               <input type="file" style="height:45px;" name="FileDataUpload" class="form-control" id="customFile" />

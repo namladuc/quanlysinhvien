@@ -16,6 +16,17 @@
         <h3 class="tile-title">Thêm ngành - Upload file excel</h3>
         <div class="tile-body">
           <form class="row" method="post" action="/table_nganh/form_add_nganh_upload_file" enctype="multipart/form-data">
+            <div class="form-group col-md-12">
+              <label class="control-label">Thêm ngành từ file nhận các định dạng file excel ('xlsx', 'csv', 'xls', 'xlsm')</label> <br>
+              Yêu cầu nội dung trong file: <br>
+              - File luôn có số lượng cột là: 5 <br>
+              - Bao gồm các cột sau: <br>
+              + Mã ngành là mã của ngành học (Nếu tìm thấy mã đã có sẽ lỗi và không tiếp tục xử lý) <br>
+              + Tên ngành là tên ngành học <br>
+              + Hình thức đào tạo: Chính Quy, Cao Đẳng, ... <br>
+              + Mã khoa: mã của khoa (Nếu mã khoa nhập trong file không tồn tại sẽ lỗi và không tiếp tục xử lý) <br>
+              + Mã hệ: mã của hệ đào tạo (Hệ chuẩn, hệ CLC, hệ Tài Năng) (Nếu mã hệ nhập trong file không tồn tại sẽ lỗi và không tiếp tục xử lý) <br>
+            </div>
             <div class="form-group col-md-4">
               <label class="control-label">Upload file</label>
               <input type="file" style="height:45px;" name="FileDataUpload" class="form-control" id="customFile" />

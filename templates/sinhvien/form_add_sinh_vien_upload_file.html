@@ -16,6 +16,27 @@
         <h3 class="tile-title">Thêm sinh viên - Upload file excel</h3>
         <div class="tile-body">
           <form class="row" method="post" action="/bang_sinh_vien/form_add_sinh_vien_upload_file" enctype ="multipart/form-data">
+            <div class="form-group col-md-12">
+              <label class="control-label">Thêm sinh viên từ file nhận các định dạng file excel ('xlsx', 'csv', 'xls', 'xlsm')</label> <br>
+              Yêu cầu nội dung trong file: <br>
+              - File luôn yêu cầu có số lượng cột ít nhất là: 6 <br>
+              - Trong đó các cột buộc phải có bao gồm các cột sau: <br>
+              + <b>Mã Sinh viên</b>: mã của sinh viên (Nếu mã sinh viên đã tồn tại sẽ báo lỗi và dừng xử lý) <br>
+              + <b>Họ tên</b>: Họ và tên của sinh viên <br>
+              + <b>Giới tính</b>: giới tính của sinh viên <br>
+              + <b>Ngày Sinh</b>: Ngày sinh của sinh viên <br>
+              + <b>Nơi sinh</b>: Nơi sinh của sinh viên <br>
+              + <b>Mã lớp</b>: Mã lớp mà sinh viên đang thuộc (Nếu mã lớp không được tìm thấy sẽ báo lỗi và dừng xử lý) <br>
+              - Ngoài ra còn các cột khác như: <br>
+              + Email <br>
+              + Dân tộc <br>
+              + Địa chỉ <br>
+              + Số điện thoại <br>
+              + Quốc tịch <br>
+              + CMT / Thẻ căn cước <br>
+              + Nơi cấp CMT <br>
+              + Ngày cấp CMT<br>
+            </div>
           <div class="form-group col-md-4">
             <label class="control-label">Upload file</label>
             <input type="file" style="height:45px;" name="FileDataUpload" class="form-control" id="customFile" />

@@ -16,6 +16,17 @@
         <h3 class="tile-title">Thêm lớp - Upload file excel</h3>
         <div class="tile-body">
           <form class="row" method="post" action="/table_lop/form_add_lop_upload_file" enctype="multipart/form-data">
+            <div class="form-group col-md-12">
+              <label class="control-label">Thêm lớp từ file nhận các định dạng file excel ('xlsx', 'csv', 'xls', 'xlsm')</label> <br>
+              Yêu cầu nội dung trong file: <br>
+              - File luôn có số lượng cột là: 5 <br>
+              - Bao gồm các cột sau: <br>
+              + Mã lớp: mã của lớp mới (Nếu mã lớp đã tồn tại sẽ lỗi và dừng xử lý) <br>
+              + Mã Ngành: mã của các ngành hiện có (Nếu mã ngành không tìm thấy trong các mã ngành hiện có sẽ báo lỗi và dừng xử lý) <br>
+              + Năm: năm của lớp này nhập học<br>
+              + Tên lớp: Tên của lớp  <br>
+              + Mã Người Quản lý: Mỗi người quản lý chỉ được quản lý 1 lớp chưa bị xóa (nếu mã người quản lý bị trùng sẽ báo lỗi, dừng xử lý) <br>
+            </div>
             <div class="form-group col-md-4">
               <label class="control-label">Upload file</label>
               <input type="file" style="height:45px;" name="FileDataUpload" class="form-control" id="customFile" />
