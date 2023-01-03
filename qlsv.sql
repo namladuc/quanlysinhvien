@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 02, 2023 at 02:41 PM
+-- Generation Time: Jan 03, 2023 at 03:16 PM
 -- Server version: 10.4.21-MariaDB
 -- PHP Version: 8.0.10
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `qlsv`
+-- Database: `quan_ly_sinh_vien_nhom_1`
 --
 
 -- --------------------------------------------------------
@@ -279,11 +279,72 @@ CREATE TABLE `gia_dinh` (
 --
 
 INSERT INTO `gia_dinh` (`ma_sinh_vien`, `ten_cha`, `nam_sinh_cha`, `sdt_cha`, `nghe_cha`, `email_cha`, `dia_chi_cha`, `noi_cha`, `ten_me`, `nam_sinh_me`, `sdt_me`, `nghe_me`, `email_me`, `dia_chi_me`, `noi_me`, `ten_vo_chong`, `ngay_sinh_vo_chong`, `nghe_vo_chong`, `dia_chi_vo_chong`, `thong_tin_anh_chi_em`, `thong_tin_cac_con`) VALUES
+(20000098, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20000250, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20000394, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002028, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002029, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002030, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002031, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002032, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002033, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002034, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002035, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002037, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002038, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002039, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002040, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002041, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002042, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002043, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002044, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002046, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002047, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002048, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002050, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002051, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002052, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002053, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002054, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
 (20002055, '', 1978, '', '', '', '', '', '', 1972, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002056, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002057, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002058, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002059, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002061, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
 (20002062, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002063, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002064, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002065, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002066, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002067, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002068, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002071, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002072, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002073, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002075, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
 (20002076, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
 (20002077, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
-(20002080, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', '');
+(20002078, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002079, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002080, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002081, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002084, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002086, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002087, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002088, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002089, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002090, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002091, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002092, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002093, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002094, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002095, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002096, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002097, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002098, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002099, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002100, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', '');
 
 -- --------------------------------------------------------
 
@@ -341,6 +402,12 @@ CREATE TABLE `khoa` (
 --
 
 INSERT INTO `khoa` (`ma_khoa`, `ten_khoa`) VALUES
+('DC', 'Địa chất'),
+('DL', 'Địa lý'),
+('HH', 'Hóa học'),
+('KTTVHDH', 'Khí tượng Thủy văn và Hải dương học'),
+('MT', 'Môi trường'),
+('SH', 'Sinh học'),
 ('TCT', 'Toán - Cơ - Tin học'),
 ('VATLY', 'Vật Lý');
 
@@ -362,7 +429,8 @@ CREATE TABLE `loai_he` (
 
 INSERT INTO `loai_he` (`ma_he`, `ten_he`, `hoc_phi_tin_chi`) VALUES
 ('CLC', 'Chất Lượng Cao', 990000),
-('HC', 'Chuẩn', 330000);
+('HC', 'Chuẩn', 330000),
+('TN', 'Tài năng', 300000);
 
 -- --------------------------------------------------------
 
@@ -384,7 +452,7 @@ CREATE TABLE `lop` (
 --
 
 INSERT INTO `lop` (`ma_lop`, `ma_nganh`, `nam`, `ten_lop`, `ma_nguoi_quan_ly`, `is_delete`) VALUES
-('KHDL2020', 'KHDL', 2020, 'K65A5', NULL, 0),
+('KHDL2020', 'KHDL', 2020, 'K65A5', 1510560002, 0),
 ('KHDL2021', 'KHDL', 2021, 'K66A5', NULL, 0),
 ('KHDL2022', 'KHDL', 2022, 'K67A5', NULL, 0),
 ('KMHTTT2020', 'KHMTTT', 2020, 'K65A7', NULL, 0),
@@ -1117,10 +1185,33 @@ CREATE TABLE `nganh` (
 --
 
 INSERT INTO `nganh` (`ma_nganh`, `ma_khoa`, `ten_nganh`, `hinh_thuc_dao_tao`, `ma_he`, `is_delete`) VALUES
+('CNKTHH', 'HH', 'Công nghệ kỹ thuật hoá học', 'Chính Quy', 'HC', 0),
+('CNKTHN', 'VATLY', 'Công nghệ kỹ thuật hạt nhân', 'Chính Quy', 'HC', 0),
+('CNKTMT', 'MT', 'Công nghệ kỹ thuật môi trường', 'Chính Quy', 'HC', 0),
+('CNQTTNMT', 'MT', 'Công nghệ quan trắc và giám sát tài nguyên môi trường', 'Chính Quy', 'HC', 0),
+('CNSH', 'SH', 'Công nghệ sinh học', 'Chính Quy', 'HC', 0),
+('DCH', 'DC', 'Địa chất học', 'Chính Quy', 'HC', 0),
+('DLTN', 'DL', 'Địa lí tự nhiên', 'Chính Quy', 'HC', 0),
+('HD', 'HH', 'Hoá dược', 'Chính Quy', 'HC', 0),
+('HDH', 'KTTVHDH', 'Hải dương học', 'Chính Quy', 'HC', 0),
+('HH', 'HH', 'Hoá học', 'Chính Quy', 'HC', 0),
+('HHCLC', 'HH', 'Hoá học', 'Chính Quy', 'CLC', 0),
+('KHCNTP', 'MT', 'Khoa học và công nghệ thực phẩm', 'Chính Quy', 'HC', 0),
 ('KHDL', 'TCT', 'Khoa học dữ liệu', 'Chính Quy', 'HC', 0),
+('KHMT', 'MT', 'Khoa học môi trường', 'Chính Quy', 'HC', 0),
 ('KHMTTT', 'TCT', 'Khoa học máy tính và thông tin', 'Chính Quy', 'HC', 0),
+('KHTTDKG', 'DL', 'Khoa học thông tin địa không gian', 'Chính Quy', 'HC', 0),
+('KHVL', 'VATLY', 'Khoa học vật liệu', 'Chính Quy', 'HC', 0),
+('KTDTTH', 'VATLY', 'Kỹ thuật điện tử và tin học', 'Chính Quy', 'HC', 0),
+('KTKHH', 'KTTVHDH', 'Khí tượng và khí hậu học', 'Chính Quy', 'HC', 0),
+('QLDD', 'DL', 'Quản lý đất đai', 'Chính Quy', 'HC', 0),
+('QLPTDTBDS', 'DL', 'Quản lý phát triển đô thị và bất động sản', 'Chính Quy', 'HC', 0),
+('QLTNMT', 'MT', 'Quản lý tài nguyên và môi trường', 'Chính Quy', 'HC', 0),
+('SH', 'SH', 'Sinh học', 'Chính Quy', 'HC', 0),
 ('TH', 'TCT', 'Toán Học', 'Chính Quy', 'HC', 0),
-('TT', 'TCT', 'Toán Tin', 'Chính Quy', 'HC', 0);
+('TNMTN', 'MT', 'Tài nguyên và môi trường nước', 'Chính Quy', 'HC', 0),
+('TT', 'TCT', 'Toán Tin', 'Chính Quy', 'HC', 0),
+('VLH', 'VATLY', 'Vật lý học', 'Chính Quy', 'HC', 0);
 
 -- --------------------------------------------------------
 
@@ -1184,7 +1275,11 @@ INSERT INTO `role_user` (`id_user`, `role_id`) VALUES
 (2, 3),
 (4, 2),
 (6, 1),
-(7, 3);
+(7, 3),
+(8, 3),
+(9, 3),
+(10, 3),
+(11, 3);
 
 -- --------------------------------------------------------
 
@@ -1219,11 +1314,72 @@ CREATE TABLE `sinh_vien` (
 --
 
 INSERT INTO `sinh_vien` (`ma_sinh_vien`, `ho_ten`, `gioi_tinh`, `ngay_sinh`, `noi_sinh`, `email`, `dan_toc`, `dia_chi`, `so_dien_thoai`, `quoc_tich`, `chung_minh_thu`, `ngay_cmt`, `noi_cmt`, `id_image`, `is_delete`, `created_at`, `created_by`, `update_at`, `update_by`) VALUES
+(20000098, 'Trần Thị Như Quỳnh', 'Nữ', '0000-00-00', 'Thị trấn Ngô Đồng, Huyện Giao Thủy, Nam Định', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20000250, 'Vũ Quang Mạnh', 'Nam', '0000-00-00', 'Xã Trung Mầu, Huyện Gia Lâm, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20000394, 'Đoàn Minh Hiển', 'Nam', '0000-00-00', 'nan', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002028, 'Nguyễn Duy Anh', 'Nam', '0000-00-00', 'Xã Xuân Minh, Huyện Thọ Xuân, Thanh Hóa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002029, 'Nguyễn Đình Việt Anh', 'Nam', '0000-00-00', 'Phường Phú Lương, Quận Hà Đông, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002030, 'Nguyễn Phan Anh', 'Nam', '0000-00-00', 'Phường Nguyễn Du, Quận Hai Bà Trưng, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002031, 'Nguyễn Thị Vân Anh', 'Nữ', '0000-00-00', 'Phường Tân Dân, Thành phố Chí Linh, Hải Dương', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002032, 'Nguyễn Việt Anh', 'Nam', '0000-00-00', 'Xã Quất Động, Huyện Thường Tín, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002033, 'Đinh Thành Công', 'Nam', '0000-00-00', 'Xã Kim Chung, Huyện Hoài Đức, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002034, 'Dương Đức Cường', 'Nam', '0000-00-00', 'Xã Trung Lương, Huyện Định Hóa, Thái Nguyên', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002035, 'Lê Thế Cường', 'Nam', '0000-00-00', 'Thị trấn Tân Phong, Huyện Quảng Xương, Thanh Hóa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002037, 'Đỗ Ngọc Diệp', 'Nam', '0000-00-00', 'Xã Quốc Tuấn, Huyện An Lão, Hải Phòng', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002038, 'Lê Thị Dung', 'Nữ', '0000-00-00', 'Xã Hà Châu, Huyện Hà Trung, Thanh Hóa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002039, 'Đinh Tiến Dũng', 'Nam', '0000-00-00', 'Quận Đống Đa, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002040, 'Nguyễn Chí Dũng', 'Nam', '0000-00-00', 'Xã Đức Thượng, Huyện Hoài Đức, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002041, 'Nguyễn Thị Duyên', 'Nữ', '0000-00-00', 'Xã Diễn Lộc, Huyện Diễn Châu, Nghệ An', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002042, 'Vương Thùy Dương', 'Nữ', '0000-00-00', 'Huyện Thuận Thành, Bắc Ninh', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002043, 'Nguyễn Công Đạt', 'Nam', '0000-00-00', 'Xã Liên Giang, Huyện Đông Hưng, Thái Bình', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002044, 'Phan Tuấn Đạt', 'Nam', '0000-00-00', 'Xã Tăng Thành, Huyện Yên Thành, Nghệ An', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002046, 'Vũ Mạnh Đức', 'Nam', '0000-00-00', 'Thị trấn Tam Sơn, Huyện Sông Lô, Vĩnh Phúc', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002047, 'Đỗ Hoàng Gia', 'Nam', '0000-00-00', 'Xã Xuân Minh, Huyện Thọ Xuân, Thanh Hóa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002048, 'Nguyễn Hoàng Giang', 'Nam', '0000-00-00', 'Xã Trung Hà, Huyện Thuỷ Nguyên, Hải Phòng', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002050, 'Hoàng Thị Hảo', 'Nữ', '0000-00-00', 'Xã Đại Thắng, Huyện Phú Xuyên, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002051, 'Phan Minh Hiếu', 'Nam', '0000-00-00', 'Xã Tân Lập, Huyện Yên Mỹ, Hưng Yên', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002052, 'Nguyễn Việt Hoàng', 'Nam', '0000-00-00', 'Hà Nam', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002053, 'Đỗ Mạnh Hùng', 'Nam', '0000-00-00', 'Xã Lâm Giang, Huyện Văn Yên, Yên Bái', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002054, 'Nguyễn Sinh Hùng', 'Nam', '0000-00-00', 'Xã Đại Lộc, Huyện Hậu Lộc, Thanh Hóa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
 (20002055, 'Nguyễn Khắc Huy', 'Nam', '2002-07-31', 'Đan Phượng', 'khachuynguyen@gmail.com', 'None', 'Đan Phượng', 'None', 'None', 'None', '0000-00-00', 'Đan Phượng', 'none_image_profile', 0, '2022-12-27 20:35:35', 'Administrator', '2022-12-28 14:58:29', 'Administrator'),
+(20002056, 'Phạm Hoàng Huynh', 'Nam', '0000-00-00', 'Xã Trung Kênh, Huyện Lương Tài, Bắc Ninh', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002057, 'Hoàng Việt Hưng', 'Nam', '0000-00-00', 'Xã Tiền Tiến, Huyện Phù Cừ, Hưng Yên', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002058, 'Nguyễn Hoàng Hưng', 'Nam', '0000-00-00', 'Xã Đức Lý, Huyện Lý Nhân, Hà Nam', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002059, 'Hán Duy Khánh', 'Nam', '0000-00-00', 'Xã An Thịnh, Huyện Lương Tài, Bắc Ninh', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002061, 'Lưu Đỗ Khoa', 'Nam', '0000-00-00', 'Xã Hòa Tiến, Huyện Yên Phong, Bắc Ninh', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
 (20002062, 'Phạm Như Khoa', 'Nam', '2002-11-08', 'Hoài Đức', 'phamnhuga@gmail.com', 'Kinh', 'Hoài Đức', '0937718364', 'Việt Nam', '001293748284', '2020-08-03', 'Hoài Đức', 'none_image_profile', 0, '2022-12-28 08:33:49', 'Administrator', '2022-12-28 08:33:49', NULL),
+(20002063, 'Nguyễn Đình Kiên', 'Nam', '0000-00-00', 'Xã Gia Tân, Huyện Gia Lộc, Hải Dương', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002064, 'Đỗ Thanh Lâm', 'Nam', '0000-00-00', 'Xã Tân Minh, Huyện Sóc Sơn, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002065, 'Nguyễn Tùng Lâm', 'Nam', '0000-00-00', 'Xã Cao Xá, Huyện Lâm Thao, Phú Thọ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002066, 'Nguyễn Thị Khánh Linh', 'Nữ', '0000-00-00', 'Thị trấn Thắng, Huyện Hiệp Hòa, Bắc Giang', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002067, 'Vũ Hoàng Long', 'Nam', '0000-00-00', 'Xã Đông Dương, Huyện Đông Hưng, Thái Bình', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002068, 'Hà Văn Mạnh', 'Nam', '0000-00-00', 'Thành phố Thanh Hóa, Thanh Hóa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002071, 'Hoàng Vũ Minh', 'Nam', '0000-00-00', 'Xã Quang Thịnh, Huyện Lạng Giang, Bắc Giang', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002072, 'Lê Trọng Minh', 'Nam', '0000-00-00', 'Xã Xuân Hồng, Huyện Thọ Xuân, Thanh Hóa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002073, 'Nguyễn Đình Minh', 'Nam', '0000-00-00', 'Xã Yên Ninh, Huyện Ý Yên, Nam Định', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002075, 'Trần Diệu Minh', 'Nữ', '0000-00-00', 'Xã Nam Hồng, Huyện Nam Trực, Nam Định', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
 (20002076, 'Dương Văn Nam', 'Nam', '2002-10-07', 'Bắc Giang', 'duongnam@gmail.com', 'Kinh', 'Bắc Giang', '0967739865', 'Việt Nam', '0028394187', '0000-00-00', '', 'Image_Profile_20002076', 0, '2022-12-27 16:47:00', 'Administrator', '2022-12-27 22:08:03', 'Administrator'),
 (20002077, 'Lã Đức Nam', 'Nam', '2002-11-28', NULL, 'namld@gmail.com', 'Kinh', NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2022-12-26 16:49:05', 'Administrator', NULL, NULL),
-(20002080, 'Phạm Hồng Nghĩa', 'Nam', '2002-10-07', 'Phú Thọ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2022-12-27 20:35:35', 'Administrator', '2022-12-27 20:35:35', NULL);
+(20002078, 'Phạm Quang Nam', 'Nam', '0000-00-00', 'Xã Nguyên Giáp, Huyện Tứ Kỳ, Hải Dương', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002079, 'Ngô Minh Nghĩa', 'Nam', '0000-00-00', 'Xã Hưng Thành, Huyện Hưng Nguyên, Nghệ An', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002080, 'Phạm Hồng Nghĩa', 'Nam', '2002-10-07', 'Phú Thọ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2022-12-27 20:35:35', 'Administrator', '2022-12-27 20:35:35', NULL),
+(20002081, 'Phan Trần Minh Ngọc', 'Nam', '0000-00-00', 'Xã Nam Phong, Thành phố Nam Định, Nam Định', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002084, 'Nguyễn Nam Phong', 'Nam', '0000-00-00', 'Xã Minh Hoàng, Huyện Phù Cừ, Hưng Yên', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002086, 'Vũ Trọng Quân', 'Nam', '0000-00-00', 'Xã Tăng Thành, Huyện Yên Thành, Nghệ An', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002087, 'Bùi Minh Quân', 'Nam', '0000-00-00', 'Xã Nam Tân, Huyện Nam Sách, Hải Dương', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002088, 'Trần Bảo Quốc', 'Nam', '0000-00-00', 'Xã Yên Đồng, Huyện Ý Yên, Nam Định', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002089, 'Đồng Thái Sơn', 'Nam', '0000-00-00', 'Xã Nghĩa Sơn, Huyện Nghĩa Hưng, Nam Định', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002090, 'Phan Tấn Sơn', 'Nam', '0000-00-00', 'Xã Đông Vinh, Thành phố Thanh Hóa, Thanh Hóa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002091, 'Lã Văn Thắng', 'Nam', '0000-00-00', 'Xã Yên Phương, Huyện Ý Yên, Nam Định', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002092, 'Nguyễn Xuân Thuận', 'Nam', '0000-00-00', 'Xã Liên Hiệp, Huyện Phúc Thọ, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002093, 'Lê Ngọc Toàn', 'Nam', '0000-00-00', 'Xã Đồng Việt, Huyện Yên Dũng, Bắc Giang', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002094, 'Vũ Thùy Trang', 'Nữ', '0000-00-00', 'Xã Đại Thắng, Huyện Vụ Bản, Nam Định', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002095, 'Hoàng Đức Trung', 'Nam', '0000-00-00', 'Xã Phú Thị, Huyện Gia Lâm, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002096, 'Nguyễn Trọng Trung', 'Nam', '0000-00-00', 'Xã Phú Thị, Huyện Gia Lâm, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002097, 'Lê Anh Tuấn', 'Nam', '0000-00-00', 'Xã Yên Bằng, Huyện Ý Yên, Nam Định', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002098, 'Vũ Văn Tùng', 'Nam', '0000-00-00', 'Xã Đại Thắng, Huyện Phú Xuyên, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002099, 'Nguyễn Văn Tùng', 'Nam', '0000-00-00', 'Xã Tam Đa, Huyện Yên Phong, Bắc Ninh', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002100, 'Nguyễn Thị Vân', 'Nữ', '0000-00-00', 'Xã An Khánh, Huyện Hoài Đức, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL);
 
 --
 -- Triggers `sinh_vien`
@@ -1249,11 +1405,72 @@ CREATE TABLE `sinh_vien_lop` (
 --
 
 INSERT INTO `sinh_vien_lop` (`ma_sinh_vien`, `ma_lop`) VALUES
+(20000098, 'KHDL2020'),
+(20000250, 'KHDL2020'),
+(20000394, 'KHDL2020'),
+(20002028, 'KHDL2020'),
+(20002029, 'KHDL2020'),
+(20002030, 'KHDL2020'),
+(20002031, 'KHDL2020'),
+(20002032, 'KHDL2020'),
+(20002033, 'KHDL2020'),
+(20002034, 'KHDL2020'),
+(20002035, 'KHDL2020'),
+(20002037, 'KHDL2020'),
+(20002038, 'KHDL2020'),
+(20002039, 'KHDL2020'),
+(20002040, 'KHDL2020'),
+(20002041, 'KHDL2020'),
+(20002042, 'KHDL2020'),
+(20002043, 'KHDL2020'),
+(20002044, 'KHDL2020'),
+(20002046, 'KHDL2020'),
+(20002047, 'KHDL2020'),
+(20002048, 'KHDL2020'),
+(20002050, 'KHDL2020'),
+(20002051, 'KHDL2020'),
+(20002052, 'KHDL2020'),
+(20002053, 'KHDL2020'),
+(20002054, 'KHDL2020'),
 (20002055, 'KHDL2020'),
+(20002056, 'KHDL2020'),
+(20002057, 'KHDL2020'),
+(20002058, 'KHDL2020'),
+(20002059, 'KHDL2020'),
+(20002061, 'KHDL2020'),
 (20002062, 'KHDL2020'),
+(20002063, 'KHDL2020'),
+(20002064, 'KHDL2020'),
+(20002065, 'KHDL2020'),
+(20002066, 'KHDL2020'),
+(20002067, 'KHDL2020'),
+(20002068, 'KHDL2020'),
+(20002071, 'KHDL2020'),
+(20002072, 'KHDL2020'),
+(20002073, 'KHDL2020'),
+(20002075, 'KHDL2020'),
 (20002076, 'KHDL2020'),
 (20002077, 'KHDL2020'),
-(20002080, 'KHDL2020');
+(20002078, 'KHDL2020'),
+(20002079, 'KHDL2020'),
+(20002080, 'KHDL2020'),
+(20002081, 'KHDL2020'),
+(20002084, 'KHDL2020'),
+(20002086, 'KHDL2020'),
+(20002087, 'KHDL2020'),
+(20002088, 'KHDL2020'),
+(20002089, 'KHDL2020'),
+(20002090, 'KHDL2020'),
+(20002091, 'KHDL2020'),
+(20002092, 'KHDL2020'),
+(20002093, 'KHDL2020'),
+(20002094, 'KHDL2020'),
+(20002095, 'KHDL2020'),
+(20002096, 'KHDL2020'),
+(20002097, 'KHDL2020'),
+(20002098, 'KHDL2020'),
+(20002099, 'KHDL2020'),
+(20002100, 'KHDL2020');
 
 -- --------------------------------------------------------
 
@@ -1296,11 +1513,15 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id_user`, `username`, `password`, `ma_nguoi_dung`, `last_login`, `register`) VALUES
-(1, '1510560001', '21232f297a57a5a743894a0e4a801fc3', 1510560001, '2023-01-02 20:26:09', '2022-12-26 16:31:04'),
-(2, '20002076', '827ccb0eea8a706c4c34a16891f84e7b', 20002076, NULL, '2023-01-02 15:22:39'),
-(4, '1510560002', '827ccb0eea8a706c4c34a16891f84e7b', 1510560002, NULL, '2023-01-02 15:45:58'),
+(1, '1510560001', '21232f297a57a5a743894a0e4a801fc3', 1510560001, '2023-01-03 20:54:02', '2022-12-26 16:31:04'),
+(2, '20002076', '827ccb0eea8a706c4c34a16891f84e7b', 20002076, '2023-01-03 15:36:55', '2023-01-02 15:22:39'),
+(4, '1510560002', '827ccb0eea8a706c4c34a16891f84e7b', 1510560002, '2023-01-03 15:54:52', '2023-01-02 15:45:58'),
 (6, '1510560003', '827ccb0eea8a706c4c34a16891f84e7b', 1510560003, NULL, '2023-01-02 20:03:10'),
-(7, '20002080', '827ccb0eea8a706c4c34a16891f84e7b', 20002080, NULL, '2023-01-02 20:03:10');
+(7, '20002080', '827ccb0eea8a706c4c34a16891f84e7b', 20002080, NULL, '2023-01-02 20:03:10'),
+(8, '20002075', 'f8a882d0b5087dc9c852865d6bea75fe', 20002075, NULL, '2023-01-03 21:09:50'),
+(9, '20002099', '4388c0c3dfb2ba8e956a5147d31d52e5', 20002099, NULL, '2023-01-03 21:10:23'),
+(10, '20002064', 'db61d5a2d28d917880d34ed510cf99d8', 20002064, NULL, '2023-01-03 21:11:08'),
+(11, '20002077', '39e9030b7efa9bdfbae5c8c13503a0f6', 20002077, NULL, '2023-01-03 21:11:29');
 
 --
 -- Indexes for dumped tables
@@ -1452,7 +1673,7 @@ ALTER TABLE `mon_hoc_dot_dang_ky`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 DELIMITER $$
 --
@@ -1466,9 +1687,21 @@ CREATE DEFINER=`root`@`localhost` EVENT `ks_hoc_start_202002` ON SCHEDULE AT '20
                 SET trang_thai = "Đang mở"
                 WHERE ma_dot_dang_ky = '202002' AND ma_dot_yeu_cau = '202002'$$
 
-CREATE DEFINER=`root`@`localhost` EVENT `ks_hoc_end_202002` ON SCHEDULE AT '2023-01-30 10:10:00' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE dot_yeu_cau_dang_ky
+CREATE DEFINER=`root`@`localhost` EVENT `ks_hoc_end_202002` ON SCHEDULE AT '2023-01-30 10:10:00' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
+
+UPDATE dot_yeu_cau_dang_ky
                 SET trang_thai = "Đã đóng"
-                WHERE ma_dot_dang_ky = '202002' AND ma_dot_yeu_cau = '202002'$$
+                WHERE ma_dot_dang_ky = '202002' AND ma_dot_yeu_cau = '202002';
+
+DELETE FROM dang_ky_mon 
+WHERE id_dang_ky IN (
+	SELECT DISTINCT mhdk.id_dang_ky
+    FROM mon_hoc_dot_dang_ky mhdk
+    WHERE mhdk.so_luong_da_dang_ky > mhdk.so_luong
+    AND mhdk.ma_dot = '202002'
+);
+
+END$$
 
 CREATE DEFINER=`root`@`localhost` EVENT `dk_hoc_start_202002` ON SCHEDULE AT '2023-02-01 10:00:00' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE dot_dang_ky
             SET trang_thai = "Đang mở"

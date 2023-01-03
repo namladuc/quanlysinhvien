@@ -1,2 +1,71 @@
 {% extends "basesv.html" %}
 {% block title %} Cổng Thông Tin - {{truong[1]}} {% endblock title %}
+{% block content %}
+
+<main class="app-content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="app-title">
+                <ul class="app-breadcrumb breadcrumb">
+                    <li class="breadcrumb-item"><a href="#"><b>Trang chủ</b></a></li>
+                </ul>
+                <div id="clock"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="tile">
+                <h3 class="tile-title">Giới thiệu</h3>
+                <div class="tile-body">
+                    <div class="col-md-12 col-lg-12">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <img src="{{ url_for('static', filename=truong[3])}}" style="border-radius: 20%;"
+
+                                    width="30%">
+                                <br>
+                                <p></p>
+                                <br>
+                                <p><span style="font-weight: bold;"> Tên trường : </span> <span
+                                        style="font-style: italic;">{{truong[1]}}</span> </p>
+                                <br>
+                                <p><span style="font-weight: bold;"> Địa chỉ : </span> <span
+                                        style="font-style: italic;">{{truong[2]}}</span> </p>
+                                <br>
+                                <p><span style="font-weight: bold;"> Ngày thành lập : </span> <span
+                                        style="font-style: italic;">{{truong[4]}}</span> </p>
+                                <br>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <img src="{{ url_for('static', filename='web/img/Index_1.jpg')}}" width="85%">
+                            </div>
+                        </div>  
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        
+            
+
+</main>
+<script src="{{url_for('static', filename='doc/js/jquery-3.2.1.min.js')}}"></script>
+<!--===============================================================================================-->
+<script src="{{url_for('static', filename='doc/js/popper.min.js')}}"></script>
+<script src="https://unpkg.com/boxicons@latest/dist/boxicons.js"></script>
+<!--===============================================================================================-->
+<script src="{{url_for('static', filename='doc/js/bootstrap.min.js')}}"></script>
+<!--===============================================================================================-->
+<script src="{{url_for('static', filename='doc/js/main.js')}}"></script>
+<!--===============================================================================================-->
+<script src="{{url_for('static', filename='doc/js/plugins/pace.min.js')}}"></script>
+<!--===============================================================================================-->
+<script src="{{url_for('static', filename='doc/js/plugins/chart.js')}}"></script>
+<!--===============================================================================================-->
+
+{% endblock content %}

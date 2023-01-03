@@ -31,7 +31,7 @@ SAVE_FOLDER_EXCEL = 'static/web/excel'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'qlsv'
+app.config['MYSQL_DB'] = 'quan_ly_sinh_vien_nhom_1'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['UPLOAD_FOLDER_IMG'] = UPLOAD_FOLDER_IMG
 app.config['SAVE_FOLDER_PDF'] = SAVE_FOLDER_PDF
@@ -59,7 +59,12 @@ def login():
     if 'truong' not in session.keys():
         cur.execute("SELECT * FROM truong")
         truong = cur.fetchall()[0]
-        session['truong'] = truong
+        
+        lst_truong = list(truong)
+        
+        lst_truong[4] = lst_truong[4].strftime("%d - %m - %Y")
+        
+        session['truong'] = lst_truong
     
     if request.method == 'POST':
         details = request.form
@@ -159,6 +164,42 @@ def logout():
 @login_required
 @app.route("/home")
 def home():
+    if session['role_id'] == 1:
+        cur = mysql.connection.cursor()
+        cur.execute("""
+                    SELECT COUNT(*)
+                    FROM sinh_vien sv
+                    WHERE sv.is_delete = 0
+                    """)
+        num_sv = cur.fetchall()[0][0]
+        
+        cur.execute("""
+                    SELECT COUNT(*)
+                    FROM khoa k
+                    """)
+        num_khoa = cur.fetchall()[0][0]
+        
+        cur.execute("""
+                    SELECT COUNT(*)
+                    FROM nganh n
+                    WHERE n.is_delete = 0
+                    """)
+        num_nganh = cur.fetchall()[0][0]
+        
+        cur.execute("""
+                    SELECT COUNT(*)
+                    FROM lop l 
+                    WHERE l.is_delete = 0
+                    """)
+        num_lop = cur.fetchall()[0][0]
+        return render_template(session['role'] + 'index.html',
+                               num_sv = num_sv,
+                               num_khoa = num_khoa,
+                               num_nganh = num_nganh,
+                               num_lop = num_lop,
+                               my_user = session['username'],
+                                truong = session['truong'])
+        
     return render_template(session['role'] + 'index.html',
                     my_user = session['username'],
                     truong = session['truong'])
@@ -233,11 +274,11 @@ def view_khoa(ma_khoa):
 def form_add_khoa():
     if session['role_id'] != 1:
         return "Error"
-    
+     
     if request.method == 'POST':
         details = request.form
-        ma_khoa= details['ma_khoa']
-        ten_khoa = details['ten_khoa']
+        ma_khoa= details['ma_khoa'].strip().upper()
+        ten_khoa = details['ten_khoa'].strip()
         
         cur = mysql.connection.cursor()
         cur.execute("""
@@ -1135,7 +1176,7 @@ def delete_lop(ma_lop):
 @app.route("/bang_sinh_vien")
 def bang_sinh_vien():
     if session['role_id'] != 1:
-        return "Error"
+        abort(404)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -1973,8 +2014,6 @@ def table_kqht_sv():
                     ORDER BY GPA DESC
                     """, (session['username'][-1],))
         diem_sinh_vien = cur.fetchall()
-    
-    print(diem_sinh_vien)
     
     return render_template(session['role'] + 'ketquahoctap/table_kqht_sv.html',
                            diem_sinh_vien = diem_sinh_vien,
@@ -4765,7 +4804,12 @@ def form_view_truong(can_edit):
                     SELECT * 
                     FROM truong
                     """)
-        session['truong'] = cur.fetchall()[0]
+        truong = cur.fetchall()[0]
+        lst_truong = list(truong)
+        
+        lst_truong[4] = lst_truong[4].strftime("%d - %m - %Y")
+        
+        session['truong'] = lst_truong
         return redirect(url_for('cai_dat'))
         
     if can_edit == 'E':
@@ -4830,6 +4874,19 @@ def delete_account(id_user):
     return redirect(url_for('view_tk'))
 
 # -------------------------- Cai dat -------------------------
+
+# Error Handler
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('error.html',
+                           error = """Lỗi thao tác: với chương trình 
+                           Bạn đã làm không đúng với hướng dẫn sử dụng
+                           Hoặc bạn không có quyền truy cập vào trang này"""), 404
+@app.errorhandler(500)
+def no_role_access(error):
+    return render_template('error.html',
+                           error = error), 500
+
 def take_image_to_save(id_image, path_to_img):
     cur = mysql.connection.cursor()
     cur.execute("""SELECT * FROM image_data""")

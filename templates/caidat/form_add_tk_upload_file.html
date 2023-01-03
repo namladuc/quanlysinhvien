@@ -17,6 +17,16 @@
         <h3 class="tile-title">Thêm tài khoản - Upload file excel</h3>
         <div class="tile-body">
           <form class="row" method="post" action="/cai_dat/form_add_tk_upload_file" enctype="multipart/form-data">
+            <div class="form-group col-md-12">
+              <label class="control-label">Thêm dữ liệu tài khoản từ file nhận các định dạng file excel ('xlsx', 'csv', 'xls', 'xlsm')</label> <br>
+              Yêu cầu nội dung trong file: <br>
+              - File luôn có số lượng cột là: 4 <br>
+              - Bao gồm các cột sau: <br>
+              + Tài khoản: Mã sinh viên hoặc mã người quản lý, nếu mã sinh viên hoặc mã người quản lý không tồn tại sẽ dừng lại và báo lỗi <br>
+              + Tên người dùng: Chỉ hữu dụng với tên của người quản lý, tên của sinh viên sẽ được liên kết trong cơ sở dữ liệu sinh viên <br>
+              + Mật khẩu: mật khẩu của tài khoản tương ứng<br>
+              + Role id: Loại quyền (1, 2 hoặc 3) tương ứng 1: admin, 2: người quản lý, 3: sinh viên  <br>
+              </div>
             <div class="form-group col-md-4">
               <label class="control-label">Upload file</label>
               <input type="file" style="height:45px;" name="FileDataUpload" class="form-control" id="customFile" />
