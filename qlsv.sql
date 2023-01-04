@@ -279,13 +279,14 @@ CREATE TABLE `gia_dinh` (
 --
 
 INSERT INTO `gia_dinh` (`ma_sinh_vien`, `ten_cha`, `nam_sinh_cha`, `sdt_cha`, `nghe_cha`, `email_cha`, `dia_chi_cha`, `noi_cha`, `ten_me`, `nam_sinh_me`, `sdt_me`, `nghe_me`, `email_me`, `dia_chi_me`, `noi_me`, `ten_vo_chong`, `ngay_sinh_vo_chong`, `nghe_vo_chong`, `dia_chi_vo_chong`, `thong_tin_anh_chi_em`, `thong_tin_cac_con`) VALUES
-(12313, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
 (20002055, '', 1978, '', '', '', '', '', '', 1972, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
 (20002062, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
 (20002076, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
 (20002077, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
-(20002080, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', '');
-
+(20002080, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002075, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002064, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', ''),
+(20002099, '', 0000, '', '', '', '', '', '', 0000, '', '', '', '', '', '', '0000-00-00', '', '', '', '');
 -- --------------------------------------------------------
 
 --
@@ -1257,7 +1258,10 @@ INSERT INTO `sinh_vien` (`ma_sinh_vien`, `ho_ten`, `gioi_tinh`, `ngay_sinh`, `no
 (20002062, 'Phạm Như Khoa', 'Nam', '2002-11-08', 'Hoài Đức', 'phamnhuga@gmail.com', 'Kinh', 'Hoài Đức', '0937718364', 'Việt Nam', '001293748284', '2020-08-03', 'Hoài Đức', 'none_image_profile', 0, '2022-12-28 08:33:49', 'Administrator', '2022-12-28 08:33:49', NULL),
 (20002076, 'Dương Văn Nam', 'Nam', '2002-10-07', 'Bắc Giang', 'duongnam@gmail.com', 'Kinh', 'Bắc Giang', '0967739865', 'Việt Nam', '0028394187', '0000-00-00', '', 'Image_Profile_20002076', 0, '2022-12-27 16:47:00', 'Administrator', '2022-12-27 22:08:03', 'Administrator'),
 (20002077, 'Lã Đức Nam', 'Nam', '2002-11-28', NULL, 'namld@gmail.com', 'Kinh', NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2022-12-26 16:49:05', 'Administrator', NULL, NULL),
-(20002080, 'Phạm Hồng Nghĩa', 'Nam', '2002-10-07', 'Phú Thọ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2022-12-27 20:35:35', 'Administrator', '2022-12-27 20:35:35', NULL);
+(20002080, 'Phạm Hồng Nghĩa', 'Nam', '2002-10-07', 'Phú Thọ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2022-12-27 20:35:35', 'Administrator', '2022-12-27 20:35:35', NULL),
+(20002064, 'Đỗ Thanh Lâm', 'Nam', '0000-00-00', 'Xã Tân Minh, Huyện Sóc Sơn, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002075, 'Trần Diệu Minh', 'Nữ', '0000-00-00', 'Xã Nam Hồng, Huyện Nam Trực, Nam Định', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002099, 'Nguyễn Văn Tùng', 'Nam', '0000-00-00', 'Xã Tam Đa, Huyện Yên Phong, Bắc Ninh', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL);
 
 --
 -- Triggers `sinh_vien`
@@ -1287,8 +1291,10 @@ INSERT INTO `sinh_vien_lop` (`ma_sinh_vien`, `ma_lop`) VALUES
 (20002062, 'KHDL2020'),
 (20002076, 'KHDL2020'),
 (20002077, 'KHDL2020'),
-(20002080, 'KHDL2020');
-
+(20002080, 'KHDL2020'),
+(20002075, 'KHDL2020'),
+(20002064, 'KHDL2020'),
+(20002099, 'KHDL2020');
 -- --------------------------------------------------------
 
 --

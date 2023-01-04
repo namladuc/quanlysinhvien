@@ -132,7 +132,7 @@
                                     <div class="form-group">
                                         <label class="control-label">Họ và tên</label>
                                         <input type="text" class="form-control" value="{{sinh_vien[1]}}" id="empname" name="ho_ten"
-                                            {{mode}}>
+                                        disabled>
                                         <span id="available"></span>
                                     </div>
                                 </div>
@@ -149,7 +149,7 @@
                                     <div class="form-group">
                                         <label class="control-label">Ngày sinh (Định dạng: Tháng - Ngày - Năm)</label>
                                         <input type="date" class="form-control" value="{{sinh_vien[3]}}" name="ngay_sinh"
-                                            id="Date_Birth" {{mode}}>
+                                            id="Date_Birth" disabled>
                                         <span id="available"></span>
                                     </div>
                                 </div>
@@ -193,13 +193,8 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label class="control-label">Lớp - Ngành - Khoa</label>
-                                        <select class="form-control" id="department" name="ma_lop" {{mode}}>
+                                        <select class="form-control" id="department" name="ma_lop" disabled>
                                             <option> {{sinh_vien[-2]}} </option>
-                                            {% for data in cac_lop %}
-                  
-                                            <option>{{data[1]}} </option>
-                          
-                                            {% endfor %}
                                           </select>
                                     </div>
                                 </div>

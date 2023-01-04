@@ -1217,6 +1217,8 @@ def form_view_update_sinh_vien(ma_sinh_vien, can_edit):
     mode = "disabled"
     if (can_edit == "Y"):
         mode = ""
+        if session['role_id'] == 2:
+            mode = "disabled"
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -1252,8 +1254,8 @@ def form_view_update_sinh_vien(ma_sinh_vien, can_edit):
     if request.method == 'POST':
         details = request.form
         ma_sinh_vien = data_default[0]
-        ho_ten = details['ho_ten'].strip()
-        ngay_sinh = details['ngay_sinh'].strip()
+        ho_ten = data_default[1]
+        ngay_sinh = data_default[3]
         gioi_tinh = details['gioi_tinh'].strip()
         dan_toc = details['dan_toc'].strip()
         quoc_tich = details['quoc_tich'].strip()
@@ -1265,8 +1267,13 @@ def form_view_update_sinh_vien(ma_sinh_vien, can_edit):
         ngay_cmt = details['ngay_cmt'].strip()
         noi_cmt = details['noi_cmt'].strip()
         id_image = data_default[13]
+        ma_lop = data_default[-2]
         
-        ma_lop = details['ma_lop'].strip()
+        if session['role_id'] == 1:
+            ho_ten = details['ho_ten'].strip()
+            ma_lop = details['ma_lop'].strip()    
+            ngay_sinh = details['ngay_sinh'].strip()
+            
         image_profile = request.files['ImageProfileUpload']
         
         if image_profile.filename != '':
@@ -1276,7 +1283,6 @@ def form_view_update_sinh_vien(ma_sinh_vien, can_edit):
             pathToImage = app.config['UPLOAD_FOLDER_IMG'] + "/" + filename
             image_profile.save(pathToImage)
             take_image_to_save(ID_image, pathToImage)
-            
 
         if ma_lop != data_default[-2]:
             for elm in cac_lop:
@@ -2213,7 +2219,15 @@ def table_kqht(ma_sinh_vien):
     tk_diem_sinh_vien = cur.fetchall()
     
     if (len(tk_diem_sinh_vien) != 1):
-        return "Error"
+        return render_template(session['role'] + 'ketquahoctap/table_kqht.html',
+                           sinh_vien = sinh_vien,
+                           index_hk = (),
+                           tk_diem_sinh_vien = (),
+                           hk = (),
+                           index_diem_hk = (),
+                           data_diem_hk = (),
+                           my_user = session['username'],
+                           truong = session['truong'])
     
     tk_diem_sinh_vien = tk_diem_sinh_vien[0]
     
