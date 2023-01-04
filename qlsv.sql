@@ -104,8 +104,19 @@ INSERT INTO `diem` (`id_diem`, `ma_sinh_vien`, `ma_mon`, `ma_hoc_ky`, `he_so_1`,
 (27, 20002076, 'MAT3382', 'HK201', 0.2, 0.2, 0.6, 9, 9, 9, 9, 4, 'A+'),
 (28, 20002080, 'MAT3379', 'HK201', 0.2, 0.2, 0.6, 10, 9, 8.5, 8.9, 3.7, 'A'),
 (29, 20002080, 'MAT3382', 'HK201', 0.2, 0.2, 0.6, 8, 7, 9, 8.4, 3.5, 'B+'),
-(30, 20002076, 'MAT3379', 'HK201', 0.2, 0.2, 0.6, 9, 9, 9, 9, 4, 'A+');
-
+(30, 20002076, 'MAT3379', 'HK201', 0.2, 0.2, 0.6, 9, 9, 9, 9, 4, 'A+'),
+(31, 20002075, 'MAT3514', 'HK200', 0.2, 0.2, 0.6, 9, 9, 9, 9, 4, 'A+'),
+(32, 20002075, 'HIS1001', 'HK200', 0.2, 0.2, 0.6, 10, 9, 8.5, 8.9, 3.7, 'A'),
+(33, 20002075, 'MAT3379', 'HK201', 0.2, 0.2, 0.6, 10, 9, 8.5, 8.9, 3.7, 'A'),
+(34, 20002075, 'MAT3382', 'HK201', 0.2, 0.2, 0.6, 8, 7, 9, 8.4, 3.5, 'B+'),
+(35, 20002099, 'MAT3514', 'HK200', 0.2, 0.2, 0.6, 9, 9, 9, 9, 4, 'A+'),
+(36, 20002099, 'HIS1001', 'HK200', 0.2, 0.2, 0.6, 10, 9, 8.5, 8.9, 3.7, 'A'),
+(37, 20002099, 'MAT3379', 'HK201', 0.2, 0.2, 0.6, 10, 9, 8.5, 8.9, 3.7, 'A'),
+(38, 20002099, 'MAT3382', 'HK201', 0.2, 0.2, 0.6, 8, 7, 9, 8.4, 3.5, 'B+'),
+(39, 20002064, 'MAT3514', 'HK200', 0.2, 0.2, 0.6, 9, 9, 9, 9, 4, 'A+'),
+(40, 20002064, 'HIS1001', 'HK200', 0.2, 0.2, 0.6, 10, 9, 8.5, 8.9, 3.7, 'A'),
+(41, 20002064, 'MAT3379', 'HK201', 0.2, 0.2, 0.6, 10, 9, 8.5, 8.9, 3.7, 'A'),
+(42, 20002064, 'MAT3382', 'HK201', 0.2, 0.2, 0.6, 8, 7, 9, 8.4, 3.5, 'B+');
 --
 -- Triggers `diem`
 --
@@ -1259,9 +1270,9 @@ INSERT INTO `sinh_vien` (`ma_sinh_vien`, `ho_ten`, `gioi_tinh`, `ngay_sinh`, `no
 (20002076, 'Dương Văn Nam', 'Nam', '2002-10-07', 'Bắc Giang', 'duongnam@gmail.com', 'Kinh', 'Bắc Giang', '0967739865', 'Việt Nam', '0028394187', '0000-00-00', '', 'Image_Profile_20002076', 0, '2022-12-27 16:47:00', 'Administrator', '2022-12-27 22:08:03', 'Administrator'),
 (20002077, 'Lã Đức Nam', 'Nam', '2002-11-28', NULL, 'namld@gmail.com', 'Kinh', NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2022-12-26 16:49:05', 'Administrator', NULL, NULL),
 (20002080, 'Phạm Hồng Nghĩa', 'Nam', '2002-10-07', 'Phú Thọ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2022-12-27 20:35:35', 'Administrator', '2022-12-27 20:35:35', NULL),
-(20002064, 'Đỗ Thanh Lâm', 'Nam', '0000-00-00', 'Xã Tân Minh, Huyện Sóc Sơn, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
-(20002075, 'Trần Diệu Minh', 'Nữ', '0000-00-00', 'Xã Nam Hồng, Huyện Nam Trực, Nam Định', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
-(20002099, 'Nguyễn Văn Tùng', 'Nam', '0000-00-00', 'Xã Tam Đa, Huyện Yên Phong, Bắc Ninh', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL);
+(20002064, 'Đỗ Thanh Lâm', 'Nam', '2002-05-04', 'Xã Tân Minh, Huyện Sóc Sơn, Hà Nội', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002075, 'Trần Diệu Minh', 'Nữ', '2002-07-22', 'Xã Nam Hồng, Huyện Nam Trực, Nam Định', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL),
+(20002099, 'Nguyễn Văn Tùng', 'Nam', '2002-07-22', 'Xã Tam Đa, Huyện Yên Phong, Bắc Ninh', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'none_image_profile', 0, '2023-01-03 20:48:22', 'Administrator', '2023-01-03 20:48:22', NULL);
 
 --
 -- Triggers `sinh_vien`

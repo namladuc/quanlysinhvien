@@ -265,7 +265,7 @@ Nếu có đề xuất nào có thể cải thiện điều này, vui lòng rẽ
 
 Lã Đức Nam - [@laducnam](https://www.linkedin.com/in/l%C3%A3-%C4%91%E1%BB%A9c-nam-9b27b4219/) - ducnamla2@gmail.com
 
-Project Link: [https://github.com/assassinnyt2811/quanlynhansu](https://github.com/assassinnyt2811/quanlynhansu)
+Project Link: [https://github.com/assassinnyt2811/quanlysinhvien](https://github.com/assassinnyt2811/quanlysinhvien)
 
 <p align="right">(<a href="#readme-top">Trở lại đầu trang</a>)</p>
 
@@ -281,8 +281,8 @@ Project Link: [https://github.com/assassinnyt2811/quanlynhansu](https://github.c
 <p align="right">(<a href="#readme-top">Trở lại đầu trang</a>)</p>
 
 
-[stars-shield]: https://img.shields.io/github/stars/assassinnyt2811/quanlynhansu.svg?style=for-the-badge
-[stars-url]: https://github.com/assassinnyt2811/quanlynhansu/stargazers
+[stars-shield]: https://img.shields.io/github/stars/assassinnyt2811/quanlysinhvien.svg?style=for-the-badge
+[stars-url]: https://github.com/assassinnyt2811/quanlysinhvien/stargazers
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/l%C3%A3-%C4%91%E1%BB%A9c-nam-9b27b4219/
 [product-screenshot]: data_img/Product.png
