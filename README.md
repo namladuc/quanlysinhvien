@@ -215,29 +215,27 @@ Vào trang web tải Git chọn mục Downloads > Chọn Tải xuống Git phiê
 
 ## Cách sử dụng
 
-Cách sử dụng: <a href="" >Link PDF báo cáo</a>
+Cách sử dụng: <a href="https://drive.google.com/file/d/1si1qK1lBTvyVq8LbXgTp1axuBHxAzRdi/view?usp=sharing" >Link hướng dẫn sử dụng</a>
 
 <p align="right">(<a href="#readme-top">Trở lại đầu trang</a>)</p>
 
 
 ## Các hướng đi
 
-- [x] Cập nhật, thêm mới hồ sơ nhân sự (nhân viên mới, thay đổi chức vụ).
-- [x] Cập nhật, thêm mới các phòng ban hay chi nhánh.
-- [x] Chấm công (rõ ràng giờ làm cơ bản, đăng ký làm thêm giờ).
-- [x] Xuất bảng lương cá nhân cho mỗi nhân viên và bảng tổng hợp cho quản lý, kế toán.
-- [x] Xem chi tiết hồ sơ nhân viên với các tài khoản được cấp quyền.
-- [x] Tìm kiếm nhân viên theo một bộ lọc được thiết kế đơn giản.
-- [x] Tính lương, thưởng và chế độ cho nhân sự. 
-- [ ] Quản lý luân chuyển nhân viên.
-- [ ] Quản lý chế độ: Bảo hiểm y tế, bảo hiểm lao động, chế độ nghỉ phép, chế độ nghỉ thai sản, chế độ thưởng, kỷ luật.
-- [ ] Có trang giới thiệu cơ cấu nhân sự nội bộ.
-- [ ] Có thêm module về quản lý công việc
+- [x] Có giao diện thân thiện với người dùng, màu sắc bố cục các phím chức năng cũng như hiển thị thông tin rõ ràng dễ sử dụng.
+- [x] Đảm bảo tính năng cốt lõi cơ bản của hệ thống quản lý sinh viên bao gồm việc tổ chức lưu trữ thông tin hồ sơ sinh viên, tổ chức đăng ký học.
+- [x] Xây dựng được các tính năng giải quyết các vấn đề thực tế.
+- [x] Quản lý đăng nhập theo nhóm người dùng (cho phép cả sinh viên đăng nhập hệ thống để đăng ký học và xem kết quả học tập của mình).
+- [x] Cung cấp khả năng thống kê, báo cáo linh hoạt có tính chất tuỳ chọn theo những tiêu chí cụ thể.
+- [x] Bộ lọc tìm kiếm nhanh.
+- [x] Chức năng nhập và quản lý sinh viên được thực hiện logic đảm bảo cho dữ liệu được hợp lệ hoá và cập nhật chính xác (ràng buộc phụ thuộc từ trên cơ sở dữ liệu tới quá trình đồng bộ thông tin bằng mã lệnh (back-end).
+- [x] Xử lý được tác vụ nhập dữ liệu bằng file cụ thể là file excel.
+- [x] Hỗ trợ xuất thông tin với nhiều định dạng từ in trực tiếp tới việc xuất excel, xuất PDF.
 - [ ] Quản lý thông tin về tuyển dụng nhân sự bổ xung cho doanh nghiệp.
+- [ ] Vẽ dữ liệu điểm trung bình các kỳ học, vẽ sơ đồ bánh xe về khả năng của sinh viên với các nhóm kiến thức kĩ năng, 
+- [ ] Các dữ liệu về bài tập lớn hay dự án của sinh viên tham gia khi được thu thập và lưu trữ xử lý như vậy sẽ là tiền đề tốt trong việc trao đổi giữa doanh nghiệp và phía đơn vị đào tạo nơi sinh viên đang theo học, quản lý sinh viên toàn diện về kĩ năng, năng lực đáp ứng yêu cầu công việc thực tế.
 
 <p align="right">(<a href="#readme-top">Trở lại đầu trang</a>)</p>
-
-
 
 ## Nhóm
 

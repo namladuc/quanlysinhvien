@@ -215,7 +215,7 @@ def forgot():
 @app.route("/view_all_khoa")
 def view_all_khoa():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     
     cur = mysql.connection.cursor()
     
@@ -237,7 +237,7 @@ def view_all_khoa():
 @app.route("/view_all_khoa/view_khoa/<string:ma_khoa>")
 def view_khoa(ma_khoa):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     
     cur = mysql.connection.cursor()
     
@@ -251,7 +251,7 @@ def view_khoa(ma_khoa):
     khoa = cur.fetchall()
     
     if (len(khoa) == 0):
-        return "Error"
+        abort(500)
     
     khoa = khoa[0]
     
@@ -273,7 +273,7 @@ def view_khoa(ma_khoa):
 @app.route("/view_all_khoa/form_add_khoa", methods=['GET','POST'])
 def form_add_khoa():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
      
     if request.method == 'POST':
         details = request.form
@@ -306,7 +306,7 @@ def form_add_khoa():
 @app.route("/view_all_khoa/form_update_khoa/<string:ma_khoa>", methods=['GET','POST'])
 def form_update_khoa(ma_khoa):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     
     cur = mysql.connection.cursor()
     
@@ -318,7 +318,7 @@ def form_update_khoa(ma_khoa):
     khoa = cur.fetchall()
     
     if (len(khoa) != 1):
-        return "Error"
+        abort(500)
     
     khoa = khoa[0]
     
@@ -343,7 +343,7 @@ def form_update_khoa(ma_khoa):
 @app.route("/delete_khoa/<string:ma_khoa>")
 def delete_khoa(ma_khoa):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     
     cur = mysql.connection.cursor()
     
@@ -356,7 +356,7 @@ def delete_khoa(ma_khoa):
                 """, (ma_khoa, ))
     data = cur.fetchall()[0][0]
     if (data != 0):
-        return "Error"
+        abort(500)
     
     cur.execute("""
                 DELETE FROM khoa
@@ -374,7 +374,7 @@ def delete_khoa(ma_khoa):
 @app.route("/table_nganh")
 def table_nganh():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -447,7 +447,7 @@ def get_table_nganh_pdf():
 @app.route("/table_nganh/form_add_nganh_upload_file", methods=['GET','POST'])
 def form_add_nganh_upload_file():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
         if data_file.filename != '':
@@ -466,7 +466,7 @@ def form_add_nganh_upload_file():
 @app.route("/table_nganh/form_add_nganh_upload_process/<string:filename>", methods=['GET','POST'])
 def form_add_nganh_upload_process(filename):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
     
     default_tag_column = ['ma_nganh','ten_nganh','hinh_thuc_dao_tao','ma_khoa','ma_he']
@@ -477,7 +477,7 @@ def form_add_nganh_upload_process(filename):
     data_column = list(data_mon_hoc.columns)
     
     if (len(data_column) > len(default_tag_column)) or len(data_column) < 5:
-        return "Error"
+        abort(500)
         
     if request.method == 'POST':
         cur = mysql.connection.cursor()
@@ -486,10 +486,10 @@ def form_add_nganh_upload_process(filename):
         column_match = [default_name_column.index(elm) for elm in column_link]
         
         if (len(set(column_match)) != len(column_link)):
-            return "Error"
+            abort(500)
         
         if (len(column_match) != 5):
-            return "Error"
+            abort(500)
         
         # Kiểm tra xem mã ngành có tồn tại không
         tmp = tuple(set(data_mon_hoc[data_column[column_match.index(0)]]))
@@ -503,7 +503,7 @@ def form_add_nganh_upload_process(filename):
         for elm in data_tuple:
             data_tmp_take.append(elm[0])
         if (len(data_tmp_take) != 0):
-            return "Error"
+            abort(500)
         
         # Kiểm tra xem mã khoa có tồn tại không
         tmp = tuple(set(data_mon_hoc[data_column[column_match.index(3)]]))
@@ -517,7 +517,7 @@ def form_add_nganh_upload_process(filename):
         for elm in data_tuple:
             data_tmp_take.append(elm[0])
         if (len(data_tmp_take) != len(tmp)):
-            return "Error"
+            abort(500)
         
         # Kiểm tra xem mã hệ có tồn tại không
         tmp = tuple(set(data_mon_hoc[data_column[column_match.index(4)]]))
@@ -531,7 +531,7 @@ def form_add_nganh_upload_process(filename):
         for elm in data_tuple:
             data_tmp_take.append(elm[0])
         if (len(data_tmp_take) != len(tmp)):
-            return "Error"
+            abort(500)
         
         sql = "INSERT INTO `nganh` ("
         for index in column_match:
@@ -562,14 +562,14 @@ def form_add_nganh_upload_process(filename):
 @app.route("/table_nganh/view_nganh_lop/<string:ma_nganh>")
 def view_nganh_lop(ma_nganh):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("SELECT ma_nganh, ten_nganh FROM nganh WHERE ma_nganh = %s", (ma_nganh, ))
     nganh = cur.fetchall()
     
     if (len(nganh) != 1):
-        return "Error"
+        abort(500)
     
     nganh = nganh[0]
     
@@ -591,7 +591,7 @@ def view_nganh_lop(ma_nganh):
 @app.route("/table_nganh/form_add_nganh", methods=['GET','POST'])
 def form_add_nganh():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("SELECT * FROM khoa")
@@ -638,7 +638,7 @@ def form_add_nganh():
 @app.route("/table_nganh/form_update_nganh/<string:ma_nganh>", methods = ['GET','POST'])
 def form_update_nganh(ma_nganh):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -649,7 +649,7 @@ def form_update_nganh(ma_nganh):
     nganh = cur.fetchall()
     
     if (len(nganh) != 1):
-        return "Error"
+        abort(500)
     
     nganh = nganh[0]
     
@@ -682,7 +682,7 @@ def form_update_nganh(ma_nganh):
 @app.route("/table_nganh/view_nganh_he")
 def view_nganh_he():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("SELECT * FROM loai_he")
@@ -696,7 +696,7 @@ def view_nganh_he():
 @app.route("/table_nganh/form_add_he", methods=['GET','POST'])
 def form_add_he():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     if request.method == 'POST':
         details = request.form
         ma_he = details['ma_he'].strip()
@@ -725,14 +725,14 @@ def form_add_he():
 @app.route("/table_nganh/form_update_he/<string:ma_he>", methods=['GET','POST'])
 def form_update_he(ma_he):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("SELECT * FROM loai_he WHERE ma_he = %s", (ma_he, ))
     he = cur.fetchall()
     
     if (len(he) != 1):
-        return "Error"
+        abort(500)
     
     he = he[0]
     
@@ -758,12 +758,12 @@ def form_update_he(ma_he):
 @app.route("/delete_he/<string:ma_he>")
 def delete_he(ma_he):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("SELECT COUNT(*) FROM nganh WHERE ma_he = %s", (ma_he, ))
     if (cur.fetchall()[0][0] != 0):
-        return "Error"
+        abort(500)
     
     cur.execute("DELETE FROM loai_he WHERE ma_he = %s", (ma_he, ))
     mysql.connection.commit()
@@ -773,7 +773,7 @@ def delete_he(ma_he):
 @app.route("/delete_nganh/<string:ma_nganh>")
 def delete_nganh(ma_nganh):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -793,7 +793,7 @@ def delete_nganh(ma_nganh):
 @app.route("/table_lop")
 def table_lop():
     if session['role_id'] == 3:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -815,7 +815,7 @@ def table_lop():
 @app.route("/table_lop/form_add_lop", methods=['GET','POST'])
 def form_add_lop():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("SELECT * FROM nganh WHERE is_delete = 0")
@@ -866,14 +866,14 @@ def form_add_lop():
 @app.route("/table_lop/form_update_lop/<string:ma_lop>", methods=['GET','POST'])
 def form_update_lop(ma_lop):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("SELECT * FROM lop WHERE ma_lop = %s", (ma_lop, ))
     lop = cur.fetchall()
     
     if (len(lop) != 1):
-        return "Error"
+        abort(500)
     
     lop = lop[0]
     
@@ -908,7 +908,7 @@ def form_update_lop(ma_lop):
 @app.route("/table_lop/form_add_lop_upload_file", methods=['GET','POST'])
 def form_add_lop_upload_file():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
         if data_file.filename != '':
@@ -927,7 +927,7 @@ def form_add_lop_upload_file():
 @app.route("/table_lop/form_add_lop_upload_process/<string:filename>", methods=['GET','POST'])
 def form_add_lop_upload_process(filename):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
     
     default_tag_column = ['ma_lop','ma_nganh','nam','ten_lop','ma_nguoi_quan_ly']
@@ -938,7 +938,7 @@ def form_add_lop_upload_process(filename):
     data_column = list(data_mon_hoc.columns)
     
     if (len(data_column) > len(default_tag_column)) or len(data_column) < 3:
-        return "Error"
+        abort(500)
         
     if request.method == 'POST':
         cur = mysql.connection.cursor()
@@ -947,14 +947,14 @@ def form_add_lop_upload_process(filename):
         column_match = [default_name_column.index(elm) for elm in column_link]
         
         if (len(set(column_match)) != len(column_link)):
-            return "Error"
+            abort(500)
         
         if (len(column_match) != 5):
-            return "Error"
+            abort(500)
         
         if (len(tuple(set(data_mon_hoc[data_column[column_match.index(4)]]))) 
             != len(tuple(data_mon_hoc[data_column[column_match.index(4)]]))):
-            return "Error"
+            abort(500)
         
         # Kiểm tra xem mã nganh có tồn tại không
         tmp = tuple(set(data_mon_hoc[data_column[column_match.index(1)]]))
@@ -968,7 +968,7 @@ def form_add_lop_upload_process(filename):
         for elm in data_tuple:
             data_tmp_take.append(elm[0])
         if (len(data_tmp_take) != len(tmp)):
-            return "Error"
+            abort(500)
         
         # Kiểm tra xem mã lớp có tồn tại không
         tmp = tuple(set(data_mon_hoc[data_column[column_match.index(0)]]))
@@ -982,7 +982,7 @@ def form_add_lop_upload_process(filename):
         for elm in data_tuple:
             data_tmp_take.append(elm[0])
         if (len(data_tmp_take) != 0):
-            return "Error"
+            abort(500)
         
         sql = "INSERT INTO `lop` ("
         for index in column_match:
@@ -1059,7 +1059,7 @@ def get_table_lop_excel():
 @app.route("/table_lop/view_lop_sinh_vien/<string:ma_lop>")
 def view_lop_sinh_vien(ma_lop):
     if session['role_id'] == 3:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -1069,7 +1069,7 @@ def view_lop_sinh_vien(ma_lop):
                 WHERE ma_lop = %s AND l.is_delete = 0""", (ma_lop, ))
     lop = cur.fetchall()
     if (len(lop) != 1):
-        return "Error"
+        abort(500)
     lop = lop[0]
     
     cur.execute("""
@@ -1099,7 +1099,7 @@ def table_print_lop_sinh_vien(ma_lop):
                 WHERE ma_lop = %s AND l.is_delete = 0""", (ma_lop, ))
     lop = cur.fetchall()
     if (len(lop) != 1):
-        return "Error"
+        abort(500)
     lop = lop[0]
     
     cur.execute("""
@@ -1134,7 +1134,7 @@ def get_table_lop_sinh_vien_excel(ma_lop):
                 WHERE ma_lop = %s AND l.is_delete = 0""", (ma_lop, ))
     lop = cur.fetchall()
     if (len(lop) != 1):
-        return "Error"
+        abort(500)
     lop = lop[0]
     
     cur.execute("""
@@ -1156,7 +1156,7 @@ def get_table_lop_sinh_vien_excel(ma_lop):
 @app.route("/delete_lop/<string:ma_lop>")
 def delete_lop(ma_lop):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -1199,7 +1199,7 @@ def bang_sinh_vien():
 @app.route("/delete_sinh_vien/<string:ma_sinh_vien>")
 def delete_sinh_vien(ma_sinh_vien):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -1234,7 +1234,7 @@ def form_view_update_sinh_vien(ma_sinh_vien, can_edit):
     data_default = cur.fetchall()
     
     if (len(data_default) == 0):
-        return "Error"
+        abort(500)
     
     data_default = data_default[0]
     
@@ -1372,7 +1372,7 @@ def form_view_update_sinh_vien(ma_sinh_vien, can_edit):
 @app.route("/bang_sinh_vien/form_add_sinh_vien_upload_file", methods=['GET','POST'])
 def form_add_sinh_vien_upload_file():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
         if data_file.filename != '':
@@ -1391,7 +1391,7 @@ def form_add_sinh_vien_upload_file():
 @app.route("/bang_sinh_vien/form_add_sinh_vien_upload_process/<string:filename>", methods=['GET','POST'])
 def form_add_sinh_vien_upload_process(filename):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
     
     default_tag_column = ['ma_sinh_vien', 'ho_ten', 'gioi_tinh', 'ngay_sinh', 'noi_sinh',
@@ -1406,7 +1406,7 @@ def form_add_sinh_vien_upload_process(filename):
     data_column = list(data_mon_hoc.columns)
     
     if (len(data_column) > len(default_tag_column)) or len(data_column) < 6:
-        return "Error"
+        abort(500)
         
     if request.method == 'POST':
         cur = mysql.connection.cursor()
@@ -1415,12 +1415,26 @@ def form_add_sinh_vien_upload_process(filename):
         column_match = [default_name_column.index(elm) for elm in column_link]
         
         if (len(set(column_match)) != len(column_link)):
-            return "Error"
+            abort(500)
         
         if 0 not in column_match or 1 not in column_match or 2 not in column_match:
-            return "Error"
+            abort(500)
         if 3 not in column_match or 4 not in column_match or 13 not in column_match:
-            return "Error"
+            abort(500)
+        
+        # Kiểm tra xem mã sinh viên có tồn tại không
+        tmp = tuple(set(data_mon_hoc[data_column[column_match.index(0)]]))
+        if len(tmp) == 1:
+            cur.execute("SELECT ma_sinh_vien FROM sinh_vien WHERE ma_sinh_vien = %s", tmp)
+        else:
+            new_tmp = ["\"" + text +"\"" for text in tmp]
+            cur.execute("SELECT ma_sinh_vien FROM sinh_vien WHERE ma_sinh_vien IN (" + ", ".join(new_tmp) + ")")
+        data_tuple = cur.fetchall()
+        data_tmp_take = []
+        for elm in data_tuple:
+            data_tmp_take.append(elm[0])
+        if (len(data_tmp_take) != 0):
+            abort(500)
         
         # Kiểm tra xem mã lớp có tồn tại không
         tmp = tuple(set(data_mon_hoc[data_column[column_match.index(13)]]))
@@ -1434,7 +1448,7 @@ def form_add_sinh_vien_upload_process(filename):
         for elm in data_tuple:
             data_tmp_take.append(elm[0])
         if (len(data_tmp_take) != len(tmp)):
-            return "Error"
+            abort(500)
         
         # Tách cột mã lớp ra so với các cột còn lại để import vào bảng khác
         ma_mon_ma_nganh = data_mon_hoc[[data_column[column_match.index(0)], data_column[column_match.index(13)]]]
@@ -1507,7 +1521,7 @@ def get_table_sinh_vien_pdf():
 @app.route("/bang_sinh_vien/form_add_sinh_vien", methods=['GET','POST'])
 def form_add_sinh_vien():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -1607,7 +1621,7 @@ def form_infomation_one_sinh_vien(ma_sinh_vien):
     data_default = cur.fetchall()
     
     if (len(data_default) == 0):
-        return "Error"
+        abort(500)
     
     data_default = data_default[0]
     
@@ -1657,7 +1671,7 @@ def table_print_sinh_vien():
 @app.route("/table_mon_hoc")
 def table_mon_hoc():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -1675,7 +1689,7 @@ def table_mon_hoc():
 @app.route("/table_mon_hoc/form_add_mon_hoc", methods = ['GET','POST'])
 def form_add_mon_hoc():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""SELECT n.*, lh.ten_he
@@ -1726,7 +1740,7 @@ def form_add_mon_hoc():
 @app.route("/table_mon_hoc/form_update_mon_hoc/<string:ma_mon>", methods = ['GET','POST'])
 def form_update_mon_hoc(ma_mon):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""SELECT n.*, lh.ten_he
@@ -1753,7 +1767,7 @@ def form_update_mon_hoc(ma_mon):
     mon_hoc = cur.fetchall()
     
     if (len(mon_hoc) != 1):
-        return "Error"
+        abort(500)
     
     mon_hoc = mon_hoc[0]
     
@@ -1797,7 +1811,7 @@ def form_update_mon_hoc(ma_mon):
 @app.route("/table_mon_hoc/form_add_mon_hoc_upload_file", methods=['GET','POST'])
 def form_add_mon_hoc_upload_file():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
         if data_file.filename != '':
@@ -1815,7 +1829,7 @@ def form_add_mon_hoc_upload_file():
 @app.route("/table_mon_hoc/form_add_mon_hoc_upload_process/<string:filename>", methods=['GET','POST'])
 def form_add_mon_hoc_upload_process(filename):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
     
     default_tag_column = ['ma_mon', 'ten_mon', 'so_tin_chi', 'ma_nganh']
@@ -1826,7 +1840,7 @@ def form_add_mon_hoc_upload_process(filename):
     data_column = list(data_mon_hoc.columns)
     
     if (len(data_column) > len(default_tag_column)) or len(data_column) < 3:
-        return "Error"
+        abort(500)
         
     if request.method == 'POST':
         cur = mysql.connection.cursor()
@@ -1835,10 +1849,10 @@ def form_add_mon_hoc_upload_process(filename):
         column_match = [default_name_column.index(elm) for elm in column_link]
         
         if (len(set(column_match)) != len(column_link)):
-            return "Error"
+            abort(500)
         
         if (len(column_match) != 4):
-            return "Error"
+            abort(500)
         
         # Kiểm tra xem mã môn có tồn tại không
         tmp = tuple(set(data_mon_hoc[data_column[column_match.index(0)]]))
@@ -1852,7 +1866,7 @@ def form_add_mon_hoc_upload_process(filename):
         for elm in data_tuple:
             data_tmp_take.append(elm[0])
         if (len(data_tmp_take) != 0):
-            return "Error"
+            abort(500)
         
         # Tách cột mã nganh ra so với các cột còn lại để import vào bảng khác
         ma_mon_ma_nganh = data_mon_hoc[[data_column[column_match.index(0)], data_column[column_match.index(3)]]]
@@ -1892,7 +1906,7 @@ def form_add_mon_hoc_upload_process(filename):
         for elm in data_tuple:
             data_tmp_take.append(elm[0])
         if (len(data_tmp_take) != len(tmp)):
-            return "Error"
+            abort(500)
         
         
         sql = "INSERT INTO `mon_hoc_nganh` ( ma_mon, ma_nganh ) VALUES "
@@ -1959,7 +1973,7 @@ def get_table_mon_hoc_excel():
 @app.route("/delete_mon_hoc/<string:ma_mon>")
 def delete_mon_hoc(ma_mon):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -1977,7 +1991,7 @@ def delete_mon_hoc(ma_mon):
 @app.route("/table_kqht_sv")
 def table_kqht_sv():
     if session['role_id'] == 3:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     diem_sinh_vien = ()
@@ -2134,7 +2148,7 @@ def get_table_kqht_sv_excel():
         diem_sinh_vien = cur.fetchall()
         
     if (len(diem_sinh_vien) == 0):
-        return "Error"
+        abort(500)
     columnName = ['MSV','HoTen','NgaySinh','TenLop','TenNganh','TenKhoa','GPA']
     data = pd.DataFrame.from_records(diem_sinh_vien, columns=columnName)
     data = data.set_index('MSV')
@@ -2165,7 +2179,7 @@ def table_kqht(ma_sinh_vien):
     sinh_vien = cur.fetchall()
     
     if (len(sinh_vien) != 1):
-        return "Error"
+        abort(500)
     
     sinh_vien = sinh_vien[0]
     
@@ -2261,7 +2275,7 @@ def table_kqht_chi_tiet(ma_sinh_vien, id_diem):
     sinh_vien = cur.fetchall()
     
     if (len(sinh_vien) != 1):
-        return "Error"
+        abort(500)
     
     sinh_vien = sinh_vien[0]
     
@@ -2274,7 +2288,7 @@ def table_kqht_chi_tiet(ma_sinh_vien, id_diem):
                 """, (id_diem, ma_sinh_vien))
     diem_mon = cur.fetchall()
     if (len(diem_mon) != 1):
-        return "Error"
+        abort(500)
     diem_mon = diem_mon[0]
     
     return render_template(session['role'] + 'ketquahoctap/table_kqht_chi_tiet.html',
@@ -2299,7 +2313,7 @@ def table_print_kqht(ma_sinh_vien):
     sinh_vien = cur.fetchall()
     
     if (len(sinh_vien) != 1):
-        return "Error"
+        abort(500)
     
     sinh_vien = sinh_vien[0]
     
@@ -2353,7 +2367,7 @@ def table_print_kqht(ma_sinh_vien):
     tk_diem_sinh_vien = cur.fetchall()
     
     if (len(tk_diem_sinh_vien) != 1):
-        return "Error"
+        abort(500)
     
     tk_diem_sinh_vien = (tk_diem_sinh_vien[0][0],round(tk_diem_sinh_vien[0][1],2),tk_diem_sinh_vien[0][2])
     
@@ -2401,7 +2415,7 @@ def get_table_kqht_excel(ma_sinh_vien):
 @app.route("/delete_diem/<string:id_diem>")
 def delete_diem(id_diem):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""DELETE FROM diem
@@ -2413,7 +2427,7 @@ def delete_diem(id_diem):
 @app.route("/table_kqht_sv/form_add_kqht", methods = ['GET','POST'])
 def form_add_kqht():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -2502,7 +2516,7 @@ def form_add_kqht():
 @app.route("/table_kqht_sv/form_add_kqht_upload_file", methods = ['GET','POST'])
 def form_add_kqht_upload_file():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
         if data_file.filename != '':
@@ -2521,7 +2535,7 @@ def form_add_kqht_upload_file():
 @app.route("/table_kqht_sv/form_add_kqht_upload_process/<string:filename>", methods=['GET','POST'])
 def form_add_kqht_upload_process(filename):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
     
     default_tag_column = ['ma_sinh_vien', 'ma_mon', 'ma_hoc_ky', 'he_so_1', 'he_so_2',
@@ -2534,7 +2548,7 @@ def form_add_kqht_upload_process(filename):
     data_column = list(data_kqht.columns)
     
     if (len(data_column) > len(default_tag_column)) or len(data_column)  < 9:
-        return "Error"
+        abort(500)
     
     if request.method == 'POST':
         cur = mysql.connection.cursor()
@@ -2543,10 +2557,10 @@ def form_add_kqht_upload_process(filename):
         column_match = [default_name_column.index(elm) for elm in column_link]
         
         if (len(set(column_match)) != len(column_link)):
-            return "Error"
+            abort(500)
         
         if (len(column_match) != 9):
-            return "Error"
+            abort(500)
         
         # Kiểm tra xem mã sinh viên có tồn tại không
         tmp = tuple(set(data_kqht[data_column[column_match.index(0)]]))
@@ -2560,7 +2574,7 @@ def form_add_kqht_upload_process(filename):
         for elm in data_tuple:
             data_tmp_take.append(elm[0])
         if (len(data_tmp_take) != len(tmp)):
-            return "Error"
+            abort(500)
         
         # Kiểm tra xem mã môn có tồn tại không
         tmp = tuple(set(data_kqht[data_column[column_match.index(1)]]))
@@ -2574,7 +2588,7 @@ def form_add_kqht_upload_process(filename):
         for elm in data_tuple:
             data_tmp_take.append(elm[0])
         if (len(data_tmp_take) != len(tmp)):
-            return "Error"
+            abort(500)
         
         # Kiểm tra xem mã HK có tồn tại không
         tmp = tuple(set(data_kqht[data_column[column_match.index(2)]]))
@@ -2588,7 +2602,7 @@ def form_add_kqht_upload_process(filename):
         for elm in data_tuple:
             data_tmp_take.append(elm[0])
         if (len(data_tmp_take) != len(tmp)):
-            return "Error"
+            abort(500)
         
         
         # Kiểm tra các môn mà các sinh viên được học
@@ -2627,7 +2641,7 @@ def form_add_kqht_upload_process(filename):
             cur.execute(sql,val)
             diem_sv = cur.fetchall()
             if (len(diem_sv) >= 2):
-                return "Error"
+                abort(500)
             if (len(diem_sv) == 1):
                 sql = """
                     UPDATE diem
@@ -2679,7 +2693,7 @@ def form_add_kqht_upload_process(filename):
 @app.route("/table_kqht_sv/form_update_kqht/<string:id_diem>", methods = ['GET','POST'])
 def form_update_kqht(id_diem):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -2690,7 +2704,7 @@ def form_update_kqht(id_diem):
     diem = cur.fetchall()
     
     if (len(diem) != 1):
-        return "Error"
+        abort(500)
     
     diem = diem[0]
     
@@ -2749,7 +2763,7 @@ def form_update_kqht(id_diem):
 @app.route("/table_kqht_sv/table_hoc_ky")
 def table_hoc_ky():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""SELECT * 
@@ -2808,7 +2822,7 @@ def get_table_hoc_ky_pdf():
 @app.route("/table_kqht_sv/form_add_hoc_ky", methods = ['GET','POST'])
 def form_add_hoc_ky():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     if request.method == 'POST':
         details = request.form
         ma_hoc_ky = details['ma_hoc_ky'].strip()
@@ -2837,7 +2851,7 @@ def form_add_hoc_ky():
 @app.route("/table_kqht_sv/form_update_hoc_ky/<string:ma_hoc_ky>", methods = ['GET','POST'])
 def form_update_hoc_ky(ma_hoc_ky):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -2847,7 +2861,7 @@ def form_update_hoc_ky(ma_hoc_ky):
                 """, (ma_hoc_ky, ))
     hoc_ky = cur.fetchall()
     if (len(hoc_ky) != 1):
-        return "Error"
+        abort(500)
     
     hoc_ky = hoc_ky[0]
     
@@ -2873,7 +2887,7 @@ def form_update_hoc_ky(ma_hoc_ky):
 @app.route("/delete_hoc_ky/<string:ma_hoc_ky>")
 def delete_hoc_ky(ma_hoc_ky):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -2906,7 +2920,7 @@ def delete_hoc_ky(ma_hoc_ky):
 @app.route("/table_dang_ky_hoc", methods=['GET','POST'])
 def table_dang_ky_hoc():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     cur.execute("""
                 SELECT ddk.ma_dot, ddk.ma_hoc_ky, hk.ten_hoc_ky
@@ -2975,7 +2989,7 @@ def get_print_dang_ky_hoc(ma_dot):
     if (len(cac_ddk) != 0):
         ma_dot_dang_ky = str(cac_ddk[0][0]) + " _ " + str(cac_ddk[0][1]) + " _ " + str(cac_ddk[0][2])
     else:
-        return "Error"
+        abort(500)
     
     cur.execute("""
                 SELECT mhdk.id_dang_ky, mh.ten_mon, mh.so_tin_chi, mhdk.ma_so_lop, mhdk.so_luong, mhdk.so_luong_da_dang_ky, 
@@ -3028,7 +3042,7 @@ def get_table_dang_ky_hoc_excel(ma_dot):
     if (len(cac_ddk) != 0):
         ma_dot_dang_ky = str(cac_ddk[0][0]) + " _ " + str(cac_ddk[0][1]) + " _ " + str(cac_ddk[0][2])
     else:
-        return "Error"
+        abort(500)
     
     cur.execute("""
                 SELECT mh.ten_mon, mh.so_tin_chi, mhdk.ma_so_lop, mhdk.so_luong, mhdk.so_luong_da_dang_ky, 
@@ -3061,7 +3075,7 @@ def get_table_dang_ky_hoc_excel(ma_dot):
 @app.route("/table_dang_ky_hoc/form_add_dot_dk", methods = ['GET','POST'])
 def form_add_dot_dk():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     # DROP EVENT IF EXISTS `dk_hoc_end_202001`
     cur.execute("""
@@ -3317,7 +3331,7 @@ def form_add_dot_dk():
 @app.route("/table_dang_ky_hoc/table_dkh_sv/<string:id_dang_ky>")
 def table_dkh_sv(id_dang_ky):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -3331,7 +3345,7 @@ def table_dkh_sv(id_dang_ky):
                 """, (id_dang_ky, ))
     thong_tin = cur.fetchall()
     if (len(thong_tin) == 0):
-        return "Error"
+        abort(500)
     thong_tin = thong_tin[0]
 
     cur.execute("""
@@ -3367,7 +3381,7 @@ def get_print_table_dk_sv(id_dang_ky):
                 """, (id_dang_ky, ))
     thong_tin = cur.fetchall()
     if (len(thong_tin) == 0):
-        return "Error"
+        abort(500)
     thong_tin = thong_tin[0]
 
     cur.execute("""
@@ -3408,7 +3422,7 @@ def get_table_dkh_sv_excel(id_dang_ky, ma_lop):
                 """, (id_dang_ky, ))
     thong_tin = cur.fetchall()
     if (len(thong_tin) == 0):
-        return "Error"
+        abort(500)
     thong_tin = thong_tin[0]
     del ma_lop
     cur.execute("""
@@ -3432,7 +3446,7 @@ def get_table_dkh_sv_excel(id_dang_ky, ma_lop):
 @app.route("/huy_dang_ky_sv/<string:id_dang_ky>_<string:ma_sinh_vien>")
 def huy_dang_ky_sv(id_dang_ky, ma_sinh_vien):
     if (session['role_id'] != 1):
-        return "Error"
+        abort(500)
     
     cur = mysql.connection.cursor()
     cur.execute("""
@@ -3446,7 +3460,7 @@ def huy_dang_ky_sv(id_dang_ky, ma_sinh_vien):
 @app.route("/table_dang_ky_hoc/table_dkh_lop_hoc/<string:ma_dot>")
 def table_dkh_lop_hoc(ma_dot):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     cur.execute("""
                 SELECT ddk.ma_dot, ddk.ma_hoc_ky, hk.ten_hoc_ky
@@ -3456,7 +3470,7 @@ def table_dkh_lop_hoc(ma_dot):
                 """, (ma_dot, ))
     thong_tin_dot = cur.fetchall()
     if (len(thong_tin_dot) == 0):
-        return "Error"
+        abort(500)
     thong_tin_dot = thong_tin_dot[0]
     
     cur.execute("""
@@ -3491,7 +3505,7 @@ def table_dkh_lop_hoc(ma_dot):
 @app.route("/table_dang_ky_hoc/form_add_dkh_lop_hoc_upload_file/<string:ma_dot>", methods = ['GET','POST'])
 def form_add_dkh_lop_hoc_upload_file(ma_dot):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -3500,7 +3514,7 @@ def form_add_dkh_lop_hoc_upload_file(ma_dot):
                 WHERE ma_dot = %s
                 """, (ma_dot, ))
     if (len(cur.fetchall()) == 0):
-        return "Error"
+        abort(500)
     
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
@@ -3521,7 +3535,7 @@ def form_add_dkh_lop_hoc_upload_file(ma_dot):
 @app.route("/table_dang_ky_hoc/form_add_dkh_lop_hoc_upload_process/<string:filename>_<string:ma_dot>", methods = ['GET','POST'])
 def form_add_dkh_lop_hoc_upload_process(filename, ma_dot):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
     
     default_tag_column = ['ma_mon', 'ma_so_lop', 'thu', 'phong_hoc', 'th_lt',
@@ -3534,7 +3548,7 @@ def form_add_dkh_lop_hoc_upload_process(filename, ma_dot):
     data_column = list(data_lop_dk.columns)
     
     if (len(data_column) > len(default_tag_column)) or len(data_column)  < 8:
-        return "Error"
+        abort(500)
     
     if request.method == 'POST':
         cur = mysql.connection.cursor()
@@ -3543,10 +3557,10 @@ def form_add_dkh_lop_hoc_upload_process(filename, ma_dot):
         column_match = [default_name_column.index(elm) for elm in column_link]
         
         if (len(set(column_match)) != len(column_link)):
-            return "Error"
+            abort(500)
         
         if (len(column_match) != 8):
-            return "Error"
+            abort(500)
         
         cur.execute("""
                     SELECT ma_dot_yeu_cau
@@ -3572,7 +3586,7 @@ def form_add_dkh_lop_hoc_upload_process(filename, ma_dot):
             data_tmp_take.append(elm[0])
         
         if (len(data_tmp_take) != len(tmp)):
-            return "Error"
+            abort(500)
         
         data_lop_dk = data_lop_dk.fillna(' ')
         
@@ -3580,16 +3594,17 @@ def form_add_dkh_lop_hoc_upload_process(filename, ma_dot):
         # Nếu có đủ rồi thì drop
         # nếu là loại khác thì sẽ thêm vào 
         for index_row in range(data_lop_dk.shape[0]):
-            sql = "SELECT id_dang_ky FROM mon_hoc_dot_dang_ky WHERE ma_so_lop = %s AND th_lt = %s"
+            sql = "SELECT id_dang_ky FROM mon_hoc_dot_dang_ky WHERE ma_so_lop = %s AND th_lt = %s AND ma_dot = %s"
             val = (data_lop_dk[data_column[column_match.index(1)]][index_row],
-                   data_lop_dk[data_column[column_match.index(4)]][index_row])
+                   data_lop_dk[data_column[column_match.index(4)]][index_row],
+                   ma_dot)
             cur.execute(sql,val)
             ktra_lop = cur.fetchall()
             if (len(ktra_lop) != 0):
                 data_lop_dk = data_lop_dk.drop(index_row)
             else:
-                sql = "SELECT id_dang_ky FROM mon_hoc_dot_dang_ky WHERE ma_so_lop = %s"
-                val = (data_lop_dk[data_column[column_match.index(1)]][index_row], )
+                sql = "SELECT id_dang_ky FROM mon_hoc_dot_dang_ky WHERE ma_so_lop = %s AND ma_dot = %s"
+                val = (data_lop_dk[data_column[column_match.index(1)]][index_row], ma_dot)
                 cur.execute(sql,val)
                 id_dk = cur.fetchall()
                 if (len(id_dk) != 0):
@@ -3644,8 +3659,9 @@ def form_add_dkh_lop_hoc_upload_process(filename, ma_dot):
                         SELECT id_dang_ky
                         FROM mon_hoc_dot_dang_ky 
                         WHERE ma_so_lop = %s
+                        AND ma_dot = %s
                         LIMIT 1
-                        """, (elm, ))
+                        """, (elm, ma_dot))
             id_dk = cur.fetchall()[0][0]
             
             cur.execute("""
@@ -3668,7 +3684,7 @@ def form_add_dkh_lop_hoc_upload_process(filename, ma_dot):
 @app.route("/table_dang_ky_hoc/form_add_dkh_lop_hoc/<string:ma_dot>", methods=['GET','POST'])
 def form_add_dkh_lop_hoc(ma_dot):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     if request.method == 'POST':
         cur = mysql.connection.cursor()
         details = request.form
@@ -3775,7 +3791,7 @@ def form_add_dkh_lop_hoc(ma_dot):
 @app.route("/delete_lop_hoc/<ma_dot>_<id_dang_ky>")
 def delete_lop_hoc(ma_dot,id_dang_ky):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -3795,7 +3811,7 @@ def delete_lop_hoc(ma_dot,id_dang_ky):
 @app.route("/delete_dot_dang_ky/<string:ma_dot>")
 def delete_dot_dang_ky(ma_dot):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -3860,7 +3876,7 @@ def delete_dot_dang_ky(ma_dot):
 @app.route("/table_khao_sat", methods = ['GET','POST'])
 def table_khao_sat():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     cur.execute("""
                 SELECT dks.ma_dot_yeu_cau, ddk.ma_hoc_ky, hk.ten_hoc_ky, ddk.ma_dot
@@ -3919,7 +3935,7 @@ def table_khao_sat():
 @app.route("/table_khao_sat/table_khao_sat_sv/<string:id_dang_ky>")
 def table_khao_sat_sv(id_dang_ky):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -3933,7 +3949,7 @@ def table_khao_sat_sv(id_dang_ky):
                 """, (id_dang_ky, ))
     thong_tin = cur.fetchall()
     if (len(thong_tin) == 0):
-        return "Error"
+        abort(500)
     thong_tin = thong_tin[0]
 
     cur.execute("""
@@ -3959,7 +3975,7 @@ def table_khao_sat_sv(id_dang_ky):
 @app.route("/view_khao_sat", methods = ['GET','POST'])
 def view_khao_sat():
     if session['role_id'] == 1 or session['role_id'] == 2:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -4001,7 +4017,7 @@ def view_khao_sat():
                 """, (ma_dot, ))
     thong_tin_hk = cur.fetchall()
     if (len(thong_tin_hk) == 0):
-        return "Error"
+        abort(500)
     thong_tin_hk = thong_tin_hk[0]
     
     cur.execute("""
@@ -4038,7 +4054,7 @@ def view_khao_sat():
         cac_ma_dk = list(set(cac_ma_dk.split(",")))
         
         if (len(cac_ma_dk) == 0):
-            return "Error"
+            abort(500)
         
         cur.execute("SELECT id_dang_ky FROM dang_ky_mon WHERE ma_sinh_vien = %s", (ma_sinh_vien, ))
         check_exits = cur.fetchall()
@@ -4099,7 +4115,7 @@ def view_khao_sat():
 @app.route("/view_dang_ky_hoc", methods = ['GET','POST'])
 def view_dang_ky_hoc():
     if session['role_id'] == 1 or session['role_id'] == 2:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -4141,7 +4157,7 @@ def view_dang_ky_hoc():
                 """, (ma_dot, ))
     thong_tin_hk = cur.fetchall()
     if (len(thong_tin_hk) == 0):
-        return "Error"
+        abort(500)
     thong_tin_hk = thong_tin_hk[0]
     
     cur.execute("""
@@ -4178,7 +4194,7 @@ def view_dang_ky_hoc():
         cac_ma_dk = list(set(cac_ma_dk.split(",")))
         
         if (len(cac_ma_dk) == 0):
-            return "Error"
+            abort(500)
         
         cur.execute("SELECT id_dang_ky FROM dang_ky_mon WHERE ma_sinh_vien = %s", (ma_sinh_vien, ))
         check_exits = cur.fetchall()
@@ -4246,7 +4262,7 @@ def form_print_dkh(ma_dot,ma_sinh_vien):
                 WHERE ma_dot = %s
                 """, (ma_dot, ))
     if (len(cur.fetchall()) == 0):
-        return "Error"
+        abort(500)
 
     ma_sinh_vien = str(session['username'][1])
     
@@ -4276,7 +4292,7 @@ def form_print_dkh(ma_dot,ma_sinh_vien):
                 """, (ma_dot, ))
     thong_tin_hk = cur.fetchall()
     if (len(thong_tin_hk) == 0):
-        return "Error"
+        abort(500)
     thong_tin_hk = thong_tin_hk[0]
     
     # lay thong tin sinh vien
@@ -4293,7 +4309,7 @@ def form_print_dkh(ma_dot,ma_sinh_vien):
                 """)
     sinh_vien = cur.fetchall()
     if (len(sinh_vien) == 0):
-        return "Error"
+        abort(500)
     sinh_vien = sinh_vien[0]
     
     # ngay thang
@@ -4385,7 +4401,7 @@ def huy_dang_ky_mon(id_dang_ky):
                 """, (ma_dot, id_dang_ky, ma_sinh_vien))
     id_tmp = cur.fetchall()
     if (len(id_tmp) == 0):
-        return "Error"
+        abort(500)
     
     cur.execute("""
                 DELETE FROM dang_ky_mon
@@ -4419,7 +4435,7 @@ def cai_dat():
 @app.route("/cai_dat/view_tk")
 def view_tk():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -4448,7 +4464,7 @@ def view_tk():
 @app.route("/cai_dat/form_add_tk", methods = ['GET','POST'])
 def form_add_tk():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -4503,7 +4519,7 @@ def form_add_tk():
 @app.route("/cai_dat/form_add_tk_qt", methods=['GET','POST'])
 def form_add_tk_qt():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     cac_quyen = {
         'Admin':1,
@@ -4606,7 +4622,7 @@ def form_chinh_sua_mk(id_user):
 @app.route("/cai_dat/form_add_tk_upload_file", methods=['GET','POST'])
 def form_add_tk_upload_file():
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     if request.method == 'POST':
         data_file = request.files['FileDataUpload']
         if data_file.filename != '':
@@ -4625,7 +4641,7 @@ def form_add_tk_upload_file():
 @app.route("/cai_dat/form_add_tk_upload_process/<string:filename>", methods=['GET','POST'])
 def form_add_tk_upload_process(filename):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     pathToFile = app.config['UPLOAD_FOLDER'] + "/" + filename
     
     default_tag_column = ['username', 'ten_nguoi_dung', 'password', 'role_id']
@@ -4636,7 +4652,7 @@ def form_add_tk_upload_process(filename):
     data_column = list(data_acc.columns)
     
     if (len(data_column) > len(default_tag_column)) or len(data_column)  < 4:
-        return "Error"
+        abort(500)
     
     if request.method == 'POST':
         cur = mysql.connection.cursor()
@@ -4645,10 +4661,10 @@ def form_add_tk_upload_process(filename):
         column_match = [default_name_column.index(elm) for elm in column_link]
         
         if (len(set(column_match)) != len(column_link)):
-            return "Error"
+            abort(500)
         
         if (len(column_match) != 4):
-            return "Error"
+            abort(500)
         
         # lọc các mã quản lý để xử lý
         data_acc = data_acc.fillna(" ")
@@ -4676,13 +4692,13 @@ def form_add_tk_upload_process(filename):
         for elm in data_tuple:
             data_tmp_take.append(elm[0])
         if (len(data_tmp_take) != 0):
-            return "Error"
+            abort(500)
         
         # kiểm tra mã quyền có trong khoảng quy định ko 1 - 3
         tmp = tuple(set(data_mng[data_column[column_match.index(3)]]))
         tmp = [int(elm) for elm in tmp]
         if max(tmp) > 3 or min(tmp) < 0:
-            return "Error 1"
+            abort(500)
         
         # xử lý dữ liệu người quản lý
         # tách cột để cho vào bảng user
@@ -4737,7 +4753,7 @@ def form_add_tk_upload_process(filename):
         for elm in data_tuple:
             data_tmp_take.append(elm[0])
         if (len(data_tmp_take) != len(tmp)):
-            return "Error 1"
+            abort(500)
         
         # Xử lý dữ liệu cho sinh viên
         for index_row in range(data_acc.shape[0]):
@@ -4781,7 +4797,7 @@ def form_add_tk_upload_process(filename):
 @app.route("/cai_dat/form_view_truong/<string:can_edit>", methods=['GET','POST'])
 def form_view_truong(can_edit):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     cur = mysql.connection.cursor()
     
     cur.execute("""
@@ -4870,7 +4886,7 @@ def form_chinh_sua_mk_one():
 @app.route("/delete_account/<string:id_user>")
 def delete_account(id_user):
     if session['role_id'] != 1:
-        return "Error"
+        abort(500)
     
     cur = mysql.connection.cursor()
     
@@ -4893,13 +4909,14 @@ def delete_account(id_user):
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('error.html',
-                           error = """Lỗi thao tác: với chương trình 
-                           Bạn đã làm không đúng với hướng dẫn sử dụng
-                           Hoặc bạn không có quyền truy cập vào trang này"""), 404
+                           error = error), 404
+    
 @app.errorhandler(500)
 def no_role_access(error):
     return render_template('error.html',
-                           error = error), 500
+                           error = """Lỗi thao tác: với chương trình 
+                           Bạn đã làm không đúng với hướng dẫn sử dụng
+                           Hoặc bạn không có quyền truy cập vào trang này"""), 500
 
 def take_image_to_save(id_image, path_to_img):
     cur = mysql.connection.cursor()
