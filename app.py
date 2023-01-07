@@ -2933,22 +2933,63 @@ def table_dang_ky_hoc():
     if (len(cac_ddk) != 0):
         ma_dot = str(cac_ddk[0][0]) + " _ " + str(cac_ddk[0][1]) + " _ " + str(cac_ddk[0][2])
         ma_dot_dang_ky = str(cac_ddk[0][0])
+        
+        cur.execute("""
+                    SELECT ma_dot, ma_hoc_ky, DATE_FORMAT(ngay_bat_dau,"%d-%m-%Y %H:%i:%S"),
+                    DATE_FORMAT(ngay_ket_thuc,"%d-%m-%Y %H:%i:%S"), trang_thai FROM dot_dang_ky
+                    WHERE ma_dot = '""" + str(cac_ddk[0][0]) + """' AND ma_hoc_ky= '""" + str(cac_ddk[0][1]) + """'
+                    """)
+        tt_dot = cur.fetchall()[0]
+        
+        cur.execute("""
+                    SELECT ma_dot_yeu_cau, ma_dot_dang_ky, ma_hoc_ky,
+                    DATE_FORMAT(ngay_bat_dau,"%d-%m-%Y %H:%i:%S"),
+                    DATE_FORMAT(ngay_ket_thuc,"%d-%m-%Y %H:%i:%S"),
+                    trang_thai
+                    FROM dot_yeu_cau_dang_ky
+                    WHERE ma_dot_dang_ky = '""" + str(cac_ddk[0][0]) + """'
+                    """)
+        tt_dotks = cur.fetchall()
+        if (len(tt_dotks) != 0):
+            tt_dotks = tt_dotks[0]
     else:
         ma_dot = ''
         ma_dot_dang_ky = ''
+        tt_dot = ''
         
     if request.method == 'POST':
         details = request.form
         ma_dot = details['ma_dot_dang_ky'].strip()
         ma_dot_dang_ky = details['ma_dot_dang_ky'].split("_")[0].strip()
-    
+        tmp = details['ma_dot_dang_ky'].split("_")
+        cur.execute("""
+                    SELECT ma_dot, ma_hoc_ky, DATE_FORMAT(ngay_bat_dau,"%d-%m-%Y %H:%i:%S"),
+                    DATE_FORMAT(ngay_ket_thuc,"%d-%m-%Y %H:%i:%S"), trang_thai FROM dot_dang_ky
+                    WHERE ma_dot = '""" + str(tmp[0].strip()) + """' AND ma_hoc_ky= '""" + str(tmp[1].strip()) + """'
+                    """)
+        tt_dot = cur.fetchall()
+        if (len(tt_dot) != 0):
+            tt_dot = tt_dot[0]
+            
+        cur.execute("""
+                SELECT ma_dot_yeu_cau, ma_dot_dang_ky, ma_hoc_ky,
+                DATE_FORMAT(ngay_bat_dau,"%d-%m-%Y %H:%i:%S"),
+                DATE_FORMAT(ngay_ket_thuc,"%d-%m-%Y %H:%i:%S"),
+                trang_thai
+                FROM dot_yeu_cau_dang_ky
+                WHERE ma_dot_dang_ky = '""" + str(tmp[0].strip()) + """'
+                """)
+        tt_dotks = cur.fetchall()
+        if (len(tt_dotks) != 0):
+            tt_dotks = tt_dotks[0]
+
     cur.execute("""
                 SELECT mhdk.id_dang_ky, mh.ten_mon, mh.so_tin_chi, mhdk.ma_so_lop, mhdk.so_luong, mhdk.so_luong_da_dang_ky, 
                 CONCAT("T",mhdk.thu,"(",mhdk.tiet_bat_dau,"-",mhdk.tiet_ket_thuc,")",mhdk.phong_hoc)
                 FROM mon_hoc_dot_dang_ky mhdk
                 JOIN mon_hoc mh ON mh.ma_mon = mhdk.ma_mon
                 WHERE mhdk.ma_dot = %s
-                """, (ma_dot, ))
+                """, (ma_dot_dang_ky, ))
     cac_lop = cur.fetchall()
     column_name = ['id_dang_ky', 'ten_mon','so_tin_chi', 'ma_so_lop',
                     'so_luong', 'so_luong_da_dang_ky', 'lich_hoc']
@@ -2969,6 +3010,8 @@ def table_dang_ky_hoc():
     return render_template(session['role'] + 'dangkyhoc/table_dang_ky_hoc.html',
                            ma_dot_dang_ky = ma_dot_dang_ky,
                            ma_dot = ma_dot,
+                           tt_dot = tt_dot,
+                           tt_dotks = tt_dotks,
                            cac_lop = data,
                            cac_ddk = cac_ddk,
                            my_user = session['username'],

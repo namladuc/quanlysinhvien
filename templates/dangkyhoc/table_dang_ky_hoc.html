@@ -61,8 +61,40 @@
             </div>
             <div class="form-group col-md-5">
             </div>
-
           </form>
+          <div class="form-group col-md-12">
+            {% if tt_dot %}
+            <p>
+              Mã đợt: <b>{{tt_dot[0]}}</b>
+              Mã học kỳ: <b>{{tt_dot[1]}}</b>
+              Ngày bắt đầu: <b>{{tt_dot[2]}}</b>
+              Ngày kết thúc: <b>{{tt_dot[3]}}</b>
+              Trạng thái: <b>
+              {% if tt_dot[4] == "Đang đóng" or tt_dot[4] == "Đã đóng"%}
+              <span style="color: red;"> {{tt_dot[4]}}</span>
+              {% else %}
+              <span style="color: green;"> {{tt_dot[4]}}</span>
+              {% endif %} </b>
+            </p>
+          {% endif %}
+          </div>
+          {% if tt_dotks != () %}
+          <div class="form-group col-md-12">
+          <p>
+            Mã đợt khảo sát: <b>{{tt_dotks[0]}}</b>
+            Mã đợt đăng ký: <b>{{tt_dotks[1]}}</b>
+            Mã học kỳ: <b>{{tt_dotks[2]}}</b>
+            Ngày bắt đầu: <b>{{tt_dotks[3]}}</b>
+            Ngày kết thúc: <b>{{tt_dotks[4]}}</b>
+            Trạng thái: <b>
+            {% if tt_dotks[5] == "Đang đóng" or tt_dotks[5] == "Đã đóng"%}
+            <span style="color: red;"> {{tt_dotks[5]}}</span>
+            {% else %}
+            <span style="color: green;"> {{tt_dotks[5]}}</span>
+            {% endif %} </b>
+          </p>
+        </div>
+          {% endif %}
           <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0" border="0"
             id="sampleTable">
             <thead>
