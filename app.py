@@ -1427,7 +1427,7 @@ def form_add_sinh_vien_upload_process(filename):
         if len(tmp) == 1:
             cur.execute("SELECT ma_sinh_vien FROM sinh_vien WHERE ma_sinh_vien = %s", tmp)
         else:
-            new_tmp = ["\"" + text +"\"" for text in tmp]
+            new_tmp = ["\"" + str(text) +"\"" for text in tmp]
             cur.execute("SELECT ma_sinh_vien FROM sinh_vien WHERE ma_sinh_vien IN (" + ", ".join(new_tmp) + ")")
         data_tuple = cur.fetchall()
         data_tmp_take = []
